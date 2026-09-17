@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import Icon from "./Icon.jsx";
 import { DEMO_DATE, courses, weeklyClasses } from "../data/demo.js";
 import {
+  addDays,
   eventsOnDate,
   formatDate,
   minutes,
   overlaps,
   planStudySessions,
+  weekStart,
   weekdayLabel,
 } from "../lib/planner.js";
 
 const periodOptions = [
-  { id: "morning", label: "上午", time: "08:00–12:00" },
-  { id: "afternoon", label: "下午", time: "13:00–18:00" },
-  { id: "evening", label: "晚上", time: "18:00–22:00" },
+  { id: "morning", label: "上午", start: "08:00", end: "12:00" },
+  { id: "afternoon", label: "下午", start: "13:00", end: "18:00" },
+  { id: "evening", label: "晚上", start: "18:00", end: "22:00" },
 ];
 
 export default function StudyPlanner({
@@ -45,6 +47,16 @@ export default function StudyPlanner({
     weeklyClasses,
     personalEvents,
   ).filter((item) => item.kind !== "study");
+  const firstDay = weekStart(DEMO_DATE);
+  const weekDates = Array.from({ length: 7 }, (_, index) =>
+    addDays(firstDay, index),
+  );
+  const weekEvents = Object.fromEntries(
+    weekDates.map((date) => [
+      date,
+      eventsOnDate(date, weeklyClasses, personalEvents),
+    ]),
+  );
 
   function togglePeriod(period) {
     setAllowedPeriods((current) =>
@@ -211,7 +223,10 @@ export default function StudyPlanner({
                       onChange={() => togglePeriod(period.id)}
                     />
                     <span>
-                      {period.label} <small>({period.time})</small>
+                      {period.label}{" "}
+                      <small>
+                        ({period.start}–{period.end})
+                      </small>
                     </span>
                   </label>
                 ))}
@@ -223,9 +238,66 @@ export default function StudyPlanner({
           </section>
           <section className="panel availability-panel">
             <div className="panel-heading">
-              <h2>{formatDate(DEMO_DATE)}時間預覽</h2>
-              <span className="subtle">課程與個人行程</span>
+              <h2>本週時間預覽</h2>
+              <span className="subtle">
+                {formatDate(firstDay)}–{formatDate(weekDates[6])}
+              </span>
             </div>
+            <div className="availability-week" aria-label="本週課程與個人行程">
+              <div className="availability-week-corner">時段</div>
+              {weekDates.map((date) => (
+                <div
+                  className={`availability-week-day${date === DEMO_DATE ? " is-today" : ""}${date < DEMO_DATE ? " is-past" : ""}`}
+                  key={date}
+                >
+                  <strong>{weekdayLabel(date)}</strong>
+                  <small>{date.slice(5).replace("-", "/")}</small>
+                </div>
+              ))}
+              {periodOptions.map((period) => (
+                <React.Fragment key={period.id}>
+                  <div className="availability-week-period">
+                    <strong>{period.label}</strong>
+                    <small>{period.start}</small>
+                  </div>
+                  {weekDates.map((date) => {
+                    const occupied = weekEvents[date].filter((item) =>
+                      overlaps(
+                        { date, start: period.start, end: period.end },
+                        item,
+                      ),
+                    );
+                    return (
+                      <div
+                        className={`availability-slot${date < DEMO_DATE ? " is-past" : ""}`}
+                        key={`${period.id}-${date}`}
+                        aria-label={`${formatDate(date)}${period.label}：${occupied.length ? occupied.map((item) => `${item.title} ${item.start} 至 ${item.end}`).join("、") : date < DEMO_DATE ? "已過" : "無固定行程"}`}
+                      >
+                        {occupied.length ? (
+                          occupied.map((item) => (
+                            <span
+                              className={`availability-event tone-${item.tone || "blue"}`}
+                              key={item.id}
+                              title={`${item.title} ${item.start}–${item.end}`}
+                            >
+                              <strong>{item.title}</strong>
+                              <small>{item.start}</small>
+                            </span>
+                          ))
+                        ) : (
+                          <span className="availability-free">
+                            {date < DEMO_DATE ? "已過" : "無固定行程"}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+            <p className="availability-mobile-caption">
+              {formatDate(DEMO_DATE)}課程與行程
+            </p>
             <div className="availability-list">
               {upcomingClasses.map((item) => (
                 <div key={item.id}>
@@ -241,7 +313,7 @@ export default function StudyPlanner({
               ))}
             </div>
             <p className="helper-text">
-              規劃時會避開課程、個人行程和已安排的複習時段。
+              產生計畫會避開課程與個人行程；手動調整時也會檢查其他複習時段。
             </p>
           </section>
         </div>
