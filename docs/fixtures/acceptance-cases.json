@@ -1,0 +1,74 @@
+{
+  "scenario": "學生在 2030-06-17 11:00 找一面候選羽球場",
+  "cases": [
+    {
+      "case_id": "recommendation_success",
+      "fixture_mode": "success",
+      "request": {
+        "date": "2030-06-17",
+        "start_time": "11:00",
+        "duration_minutes": 60,
+        "party_size": 2
+      },
+      "expected": {
+        "http_status": 200,
+        "stop_layer": "response_contract",
+        "body_subset": {
+          "status": "recommended",
+          "candidate": {
+            "court_id": "court-b"
+          },
+          "evidence": {
+            "fixture_id": "today-info-2030-06-17",
+            "slot_id": "court-b-1100"
+          }
+        }
+      }
+    },
+    {
+      "case_id": "invalid_duration",
+      "fixture_mode": "success",
+      "request": {
+        "date": "2030-06-17",
+        "start_time": "11:00",
+        "duration_minutes": 0,
+        "party_size": 2
+      },
+      "expected": {
+        "http_status": 422,
+        "stop_layer": "request_validation",
+        "body_subset": {
+          "error": {
+            "code": "INVALID_REQUEST",
+            "field": "duration_minutes"
+          }
+        },
+        "must_not_call": [
+          "today_info_adapter",
+          "candidate_filter",
+          "candidate_selection"
+        ]
+      }
+    },
+    {
+      "case_id": "today_info_timeout",
+      "fixture_mode": "upstream_timeout",
+      "request": {
+        "date": "2030-06-17",
+        "start_time": "11:00",
+        "duration_minutes": 60,
+        "party_size": 2
+      },
+      "expected": {
+        "http_status": 502,
+        "stop_layer": "today_info_adapter",
+        "body_subset": {
+          "error": {
+            "code": "TODAY_INFO_UNAVAILABLE"
+          }
+        },
+        "must_not_call": ["candidate_filter", "candidate_selection"]
+      }
+    }
+  ]
+}
