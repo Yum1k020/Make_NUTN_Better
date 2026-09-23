@@ -56,7 +56,13 @@
 - **When：** 使用者查看畢業進度。
 - **Then：** 系統顯示尚缺 28 學分、該門必修名稱及 2 場講座。
 
-## 課堂 Baseline 文件
+## 後端 API
+
+已提供學生安排系統的待辦事項 API（新增、查詢、修改、刪除），以 SQLite 保存資料。
+安裝、啟動、互動式 API 文件及測試方式見 [後端說明](backend/README.md)。
+目前為本機單人版本，尚未串接前端或登入功能。
+
+## 課堂 Baseline 範例文件
 
 - [羽球場推薦 Baseline Declaration 初稿](docs/baseline-declaration.md)：定義 2030-06-17 合成 `today-info`、request／response 協定、`200`／`422`／`502` 驗收案例及 11:00 已知失敗。
 
