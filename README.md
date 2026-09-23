@@ -1,90 +1,53 @@
-# Make_NUTN_Better
+from datetime import datetime, time, timedelta
+from typing import List
 
-組員：蔣仲鋰、張華庭、陳苾妏、呂安婷
-
-透過 AI Agent 改善大學生的校園生活。本專案最終選定「學生個人安排系統」，整合課表、待辦事項、私人行程、學習規劃與畢業進度，協助學生安排時間並掌握修課需求。
-
-## 學生個人安排系統
-
-將先前提案中的「課表與學習規劃」及「學分與畢業進度追蹤」整合為同一個系統，同時處理學生的日常安排與長期修課規劃。
-
-- **Problem：** 學生的課表、作業、考試與私人行程分散在不同地方，難以統一安排時間；規劃選課時，也需要自行比對學分與畢業條件，容易遺漏待辦事項、延誤複習或漏修必要課程。
-- **Target user：** 需要整合日常行程、學習規劃與畢業進度的大學生。
-- **User Story：** 身為大學生，我希望在同一個系統查看課表、管理待辦與行程，依空閒時間安排複習，並追蹤已取得的學分、尚缺的必修課與講座，以便兼顧日常生活與課業，並如期畢業。
-
-### 核心功能
-
-| 功能 | 說明 |
-| --- | --- |
-| 課表整合 | 統一顯示課程名稱、上課時間與地點。 |
-| 待辦與行程管理 | 管理作業期限、考試日期、私人行程與完成狀態。 |
-| 學習規劃 | 依照可用時間、考試日期及所需複習時數安排讀書進度。 |
-| 衝突提醒 | 提醒使用者行程重疊或可用複習時間不足。 |
-| 畢業進度追蹤 | 比對修課紀錄與適用的畢業規則，顯示已取得學分及尚缺的必修課、講座等條件。 |
-
-### AI Agent 的用途
-
-1. **資料擷取與整理：** 從指定且可存取的資料來源，或使用者提供的資料，擷取課表、作業、考試與修課資訊，轉換為統一格式；初期以固定格式測試資料驗證。
-2. **學習安排：** 根據既有課表、私人行程、考試日期與使用者設定的複習時數，產生可檢視及調整的複習計畫。
-3. **進度說明：** 將學分與畢業條件的比對結果整理成清楚的缺項清單，協助使用者規劃後續修課。
-
-學分計算與畢業條件比對依明確規則執行；AI Agent 負責資料整理、安排與說明。
-
-## Acceptance Criteria（驗收條件）
-
-### 1. 資料擷取與課表整合
-
-- **Given：** 提供固定格式的課表與作業測試資料。
-- **When：** 使用者啟動 AI Agent 匯入資料。
-- **Then：** 系統正確顯示課程名稱、上課時間與作業期限；缺少必要欄位時，提示使用者補充。
-
-### 2. 待辦與私人行程管理
-
-- **Given：** 使用者已匯入課表。
-- **When：** 使用者新增、修改或刪除待辦事項與私人行程。
-- **Then：** 行事曆同步更新；若新增或修改後的行程與既有課程重疊，顯示衝突提醒。
-
-### 3. 自動安排複習
-
-- **Given：** 使用者已設定考試日期、所需複習時數及可安排時段。
-- **When：** 使用者要求 AI Agent 規劃複習。
-- **Then：** 系統在考試前的空閒時段安排指定時數，且不與既有行程重疊；時間不足時，顯示尚缺的時數。
-
-### 4. 畢業進度追蹤
-
-- **Given：** 提供測試用畢業規則：需修滿 128 學分、指定必修及 6 場講座；學生已取得 100 學分、缺少 1 門必修且完成 4 場講座。
-- **When：** 使用者查看畢業進度。
-- **Then：** 系統顯示尚缺 28 學分、該門必修名稱及 2 場講座。
+from .models import StudyPlanRequest, StudyBlock
 
 
-## 先前提案
+DAY_START = time(9, 0)
+DAY_END = time(22, 0)
+BLOCK_HOURS = 1
 
-### 1. 租屋媒合 - 組員1
 
-- **Problem：** 學生在準備搬家或找租屋處時，退租與招租資訊分散在不同社群，難以確認空房時間、租金及屋況，需要逐一詢問。
-- **Target user：** 即將退租、希望分享房源的學生，以及準備在學校附近租屋的學生。
-- **User Story：** 身為準備租屋的學生，我希望找到即將退租且符合預算與入住時間的房源，並向原租客了解居住經驗，以便更快找到適合的住處。
+def _overlaps(start: datetime, end: datetime, busy_start: datetime, busy_end: datetime) -> bool:
+    return start < busy_end and end > busy_start
 
-### 2. 二手書交易 - 組員3
 
-- **Problem：** 學生修完課後，課本常被閒置；需要課本的學生則難以找到符合課程與版本的二手書，必須在社群中逐篇搜尋與詢問。
-- **Target user：** 有閒置課本想出售或贈送的學生，以及需要購買課本的學生。
-- **User Story：** 身為有閒置課本的學生，我希望上架書籍的名稱、版本、書況與價格，讓需要的人能搜尋並聯絡我，以便讓課本再次被使用並回收部分購書費用。
+def build_study_plan(request: StudyPlanRequest) -> tuple[List[StudyBlock], float, float]:
+    required = float(request.exam.required_study_hours)
+    remaining = required
+    result: List[StudyBlock] = []
 
-### 3. 拼車 - 組員2
+    current_date = request.available_range.start
+    end_date = request.available_range.end
 
-- **Problem：** 學生週末前往火車站時，獨自搭計程車的費用較高，即使有其他同學同時出發，也難以找到時間與路線相近的人共同搭車。
-- **Target user：** 週末返家、需要從學校或住處搭車前往火車站的學生。
-- **User Story：** 身為週末要搭火車返家的學生，我希望找到出發時間與地點相近的同學一起叫車，以便分攤車資並準時抵達車站。
+    while current_date <= end_date and remaining > 0:
+        cursor = datetime.combine(current_date, DAY_START)
+        day_end = datetime.combine(current_date, DAY_END)
 
-### 4. 課表與學習規劃 - 組員3
+        while cursor < day_end and remaining > 0:
+            duration = min(BLOCK_HOURS, remaining)
+            candidate_end = cursor + timedelta(hours=duration)
 
-- **Problem：** 學生的課表、作業期限與私人行程分散在不同地方，安排讀書時間時需要反覆核對，容易遺漏待辦事項或將複習集中在考前。
-- **Target user：** 需要同時安排課程、作業、課外活動與考試複習的大學生。
-- **User Story：** 身為需要兼顧課業與活動的學生，我希望整合課表、待辦事項與考試日期，依照空堂時間和學習進度安排複習，以便掌握每日任務並提前準備考試。
+            if candidate_end > day_end:
+                break
 
-### 5. 學分與畢業進度追蹤 - 組員4
+            # 不允許排到考試時間之後
+            if cursor >= request.exam.exam_date:
+                break
 
-- **Problem：** 學生在選課或確認畢業資格時，需要自行比對修課紀錄與適用的畢業規定，容易漏算學分類別、未修必修課或講座次數，影響後續選課安排。
-- **Target user：** 需要規劃選課及確認畢業進度的大學生，尤其是大三、大四學生。
-- **User Story：** 身為正在規劃畢業的學生，我希望查看已取得的各類學分，以及尚缺的必修課、講座與其他畢業條件，以便提前安排修課並如期畢業。
+            has_conflict = any(
+                _overlaps(cursor, candidate_end, busy.start, busy.end)
+                for busy in request.busy_intervals
+            )
+
+            if not has_conflict:
+                result.append(StudyBlock(start=cursor, end=candidate_end))
+                remaining -= duration
+
+            cursor += timedelta(hours=BLOCK_HOURS)
+
+        current_date += timedelta(days=1)
+
+    scheduled = required - remaining
+    return result, round(scheduled, 2), round(remaining, 2)
