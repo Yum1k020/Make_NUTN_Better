@@ -1,0 +1,4 @@
+Flask>=3.1,<4
+flask-smorest>=0.47,<0.48
+marshmallow>=4,<5
+swagger-ui-bundle>=1.1,<2
