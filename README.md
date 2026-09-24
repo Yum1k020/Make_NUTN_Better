@@ -96,3 +96,5 @@
 ## 本機後端開發環境
 
 Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重建與完整移除方式請見 [後端說明](backend/README.md)。已提供固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`；[API 規格與實測證據](docs/api/me.md) 記錄契約、限制與測試結果。前端尚未串接後端。
+
+另提供 `GET /api/v1/semesters`、`GET /api/v1/courses`、`GET /api/v1/courses/{id}`、`GET /api/v1/course-offerings` 四支唯讀測試資料 API；查詢條件、資料庫升級方式及實測結果見 [課程查詢 API 文件](docs/api/catalog.md)。

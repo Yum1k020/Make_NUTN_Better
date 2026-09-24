@@ -48,11 +48,13 @@ def init_db():
         db.executemany("INSERT OR IGNORE INTO departments VALUES (?)",
                        [("dept-csie",), ("dept-demo",)])
         db.executemany("INSERT OR IGNORE INTO admission_years VALUES (?)", [(114,), (115,)])
-        db.executemany("INSERT OR IGNORE INTO semesters VALUES (?)",
+        db.executemany("INSERT OR IGNORE INTO semesters (id) VALUES (?)",
                        [("semester-115-1",), ("semester-115-2",)])
         db.execute("INSERT OR IGNORE INTO rule_sets VALUES (?, ?, ?)",
                    ("rules-csie-115-v1", "dept-csie", 115))
         db.execute("INSERT OR IGNORE INTO user_profiles (user_id) VALUES (?)", (DEMO_USER_ID,))
+        from .catalog_seed import init_catalog
+        init_catalog(db)
 
 
 def init_app(app):

@@ -1,12 +1,13 @@
 # 後端開發環境
 
-目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。完整規格、驗收案例與真正執行的測試證據見 [使用者資料 API](../docs/api/me.md)。尚未建立登入、畢業審核或排程 API；既有前端仍使用自己的示範資料。
+目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供四支唯讀的學期、課程、課程詳情及學期開課查詢 API。規格與實測證據見 [使用者資料 API](../docs/api/me.md) 與 [課程查詢 API](../docs/api/catalog.md)。尚未建立登入、畢業審核或排程 API；既有前端仍使用自己的示範資料。
 
 ## 位置與分支
 
+- 課程查詢 API 分支：`feature/course-catalog-api`，由使用者資料 API 分支延伸；沿用已決定的 Flask，調整原規格的 FastAPI baseline。
 - 使用者資料 API 分支：`feature/user-profile-api`，從 `dev/backend-setup` 建立並保留原本未提交的環境檔案。
-- 已抓取並建立追蹤分支：`main`、`codex/frontend-student-planner`、`docs/data-guide`。
-- 工作目錄內的 `DATA_GUIDE.md` 與規則 JSON 複製自 `origin/docs/data-guide`，尚未提交或合併文件分支的歷史。
+- 前端與資料指南已合併至 `main`，原本的前端／文件功能分支已清理；此課程 API 分支尚未合併 `main` 的文件歷史。
+- 工作目錄內另行保留的 `DATA_GUIDE.md` 與規則 JSON 不會被初始化程式自動匯入。
 - 後端環境、使用者資料 API 與測試證據一併納入此功能分支；本機資料庫與虛擬環境由 .gitignore 排除。
 
 ## 開發工具
@@ -30,6 +31,8 @@
 
 第一次使用請先執行 `./scripts/setup-backend.sh` 安裝依賴。初始化可重複執行，不會覆寫個人資料。預設資料庫為 `backend/instance/profile.sqlite3`；可用 `ME_DATABASE=/absolute/path/profile.sqlite3` 指定其他檔案，初始化和啟動必須指定同一路徑。
 
+更新至課程查詢版本後，請再執行一次 `./scripts/init-backend-db.sh`：會保留既有 `/me` 資料、升級學期欄位並建立課程測試資料。查詢 API 本身不會自動建表或寫入種子；未升級的資料庫會回傳 500。日期、課程代碼、先修與校區均為展示資料，詳見課程查詢規格。
+
 - 測試網頁：<http://127.0.0.1:5050/docs>
 - 健康檢查：<http://127.0.0.1:5050/api/health>
 - OpenAPI：<http://127.0.0.1:5050/openapi.json>
@@ -44,6 +47,8 @@ Swagger UI 中可使用 `POST /api/dev/echo`，輸入 `{"message":"測試 Flask 
 ./scripts/test-backend.sh
 # 另存每次實際 HTTP 回應、SQL trace、前後資料及版本雜湊
 ./scripts/test-backend.sh --evidence=../docs/api/evidence/me-results.json
+# 課程查詢版本完整回歸測試（保留歷史 /me 證據，另存新檔）
+./scripts/test-backend.sh --evidence=../docs/api/evidence/catalog-results.json
 ```
 
 驗證環境介面及使用者資料契約、交易回滾、參照資料、部分更新和真實 HTTP 程序重啟後持久保存。測試使用暫存 SQLite，不改動開發資料；重啟測試需要允許監聽 `127.0.0.1`。登入及兩位登入使用者隔離明確標示 skip／未執行。
