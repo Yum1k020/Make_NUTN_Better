@@ -55,6 +55,10 @@ def init_db():
         db.execute("INSERT OR IGNORE INTO user_profiles (user_id) VALUES (?)", (DEMO_USER_ID,))
         from .catalog_seed import init_catalog
         init_catalog(db)
+        from .planner_core import init_planner
+        from .planner_graduation import init_graduation
+        init_planner(db)
+        init_graduation(db)
 
 
 def init_app(app):

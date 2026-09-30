@@ -57,6 +57,10 @@
 - **Then：** 系統顯示尚缺 28 學分、該門必修名稱及 2 場講座。
 
 
+## 後端 API
+
+Flask＋SQLite 已提供使用者資料、課程查詢與學生安排 API baseline。啟動方式見 [後端 README](backend/README.md)，規格、限制與 252 通過／4 未執行的實測紀錄見 [學生安排 API](docs/api/student-planner.md)。目前固定測試使用者，尚未串接前端。
+
 ## 前端原型
 
 可操作的前端原型位於 [`frontend/`](frontend/README.md)。目前使用本機示範資料，提供課表、待辦與行程、複習規劃、修課規劃、畢業進度及兩個校區的地圖檢視。啟動與測試方式請見前端 README。

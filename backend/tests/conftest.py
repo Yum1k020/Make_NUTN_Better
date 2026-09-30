@@ -21,7 +21,7 @@ def pytest_addoption(parser):
 
 def pytest_sessionstart(session):
     paths = sorted(path for folder in ("backend/app", "backend/tests", "scripts")
-                   for path in (ROOT / folder).rglob("*") if path.suffix in (".py", ".sh"))
+                   for path in (ROOT / folder).rglob("*") if path.suffix in (".py", ".sh", ".json"))
     paths += [ROOT / "backend/requirements-dev.lock.txt", ROOT / "backend/pytest.ini"]
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in paths}

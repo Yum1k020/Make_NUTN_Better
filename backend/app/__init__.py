@@ -69,6 +69,8 @@ def create_app(test_config=None):
     db.init_app(app)
     api.register_blueprint(profile.routes)
     api.register_blueprint(catalog.routes)
+    from . import planner
+    planner.init_app(app, api)
 
     @app.get("/")
     def index():
