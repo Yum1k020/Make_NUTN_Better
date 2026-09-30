@@ -1,0 +1,3850 @@
+{
+  "tests": [
+    {
+      "id": "tests/test_app.py::test_health_and_documentation_are_available_locally",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.016294665983878076,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_app.py::test_json_validation_and_unicode_roundtrip",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.004203375021461397,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_me.py::test_G01_complete_profile",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0016795839765109122,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_G02_missing_values",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005548340268433094,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": null,
+              "current_semester_id": null,
+              "department_id": null,
+              "profile_complete": false,
+              "rule_set_id": null,
+              "rule_status": "profile_incomplete",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT id FROM rule_sets WHERE department_id = NULL AND admission_year = NULL",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_G03_unauthenticated",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 5.020800745114684e-05,
+      "reason": "('/Users/yum_.ko/Documents/Codex/2026-09-22/https-github-com-yum1k020-make-nutn/Make_NUTN_Better/backend/tests/test_me.py', 79, 'Skipped: 未執行：baseline 未實作登入驗證，G03 401 留待正式版')",
+      "records": []
+    },
+    {
+      "id": "tests/test_me.py::test_P01_full_patch_and_get",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0014343340299092233,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P02_partial_patch",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0023568340111523867,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-2",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-2"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-2'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-2', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-2'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-2",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-2"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-2"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-2'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[abc]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0017206250340677798,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": "abc"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": []
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[115]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0016416250145994127,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": "115"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": []
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[115.0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0015177499735727906,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": 115.0
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": []
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[True]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0014336250023916364,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": true
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": []
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[value4]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.001539708988275379,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": []
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": []
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[value5]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0016977920313365757,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": {}
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": []
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P04_unknown_department",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005915410001762211,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "unknown"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "department_id",
+                  "reason": "系所不存在"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'unknown'",
+            "ROLLBACK"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P05_unknown_semester",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004977499484084547,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "current_semester_id": "unknown"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "current_semester_id",
+                  "reason": "學期不存在"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM semesters WHERE id = 'unknown'",
+            "ROLLBACK"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004685420426540077,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {},
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "必須為至少包含一個可修改欄位的 JSON 物件"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005328339757397771,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": null
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "department_id",
+                  "reason": "必須為非 null 的字串"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005014160415157676,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": null
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload3]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004617910017259419,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "current_semester_id": null
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "current_semester_id",
+                  "reason": "必須為非 null 的字串"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P07_readonly_or_unknown_field[user_id]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004794170381501317,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "user_id": "other",
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "user_id",
+                  "reason": "不允許修改此欄位"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P07_readonly_or_unknown_field[rule_set_id]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004899170016869903,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "rule_set_id": "other",
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "rule_set_id",
+                  "reason": "不允許修改此欄位"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P07_readonly_or_unknown_field[unexpected]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005254169809632003,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "unexpected": "other",
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "unexpected",
+                  "reason": "不允許修改此欄位"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P08_atomic_validation",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0015724999830126762,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "unknown",
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "department_id",
+                  "reason": "系所不存在"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'unknown'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-2'",
+            "ROLLBACK"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P09_missing_rule_and_rematch[change0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.002370000001974404,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-demo"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-demo",
+              "profile_complete": true,
+              "rule_set_id": null,
+              "rule_status": "not_found",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-demo",
+              "admission_year": 115,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-demo'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-demo' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-demo', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = NULL WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-demo'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-demo' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-demo",
+              "profile_complete": true,
+              "rule_set_id": null,
+              "rule_status": "not_found",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-demo",
+              "admission_year": 115,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-demo",
+              "admission_year": 115,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-demo'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-demo' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-demo",
+              "admission_year": 115,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P09_missing_rule_and_rematch[change1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0024161249748431146,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": 114
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 114,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": null,
+              "rule_status": "not_found",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 114,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 114",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 114",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 114,\n                           current_semester_id = 'semester-115-1', rule_set_id = NULL WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 114",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 114",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 114,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": null,
+              "rule_status": "not_found",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 114,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 114,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 114",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 114",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 114,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P10_database_failure_rolls_back",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.002763958997093141,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "fault_injection": "SQLite AFTER UPDATE trigger RAISE(FAIL); update runs before failure"
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 500,
+          "actual_status": 500,
+          "actual_body": {
+            "error": {
+              "code": "INTERNAL_ERROR",
+              "fields": [],
+              "message": "無法讀取或保存使用者資料"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-2'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-2', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-2', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-2', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "ROLLBACK"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_P11_malformed_json",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00045295897871255875,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": "{\"admission_year\":115",
+          "expected_status": 400,
+          "actual_status": 400,
+          "actual_body": {
+            "error": {
+              "code": "INVALID_JSON",
+              "fields": [],
+              "message": "請求 JSON 格式錯誤"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X01_unsupported_reference[payload0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.000622499966993928,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "admission_year": 116
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "入學年度不受支援"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM admission_years WHERE year = 116",
+            "ROLLBACK"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X01_unsupported_reference[payload1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005252500413917005,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": ""
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "department_id",
+                  "reason": "系所不存在"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = ''",
+            "ROLLBACK"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X01_unsupported_reference[payload2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.000495165993925184,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "current_semester_id": ""
+          },
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "current_semester_id",
+                  "reason": "學期不存在"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM semesters WHERE id = ''",
+            "ROLLBACK"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[null]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004546659765765071,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": "null",
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "必須為至少包含一個可修改欄位的 JSON 物件"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[[]]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005577499978244305,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": "[]",
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "必須為至少包含一個可修改欄位的 JSON 物件"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[\"text\"]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004445419763214886,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": "\"text\"",
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "必須為至少包含一個可修改欄位的 JSON 物件"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[115]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004630409530363977,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": "115",
+          "expected_status": 422,
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "必須為至少包含一個可修改欄位的 JSON 物件"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X03_media_type",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00040962500497698784,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "text/plain",
+          "input": "{}",
+          "expected_status": 415,
+          "actual_status": 415,
+          "actual_body": {
+            "error": {
+              "code": "UNSUPPORTED_MEDIA_TYPE",
+              "fields": [],
+              "message": "請使用 application/json"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": []
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X04_incomplete_with_matching_rule",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.001076499989721924,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": null,
+              "department_id": "dept-csie",
+              "profile_complete": false,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "profile_incomplete",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = NULL, rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X05_related_records_and_other_profile_preserved",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0014231670065782964,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            },
+            {
+              "user_id": "user-other",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            },
+            {
+              "user_id": "user-other",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "synthetic_related_records_after": {
+            "fixture_courses": [
+              [
+                "keep",
+                "user-demo-001"
+              ]
+            ],
+            "fixture_todos": [
+              [
+                "keep",
+                "user-demo-001"
+              ]
+            ],
+            "fixture_events": [
+              [
+                "keep",
+                "user-demo-001"
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X06_init_idempotent",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0017354580340906978,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X07_invalid_response_rolls_back",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0018857920076698065,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "fault_injection": "Response validation raises ValidationError after UPDATE, before COMMIT"
+        },
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "current_semester_id": "semester-115-2"
+          },
+          "expected_status": 500,
+          "actual_status": 500,
+          "actual_body": {
+            "error": {
+              "code": "INTERNAL_ERROR",
+              "fields": [],
+              "message": "無法讀取或保存使用者資料"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-2'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-2', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "ROLLBACK"
+          ]
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X08_openapi",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005473750061355531,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_me.py::test_X09_real_http_process_restart",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.20391350000863895,
+      "reason": null,
+      "records": [
+        {
+          "phase": "before restart",
+          "process_id": 58563,
+          "port": 52078
+        },
+        {
+          "transport": "real HTTP / subprocess",
+          "method": "PATCH",
+          "url": "http://127.0.0.1:52078/api/v1/me",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          }
+        },
+        {
+          "transport": "real HTTP / subprocess",
+          "method": "PATCH",
+          "url": "http://127.0.0.1:52078/api/v1/me",
+          "input": {
+            "current_semester_id": "semester-115-2"
+          },
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-2",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          }
+        },
+        {
+          "transport": "real HTTP / subprocess",
+          "method": "PATCH",
+          "url": "http://127.0.0.1:52078/api/v1/me",
+          "input": {
+            "admission_year": "abc"
+          },
+          "actual_status": 422,
+          "actual_body": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "admission_year",
+                  "reason": "必須為系統支援的民國年度整數"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          }
+        },
+        {
+          "transport": "real HTTP / subprocess",
+          "method": "PATCH",
+          "url": "http://127.0.0.1:52078/api/v1/me",
+          "input": "{\"admission_year\":",
+          "actual_status": 400,
+          "actual_body": {
+            "error": {
+              "code": "INVALID_JSON",
+              "fields": [],
+              "message": "請求 JSON 格式錯誤"
+            }
+          }
+        },
+        {
+          "transport": "real HTTP / subprocess",
+          "method": "GET",
+          "url": "http://127.0.0.1:52078/api/v1/me",
+          "input": null,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-2",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          }
+        },
+        {
+          "phase": "after restart",
+          "process_id": 58564,
+          "port": 52085
+        },
+        {
+          "transport": "real HTTP / subprocess",
+          "method": "GET",
+          "url": "http://127.0.0.1:52085/api/v1/me",
+          "input": null,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-2",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X10_authenticated_user_isolation",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 6.679201032966375e-05,
+      "reason": "('/Users/yum_.ko/Documents/Codex/2026-09-22/https-github-com-yum1k020-make-nutn/Make_NUTN_Better/backend/tests/test_me.py', 279, 'Skipped: 未執行：固定身分 baseline 無法提供兩位登入使用者隔離；合成資料保留測試不代表登入隔離')",
+      "records": []
+    },
+    {
+      "id": "tests/test_me.py::test_X11_missing_database_returns_json_500",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.004923166998196393,
+      "reason": null,
+      "records": [
+        {
+          "precondition": "Database parent directory does not exist; init-db not run",
+          "method": "GET",
+          "input": null,
+          "actual_status": 500,
+          "actual_body": {
+            "error": {
+              "code": "INTERNAL_ERROR",
+              "fields": [],
+              "message": "無法讀取或保存使用者資料"
+            }
+          }
+        },
+        {
+          "precondition": "Database parent directory does not exist; init-db not run",
+          "method": "PATCH",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "actual_status": 500,
+          "actual_body": {
+            "error": {
+              "code": "INTERNAL_ERROR",
+              "fields": [],
+              "message": "無法讀取或保存使用者資料"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_me.py::test_X12_inconsistent_stored_rule_returns_500",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0026862500235438347,
+      "reason": null,
+      "records": [
+        {
+          "transport": "Flask test client",
+          "method": "PATCH",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": {
+            "department_id": "dept-csie",
+            "admission_year": 115,
+            "current_semester_id": "semester-115-1"
+          },
+          "expected_status": 200,
+          "actual_status": 200,
+          "actual_body": {
+            "data": {
+              "admission_year": 115,
+              "current_semester_id": "semester-115-1",
+              "department_id": "dept-csie",
+              "profile_complete": true,
+              "rule_set_id": "rules-csie-115-v1",
+              "rule_status": "matched",
+              "user_id": "user-demo-001"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": null,
+              "admission_year": null,
+              "rule_set_id": null,
+              "current_semester_id": null
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": "rules-csie-115-v1",
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN IMMEDIATE",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "UPDATE user_profiles SET department_id = 'dept-csie', admission_year = 115,\n                           current_semester_id = 'semester-115-1', rule_set_id = 'rules-csie-115-v1' WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "COMMIT"
+          ]
+        },
+        {
+          "fault_injection": "Remove stored rule_set_id despite matching department/year"
+        },
+        {
+          "transport": "Flask test client",
+          "method": "GET",
+          "path": "/api/v1/me",
+          "content_type": "application/json",
+          "input": null,
+          "expected_status": 500,
+          "actual_status": 500,
+          "actual_body": {
+            "error": {
+              "code": "INTERNAL_ERROR",
+              "fields": [],
+              "message": "無法讀取或保存使用者資料"
+            }
+          },
+          "before": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "after": [
+            {
+              "user_id": "user-demo-001",
+              "department_id": "dept-csie",
+              "admission_year": 115,
+              "rule_set_id": null,
+              "current_semester_id": "semester-115-1"
+            }
+          ],
+          "sql_trace": [
+            "BEGIN",
+            "SELECT * FROM user_profiles WHERE user_id = 'user-demo-001'",
+            "SELECT 1 FROM departments WHERE id = 'dept-csie'",
+            "SELECT 1 FROM admission_years WHERE year = 115",
+            "SELECT 1 FROM semesters WHERE id = 'semester-115-1'",
+            "SELECT id FROM rule_sets WHERE department_id = 'dept-csie' AND admission_year = 115",
+            "ROLLBACK"
+          ]
+        }
+      ]
+    }
+  ],
+  "started_at": "2026-09-23T11:45:27.514715+08:00",
+  "base_commit": "1701d995b45b431445ef678b2fb69383c4721316",
+  "branch": "feature/user-profile-api",
+  "version_note": "Uncommitted working tree; source hashes identify tested content, not HEAD alone.",
+  "source_sha256": {
+    "backend/app/__init__.py": "c4df1186d3252a59d19b81ae3ed4c594c98d81668f2bb889650c90ee6882b989",
+    "backend/app/db.py": "606bbcb6fd0139efd4c83444d38faf0ecd73e71175e7b1ba71aa3347eddc6292",
+    "backend/app/profile.py": "75ace7bc3133641ae73bb351e24a3889847f850815716a464cbbffd33f39f865",
+    "backend/tests/conftest.py": "9c6bf2d093bf443ddb25ded9c93b08e0a474584be6d73168c800e658e5afa3c9",
+    "backend/tests/test_app.py": "4aa94016566b1265df7500f1063ec9cd211dcdadf16ab3023ff77ffdd97ede5b",
+    "backend/tests/test_me.py": "9cb43b361f4b64f47a5c2d2f6ca586ed9cb64bfe14112c5d3f3138770fa54d71",
+    "scripts/init-backend-db.sh": "9b6a1a98680ac20869d84c96d39177d9dd884575df3d17b78c1ee6bc43bf8020",
+    "scripts/run-backend.sh": "5c750e591f20af8ebb652ab99868443859f0fcf7113101cfb74b50856cc0f533",
+    "scripts/setup-backend.sh": "0309e69bad34e461287ca2e910483afaead5fb5ea73cc5ca5e56f5fe4a3cd237",
+    "scripts/test-backend.sh": "50227624bd6617997bdc9874c327a8ee15862b5f7143e43a79bf668c0c00ccbf",
+    "backend/requirements-dev.lock.txt": "f3b8890b611d0bcd6bec6592b8c5ac3f9cbf1064fc21469d27ad610c90f3fcae",
+    "backend/pytest.ini": "e1fa086b4b20a9dd7df74a60557406fd96aea6fdff7fef999a398ad0d32a384b"
+  },
+  "source_fingerprint": "e6907dfa5522103528852270ff7a5e5cc5950a6c643ec8b251127f3e5a087366",
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "packages": {
+    "Flask": "3.1.3",
+    "flask-smorest": "0.47.0",
+    "marshmallow": "4.3.1",
+    "pytest": "9.1.1"
+  },
+  "command": "./scripts/test-backend.sh -c /Users/yum_.ko/Documents/Codex/2026-09-22/https-github-com-yum1k020-make-nutn/Make_NUTN_Better/backend/pytest.ini --evidence=../docs/api/evidence/me-results.json",
+  "finished_at": "2026-09-23T11:45:28.134461+08:00",
+  "exit_code": 0
+}

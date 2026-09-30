@@ -4,3 +4,12 @@ frontend/dist/
 .env
 .env.*
 !.env.example
+
+# Project-local backend environments and generated files
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+backend/instance/
+*.egg-info/

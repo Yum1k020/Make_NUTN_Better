@@ -57,6 +57,10 @@
 - **Then：** 系統顯示尚缺 28 學分、該門必修名稱及 2 場講座。
 
 
+## 後端 API
+
+Flask＋SQLite 已提供使用者資料、課程查詢與學生安排 API baseline。啟動方式見 [後端 README](backend/README.md)，規格、限制與 252 通過／4 未執行的實測紀錄見 [學生安排 API](docs/api/student-planner.md)。目前固定測試使用者，尚未串接前端。
+
 ## 前端原型
 
 可操作的前端原型位於 [`frontend/`](frontend/README.md)。目前使用本機示範資料，提供課表、待辦與行程、複習規劃、修課規劃、畢業進度及兩個校區的地圖檢視。啟動與測試方式請見前端 README。
@@ -92,3 +96,9 @@
 - **Problem：** 學生在選課或確認畢業資格時，需要自行比對修課紀錄與適用的畢業規定，容易漏算學分類別、未修必修課或講座次數，影響後續選課安排。
 - **Target user：** 需要規劃選課及確認畢業進度的大學生，尤其是大三、大四學生。
 - **User Story：** 身為正在規劃畢業的學生，我希望查看已取得的各類學分，以及尚缺的必修課、講座與其他畢業條件，以便提前安排修課並如期畢業。
+
+## 本機後端開發環境
+
+Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重建與完整移除方式請見 [後端說明](backend/README.md)。已提供固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`；[API 規格與實測證據](docs/api/me.md) 記錄契約、限制與測試結果。前端尚未串接後端。
+
+另提供 `GET /api/v1/semesters`、`GET /api/v1/courses`、`GET /api/v1/courses/{id}`、`GET /api/v1/course-offerings` 四支唯讀測試資料 API；查詢條件、資料庫升級方式及實測結果見 [課程查詢 API 文件](docs/api/catalog.md)。
