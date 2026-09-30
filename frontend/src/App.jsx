@@ -3,6 +3,7 @@ import Dashboard from "./components/Dashboard.jsx";
 import StudyPlanner from "./components/StudyPlanner.jsx";
 import CoursePlanner from "./components/CoursePlanner.jsx";
 import GraduationProgress from "./components/GraduationProgress.jsx";
+import GateEvidence from "./components/GateEvidence.jsx";
 import ItemDialog from "./components/ItemDialog.jsx";
 import CampusMapDialog from "./components/CampusMapDialog.jsx";
 import Icon from "./components/Icon.jsx";
@@ -179,6 +180,7 @@ export default function App() {
             onNavigate={setActivePage}
           />
         )}
+        {activePage === "evidence" && <GateEvidence />}
       </main>
       <MobileNav activePage={activePage} onNavigate={setActivePage} />
       {dialog && (
