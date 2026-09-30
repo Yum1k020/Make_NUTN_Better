@@ -88,6 +88,12 @@ def string(value, maximum=None):
     return value
 
 
+def description(value):
+    if type(value) is not str or len(value.strip()) > 5000:
+        raise ValueError("描述須為最多 5000 字元的字串")
+    return value.strip()
+
+
 def boolean(value):
     if type(value) is not bool:
         raise ValueError("須為 boolean")
@@ -188,8 +194,11 @@ RESOURCE = {
         "section_name": (lambda v: string(v, 200), True), "meetings": (lambda v: weekly(v, True), False)},
         ["semester_id", "course_id"], {"offering_id": None, "section_name": None}),
     "tasks": ("task_id", {"title": TITLE, "type": (choice("todo", "assignment", "report", "exam", "review"), False),
-        "course_id": NULL_ID, "due_date": DATE, "due_time": (clock, True), "completed": (boolean, False), "event_id": NULL_ID},
-        ["title", "type", "due_date"], {"course_id": None, "due_time": None, "completed": False, "event_id": None}),
+        "course_id": NULL_ID, "due_date": (lambda v: day(v).isoformat(), True), "due_time": (clock, True),
+        "description": (description, False), "priority": (choice("low", "medium", "high"), False),
+        "completed": (boolean, False), "event_id": NULL_ID},
+        ["title"], {"type": "todo", "description": "", "priority": "medium", "due_date": None,
+                    "course_id": None, "due_time": None, "completed": False, "event_id": None}),
     "personal-events": ("event_id", {"title": TITLE, "starts_at": DATETIME, "ends_at": DATETIME,
         "location": (lambda v: string(v, 500), True)}, ["title", "starts_at", "ends_at"], {"location": None}),
     "study-plans": ("plan_id", {"course_id": ID, "exam_task_id": NULL_ID, "start_date": DATE, "exam_date": DATE,
@@ -222,6 +231,10 @@ def unpack(row):
     data = json.loads(row["body"])
     if type(data) is not dict:
         raise ValueError("Invalid stored resource object")
+    if row["kind"] == "tasks":
+        # Older JSON records predate these optional fields. Do not write on reads.
+        data.setdefault("description", "")
+        data.setdefault("priority", "medium")
     id_field, fields, required, _ = RESOURCE[row["kind"]]
     try:
         visible = {k: v for k, v in data.items() if k in fields}

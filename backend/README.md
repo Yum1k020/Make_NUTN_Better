@@ -89,3 +89,7 @@ PYTHON_BIN=/absolute/path/to/python3.12 ./scripts/setup-backend.sh
 ## 後續待決定
 
 此 baseline 使用 Python 內建 sqlite3，無需額外資料庫服務或 ORM。登入方法、正式部署資料庫、資料遷移與部署環境仍待決定；目前固定身分僅供本機開發展示。
+
+## 待辦功能擴充
+
+新增描述、優先級、無截止日期待辦、limit/offset 分頁及 `/api/v1/health` 資料庫檢查，詳見 [契約與舊版差異](../docs/api/task-api-enhancements.md)。此分支沿用 Flask，不需要安裝 FastAPI 或變更 SQLite 表結構。

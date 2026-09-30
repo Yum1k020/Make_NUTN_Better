@@ -2,6 +2,10 @@
 
 本文件記錄已實作的 Flask baseline 與真正執行的測試。[原始規格](student-planner-spec.md) 保留使用者提供的完整輸入／輸出、必填欄位、型別與預期案例；原文的「未執行」不會因實作存在而自動變成通過。本文件與原始 JSON 證據才是本輪實測紀錄。
 
+## 待辦功能更新
+
+`feature/task-api-enhancements` 已將舊 FastAPI 待辦原型的描述、優先級、無期限待辦、分頁與資料庫健康檢查移植至 Flask。最新契約見 [待辦擴充說明](task-api-enhancements.md)；下方測試紀錄及原始規格保留為歷史版本。
+
 ## 實作範圍與 baseline
 
 沿用專案已決定的 Flask，並非原附件提及的 FastAPI。SQLite、固定使用者 `user-demo-001`，全部業務端點使用 `/api/v1`。既有 `/me`、學期及課程查詢保持相容；既有前端尚未串接。

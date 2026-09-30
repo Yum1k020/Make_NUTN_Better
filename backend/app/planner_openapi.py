@@ -43,6 +43,10 @@ def resource_schema(kind, patch=False):
             schema = DATETIME
         elif key in ("target_minutes", "session_minutes"):
             schema = POSITIVE
+        elif key == "description":
+            schema = {"type": "string", "maxLength": 5000, "default": ""}
+        elif key == "priority":
+            schema = {**enum("low", "medium", "high"), "default": "medium"}
         elif key == "title":
             schema = {"type": "string", "minLength": 1, "maxLength": 200}
         elif key in ("passed", "completed"):
@@ -61,6 +65,8 @@ def resource_schema(kind, patch=False):
     result = obj(properties, () if patch else required, minProperties=1)
     if kind == "timetable-entries":
         result["description"] = "offering_id 模式與手動 meetings 互斥；catalog 模式不可提供 section_name 或 meetings。"
+    if kind == "tasks":
+        result["description"] = "title 必填；type 預設 todo。due_date 可省略或為 null；清除日期會清除時間。description 預設空字串，priority 預設 medium。"
     if kind == "enrollments":
         result["description"] = "finished 必須提供 boolean passed；in_progress 的 passed、grade 必須為 null；成績與 passed 必須一致。"
     return result
@@ -90,18 +96,26 @@ def register_docs(app, api):
     def param(name, schema=TEXT, required=False, location="query"):
         return {"name": name, "in": location, "required": required, "schema": schema}
 
+    add_path("/api/v1/health", {"get": operation("檢查服務、使用者與規劃資料表",
+        output=obj({"status": enum("ok")}, ["status"]))})
+
     list_output = {"type": "object", "required": ["data", "meta"],
                    "properties": {"data": {"type": "array", "items": {"type": "object"}}, "meta": obj({"count": {"type": "integer", "minimum": 0}}, ["count"])}}
     filters = {
         "enrollments": [param("semester_id"), param("enrollment_status", enum("in_progress", "finished"))],
         "timetable-entries": [param("semester_id")],
-        "tasks": [param("from", DATE), param("to", DATE), param("completed", enum("true", "false")), param("course_id")],
+        "tasks": [param("from", DATE), param("to", DATE), param("completed", enum("true", "false")), param("course_id"),
+                  param("limit", {"type": "integer", "minimum": 1, "maximum": 200, "default": 50}),
+                  param("offset", {"type": "integer", "minimum": 0, "default": 0})],
         "personal-events": [param("from", DATETIME), param("to", DATETIME)],
         "study-plans": [], "planned-courses": [param("target_semester_id")],
     }
+    task_list_output = deepcopy(list_output)
+    task_list_output["properties"]["meta"] = obj({key: {"type": "integer", "minimum": 0}
+        for key in ("count", "total", "limit", "offset")}, ["count", "total", "limit", "offset"])
     for kind, parameters in filters.items():
         add_path(path="/api/v1/" + kind, operations={
-            "get": operation("本人資源清單：" + kind, params=parameters, output=list_output),
+            "get": operation("本人資源清單：" + kind, params=parameters, output=task_list_output if kind == "tasks" else list_output),
             "post": operation("新增：" + kind, 201, resource_schema(kind))})
         params = [param("resource_id", required=True, location="path")]
         add_path(path="/api/v1/" + kind + "/{resource_id}", operations={

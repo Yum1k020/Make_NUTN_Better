@@ -1,3 +1,5 @@
+> 待辦 API 已於 `feature/task-api-enhancements` 擴充；description、priority、可省略截止日期與分頁的新契約請見 [待辦擴充說明](task-api-enhancements.md)。下文保留原始規格。
+
 # 學生個人安排系統 API 規格
 
 ## 1. 共用約定
