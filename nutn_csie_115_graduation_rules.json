@@ -1,0 +1,958 @@
+{
+  "schema_version": "2.0.0",
+  "rule_set_id": "nutn-csie-115-integrated-v2",
+  "title": "國立臺南大學資工系115入學：團隊整合畢業進度規則",
+  "language": "zh-TW",
+  "scope": {
+    "institution": "國立臺南大學",
+    "department": "資訊工程學系",
+    "degree": "大學部",
+    "admission_academic_year_roc": 115,
+    "program_catalog_academic_year_roc": 114,
+    "purpose": "課堂展示系統",
+    "authority": "依專案文件與團隊決策整合，未重新核對校方原始PDF；非校方正式認證",
+    "official_graduation_certification": false,
+    "result_label": "符合本次啟用的專案規則"
+  },
+  "sources": [
+    {
+      "id": "mvp_v1",
+      "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+      "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce",
+      "role": "舊版門檻、必修、114學程清單與累計講座格式"
+    },
+    {
+      "id": "source_v1",
+      "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+      "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79",
+      "role": "新版選修目錄、自由選修來源、通識細節與認列區分"
+    },
+    {
+      "id": "markdown",
+      "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+      "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6",
+      "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實"
+    },
+    {
+      "id": "curriculum_115",
+      "filename": "資工系115大學部課程架構表.pdf",
+      "verification_status": "referenced_by_input_documents_not_reverified",
+      "role": "原文件引用的課程架構來源"
+    },
+    {
+      "id": "program_map_114",
+      "filename": "114 學年度大學部課程規劃地圖.pdf",
+      "verification_status": "referenced_by_mvp_not_reverified",
+      "role": "舊版引用的學程清單來源"
+    },
+    {
+      "id": "user_decisions",
+      "file": "docs/decisions/CHANGE_DECISIONS.md",
+      "section": "GR-001～GR-015",
+      "role": "本次使用者逐項確認的團隊政策"
+    }
+  ],
+  "credit_requirements": {
+    "minimum_total_credits": 133,
+    "source": {
+      "source_id": "markdown",
+      "section": "4.1",
+      "basis": "attachment_rule"
+    },
+    "general_education": {
+      "minimum_total_credits": 30,
+      "core": {
+        "required_credits": 12,
+        "check_each_requirement": true,
+        "requirements": [
+          {
+            "key": "chinese",
+            "name": "中文閱讀與書寫",
+            "required_credits": 4,
+            "course_code": null
+          },
+          {
+            "key": "english",
+            "name": "英文",
+            "required_credits": 4,
+            "course_code": null
+          },
+          {
+            "key": "physical_education",
+            "name": "體育",
+            "required_credits": 2,
+            "course_code": null
+          },
+          {
+            "key": "computational_thinking_ai",
+            "name": "運算思維與AI賦能程式設計",
+            "required_credits": 2,
+            "course_code": null
+          }
+        ],
+        "level_placement_details": null
+      },
+      "elective": {
+        "minimum_credits": 18,
+        "domain_courses": {
+          "minimum_credits": 12,
+          "minimum_distinct_domains": 3,
+          "domains": [
+            "文史哲藝術",
+            "社會脈動",
+            "生命科學",
+            "科技探索"
+          ],
+          "domain_completion_policy": {
+            "minimum_distinct_passed_recognized_courses": 1,
+            "status": "provisional",
+            "source": {
+              "source_id": "markdown",
+              "section": "4.2",
+              "basis": "existing_project_setting"
+            }
+          }
+        },
+        "diverse_courses": {
+          "maximum_counted_credits": 6,
+          "minimum_required_credits": 0,
+          "eligible_types": [
+            "各系專業課程",
+            "微學分課程",
+            "自主募課課程",
+            "師培課程",
+            "校際選課課程",
+            "本校認可之平臺課程"
+          ],
+          "recognition_required": true
+        }
+      }
+    },
+    "college_core": {
+      "required_credits": 2,
+      "required_courses": [
+        {
+          "name": "科技法律",
+          "credits": 2,
+          "course_code": null
+        }
+      ]
+    },
+    "department_required": {
+      "required_credits": 69,
+      "require_all_courses_passed_and_recognized": true,
+      "course_count": 25,
+      "courses": [
+        {
+          "course_code": "NN1001",
+          "name": "微積分(一)",
+          "credits": 3,
+          "recommended_term": "大一上"
+        },
+        {
+          "course_code": "NN1014",
+          "name": "計算機概論",
+          "credits": 3,
+          "recommended_term": "大一上"
+        },
+        {
+          "course_code": "NN1204",
+          "name": "計算機程式設計(一)",
+          "credits": 3,
+          "recommended_term": "大一上"
+        },
+        {
+          "course_code": "NN1205",
+          "name": "計算機程式設計實習(一)",
+          "credits": 2,
+          "recommended_term": "大一上"
+        },
+        {
+          "course_code": "NN1009",
+          "name": "微積分(二)",
+          "credits": 3,
+          "recommended_term": "大一下"
+        },
+        {
+          "course_code": "NN1215",
+          "name": "電子電路學",
+          "credits": 3,
+          "recommended_term": "大一下"
+        },
+        {
+          "course_code": "NN1016",
+          "name": "線性代數",
+          "credits": 3,
+          "recommended_term": "大一下"
+        },
+        {
+          "course_code": "NN1206",
+          "name": "計算機程式設計(二)",
+          "credits": 3,
+          "recommended_term": "大一下"
+        },
+        {
+          "course_code": "NN1207",
+          "name": "計算機程式設計實習(二)",
+          "credits": 2,
+          "recommended_term": "大一下"
+        },
+        {
+          "course_code": "NN1013",
+          "name": "離散數學",
+          "credits": 3,
+          "recommended_term": "大二上"
+        },
+        {
+          "course_code": "NN1018",
+          "name": "資料結構",
+          "credits": 3,
+          "recommended_term": "大二上"
+        },
+        {
+          "course_code": "NN1199",
+          "name": "邏輯設計",
+          "credits": 3,
+          "recommended_term": "大二上"
+        },
+        {
+          "course_code": "NN1200",
+          "name": "邏輯設計實驗",
+          "credits": 2,
+          "recommended_term": "大二上"
+        },
+        {
+          "course_code": "NN1208",
+          "name": "機率",
+          "credits": 3,
+          "recommended_term": "大二上"
+        },
+        {
+          "course_code": "NN1023",
+          "name": "系統程式",
+          "credits": 3,
+          "recommended_term": "大二下"
+        },
+        {
+          "course_code": "NN1024",
+          "name": "計算機網路",
+          "credits": 3,
+          "recommended_term": "大二下"
+        },
+        {
+          "course_code": "NN1066",
+          "name": "數位系統",
+          "credits": 3,
+          "recommended_term": "大二下"
+        },
+        {
+          "course_code": "NN1067",
+          "name": "數位系統實驗",
+          "credits": 2,
+          "recommended_term": "大二下"
+        },
+        {
+          "course_code": "NN1037",
+          "name": "人工智慧",
+          "credits": 3,
+          "recommended_term": "大二下"
+        },
+        {
+          "course_code": "NN1031",
+          "name": "作業系統",
+          "credits": 3,
+          "recommended_term": "大三上"
+        },
+        {
+          "course_code": "NN1032",
+          "name": "演算法",
+          "credits": 3,
+          "recommended_term": "大三上"
+        },
+        {
+          "course_code": "NN1030",
+          "name": "資料庫系統",
+          "credits": 3,
+          "recommended_term": "大三上"
+        },
+        {
+          "course_code": "NN1033",
+          "name": "計算機組織",
+          "credits": 3,
+          "recommended_term": "大三上"
+        },
+        {
+          "course_code": "NN1053",
+          "name": "畢業專題實作(一)",
+          "credits": 2,
+          "recommended_term": "大三下"
+        },
+        {
+          "course_code": "NN1062",
+          "name": "畢業專題實作(二)",
+          "credits": 2,
+          "recommended_term": "大四上"
+        }
+      ],
+      "source": {
+        "source_id": "markdown",
+        "section": "5",
+        "basis": "attachment_rule"
+      }
+    },
+    "department_elective": {
+      "minimum_credits": 12,
+      "recognition_required": true
+    },
+    "free_elective": {
+      "minimum_credits": 20,
+      "eligible_course_kind": "專業課程",
+      "eligible_providers": [
+        "本系",
+        "外系",
+        "外校（含國內外大學）",
+        "師培中心",
+        "通識中心"
+      ],
+      "automatic_eligibility_by_provider_only": false,
+      "source": {
+        "source_id": "markdown",
+        "section": "4.3",
+        "basis": "attachment_rule"
+      }
+    },
+    "subtotals": {
+      "department_required_and_elective_minimum": 81,
+      "including_college_core_minimum": 83,
+      "note": "小計不是額外學分，不可再次加入總學分。"
+    }
+  },
+  "credit_allocation": {
+    "source": {
+      "source_id": "markdown",
+      "section": "4.3、7.2",
+      "basis": "proposed_design"
+    },
+    "categories": [
+      "general_core",
+      "general_domain",
+      "general_diverse",
+      "college_required",
+      "department_required",
+      "department_elective",
+      "free_elective"
+    ],
+    "count_same_course_once": true,
+    "count_same_credit_once": true,
+    "allocation_sum_must_not_exceed_recognized_credits": true,
+    "department_elective_overflow": {
+      "status": "adopted_project_policy",
+      "priority_category": "department_elective",
+      "priority_credits": 12,
+      "overflow_category": "free_elective",
+      "recognition_required": true,
+      "automatic_when_eligible": true,
+      "requires_passed": true,
+      "free_elective_eligibility_required": true,
+      "unknown_eligibility_behavior": "pending_confirmation"
+    },
+    "automatically_reclassify_unknown_or_other_excess_credits": false,
+    "program_course_count_can_overlap_credit_check": true,
+    "general_education_overflow_to_free": "不自動轉列",
+    "example": {
+      "passed_department_elective_credits": 24,
+      "passed_other_eligible_free_elective_credits": 8,
+      "allocated_department_elective_credits": 12,
+      "allocated_free_elective_credits": 20,
+      "total_credits_from_example_courses": 32,
+      "precondition": "範例所有學分均已通過、在共同範圍內且分類與自由選修資格已確認"
+    }
+  },
+  "program_requirements": {
+    "minimum_completed_programs": 2,
+    "programs": [
+      {
+        "id": "cloud_network",
+        "name": "雲端網路",
+        "courses": [
+          "物聯網",
+          "無線通訊網路",
+          "雲端計算",
+          "網路通訊協定",
+          "安全程式設計",
+          "區塊鏈原理與應用",
+          "平行計算",
+          "多媒體系統",
+          "網路程式設計",
+          "網路實務應用",
+          "資訊安全"
+        ],
+        "minimum_distinct_passed_courses": 3,
+        "requires_passed": true,
+        "requires_recognized": true
+      },
+      {
+        "id": "intelligent_computing",
+        "name": "智慧計算",
+        "courses": [
+          "人工智慧",
+          "機器學習",
+          "軟式計算",
+          "計算理論",
+          "深度學習",
+          "資訊擷取",
+          "圖形識別",
+          "計算機圖學",
+          "資料探勘",
+          "智慧型機器人"
+        ],
+        "minimum_distinct_passed_courses": 3,
+        "requires_passed": true,
+        "requires_recognized": true
+      },
+      {
+        "id": "applied_information",
+        "name": "應用資訊",
+        "courses": [
+          "生物資訊學",
+          "電腦對局",
+          "軟體工程",
+          "影像處理",
+          "訊號與系統",
+          "數位訊號處理",
+          "電子自動化設計",
+          "計算機結構",
+          "嵌入式系統",
+          "量子計算"
+        ],
+        "minimum_distinct_passed_courses": 3,
+        "requires_passed": true,
+        "requires_recognized": true
+      }
+    ],
+    "completion_basis": "各學程至少三門不同的已通過且已認列指定課程；至少兩個學程完成",
+    "catalog_selection": "保留舊版114學程清單供115入學使用，此為團隊政策，適用性未經本次校方核實",
+    "cross_program_overlap": "目前三份清單沒有相同課名；若未來清單出現重複，須另訂採計規則。",
+    "course_matching": "以清單課名映射正式課程識別碼；未提供的課程代碼不推測，不自動判定異名課程等同。",
+    "catalog_year": 114,
+    "minimum_project_inferred_certificates": 2,
+    "certificate_policy": {
+      "store_separately_from_course_progress": true,
+      "derive_from_course_completion": true,
+      "when_course_requirement_met": "inferred_obtained",
+      "inference_basis": "project_course_completion",
+      "counts_toward_overall_program_requirement": true,
+      "implies_official_verification": false,
+      "when_course_requirement_unknown": "unknown",
+      "when_course_requirement_not_met": "not_inferred",
+      "note": "not_inferred僅表示本系統未推定，不是宣稱未持有真實證書。已驗證證書的獨立流程不在本次範圍。",
+      "suggested_result_fields": [
+        "course_progress",
+        "certificate_status",
+        "certificate_basis",
+        "officially_verified"
+      ]
+    }
+  },
+  "lecture_requirements": {
+    "professional": {
+      "name": "專業講座",
+      "minimum_count": 10,
+      "source_ids": [
+        "curriculum_115",
+        "user_decisions"
+      ]
+    },
+    "general": {
+      "name": "一般講座",
+      "minimum_count": 12,
+      "source_ids": [
+        "user_decisions"
+      ]
+    },
+    "count_separately": true,
+    "cross_category_double_count_allowed": false,
+    "input_mode": "手動提供已通過的專業與一般講座累計場次，非單純出席場次",
+    "review_reflection_or_certification": false,
+    "note": "專業至少10場、一般至少12場；兩類分開。系統不保存逐場活動、出席、心得或審核過程；只接收已通過總數，無法逐場防重。",
+    "store_individual_records": false,
+    "count_value_semantics": "passed_count",
+    "unknown_count": null
+  },
+  "evaluation_contract": {
+    "statuses": {
+      "met": "已達標",
+      "not_met": "未達標",
+      "pending_confirmation": "待確認"
+    },
+    "overall_status_priority": [
+      "not_met",
+      "pending_confirmation",
+      "met"
+    ],
+    "all_enabled_checks_must_be_met": true,
+    "preserve_all_check_results": true,
+    "null_is_unknown_not_zero": true,
+    "uncertain_records_count_as_confirmed_credits": false,
+    "unresolved_requirement_must_not_be_silently_skipped": true,
+    "missing_program_catalog_blocks_course_check_not_verified_certificate_check": true,
+    "remaining_value_formula": "max(required_value - actual_value, 0)",
+    "credit_progress_percent_formula": "min(actual_total_credits / 133 * 100, 100)",
+    "unknown_actual_produces_null_remaining": true,
+    "credit_progress_is_not_graduation_eligibility": true,
+    "retain_actual_credits_above_total_threshold": true,
+    "suggested_result_fields": [
+      "user_id",
+      "rule_set_id",
+      "evaluated_at",
+      "overall_status",
+      "checks",
+      "credit_allocation",
+      "missing_required_courses",
+      "program_progress",
+      "lecture_progress",
+      "data_errors",
+      "unchecked_requirements"
+    ],
+    "source": {
+      "source_id": "markdown",
+      "section": "7",
+      "basis": "proposed_design"
+    },
+    "all_requirement_groups_must_pass": [
+      "總學分",
+      "通識核心各項課程",
+      "通識選修學分",
+      "通識領域學分及領域數",
+      "院核心必修",
+      "全部系專業必修",
+      "系專業選修",
+      "自由選修",
+      "學程完成數",
+      "專業講座場次",
+      "一般講座場次"
+    ],
+    "certificate_evaluation": "依團隊修課條件推定，非獨立校方驗證",
+    "overall_met_label": "符合本次啟用的專案規則",
+    "not_official_graduation_certification": true
+  },
+  "implementation_notes": [
+    "本檔是唯一整合規則來源；舊版根目錄檔案已由Git歷史保留。",
+    "本次只有規則及文件整合，尚未遷移Flask後端；backend/app/data/中的mvp-v1是現行相容快照。",
+    "消費端不可直接用本檔覆蓋舊後端規則：通過政策、共同認列範圍、證書欄位與JSON結構都需要程式更新。",
+    "共同認列範圍未提供時，相關採計待確認；不可使用35門選修目錄或114學程名單代替共同範圍。",
+    "各policy_provenance條目覆蓋該路徑及子項；更具體路徑優先。來源章節只是追溯依據，不代表本次重新驗證校方規定。"
+  ],
+  "version": "2.0.0",
+  "decision_date": "2026-10-03",
+  "document_type": "graduation_rule_configuration",
+  "implementation_status": "specification_only_backend_not_migrated",
+  "course_catalog": {
+    "department_electives": [
+      {
+        "course_code": "NN1109",
+        "name": "物件導向程式設計",
+        "credits": 3,
+        "recommended_term": "大二"
+      },
+      {
+        "course_code": "NN1209",
+        "name": "常微分方程",
+        "credits": 3,
+        "recommended_term": "大二"
+      },
+      {
+        "course_code": "NN1060",
+        "name": "資訊倫理與法律",
+        "credits": 3,
+        "recommended_term": "大二"
+      },
+      {
+        "course_code": "NN1027",
+        "name": "數值方法",
+        "credits": 3,
+        "recommended_term": "大二"
+      },
+      {
+        "course_code": "NN1198",
+        "name": "訊號與系統",
+        "credits": 3,
+        "recommended_term": "大二"
+      },
+      {
+        "course_code": "NN1035",
+        "name": "軟體工程",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1041",
+        "name": "影像處理",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1040",
+        "name": "計算機圖學",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1072",
+        "name": "區塊鏈原理與應用",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1100",
+        "name": "多媒體系統",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1095",
+        "name": "編譯器設計",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1211",
+        "name": "嵌入式系統",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1187",
+        "name": "業界實習(一)",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1188",
+        "name": "業界實習(二)",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1189",
+        "name": "資通訊安全實務",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1214",
+        "name": "網路實務應用",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1216",
+        "name": "量子電腦導論",
+        "credits": 3,
+        "recommended_term": "大三"
+      },
+      {
+        "course_code": "NN1044",
+        "name": "計算機結構",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1217",
+        "name": "強化學習",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1068",
+        "name": "無線通訊網路",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1091",
+        "name": "圖形識別",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1113",
+        "name": "電子自動化設計",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1218",
+        "name": "人工智慧生醫資料分析",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1179",
+        "name": "雲端計算",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1180",
+        "name": "數位訊號處理",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1185",
+        "name": "平行計算",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1190",
+        "name": "物聯網",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1219",
+        "name": "生成式人工智慧",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1193",
+        "name": "智慧型機器人",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1203",
+        "name": "資料探勘",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1069",
+        "name": "機器學習",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1212",
+        "name": "醫學影像分析",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1194",
+        "name": "深度學習",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1213",
+        "name": "量子計算",
+        "credits": 3,
+        "recommended_term": "大四"
+      },
+      {
+        "course_code": "NN1220",
+        "name": "多媒體網路",
+        "credits": 3,
+        "recommended_term": "大四"
+      }
+    ],
+    "source": {
+      "source_id": "markdown",
+      "section": "6",
+      "basis": "attachment_rule"
+    },
+    "is_program_membership_list": false,
+    "recommended_term_is_guaranteed_offering": false
+  },
+  "passing_and_recognition": {
+    "numeric_grade_optional": true,
+    "explicit_pass_status_required_for_counting": true,
+    "optional_numeric_threshold": {
+      "value": 60,
+      "enabled_by_default": false,
+      "policy_source": "user_decisions"
+    },
+    "grade_alone_implies_passed": false,
+    "numeric_grade_does_not_override_explicit_status_when_policy_disabled": true,
+    "count_only_passed_and_recognized": true,
+    "planned_or_in_progress_counts_as_earned": false,
+    "unique_course_counting": true,
+    "duplicate_input_handling": "同一學生同一課程不重複計算學分或學程門數",
+    "recognition_status_values": [
+      "pending_confirmation",
+      "recognized",
+      "not_recognized"
+    ],
+    "common_recognition_scope": {
+      "status": "not_provided",
+      "version": null,
+      "course_ids": null,
+      "source": null,
+      "scope_is_exhaustive_once_provided": true,
+      "inside_scope": "recognized",
+      "outside_scope": "not_recognized",
+      "before_scope_provided": "pending_confirmation",
+      "unknown_course_identity": "pending_confirmation",
+      "null_means": "尚未提供範圍，不等於拒絕所有課程",
+      "empty_list_means": "明確提供空範圍，沒有任何課程獲認列",
+      "scope_only_grants_general_eligibility": true,
+      "category_and_program_membership_still_required": true
+    },
+    "special_cases_requiring_separate_policy": [
+      "抵免",
+      "免修",
+      "替代課程",
+      "重修流程與歷次成績選擇"
+    ]
+  },
+  "excluded_conditions": [
+    "抵免",
+    "免修",
+    "替代課程",
+    "重修流程與歷次成績選擇",
+    "講座心得審核",
+    "講座活動認證流程",
+    "學程證書申請與文件審核",
+    "其他校級畢業門檻",
+    "通識分級與其他細部修課限制",
+    "畢業模擬",
+    "可能畢業學期估計",
+    "GPA計算"
+  ],
+  "pending_items": [
+    "使用者提供的共同認列範圍與版本",
+    "正式課程ID與學程課名對照",
+    "通識分級與細部領域規則",
+    "特殊課程採計依據",
+    "後端新規則與資料欄位遷移"
+  ],
+  "policy_provenance": [
+    {
+      "path": "/credit_requirements",
+      "sources": [
+        "mvp_v1",
+        "source_v1",
+        "curriculum_115"
+      ],
+      "decision": "GR-001",
+      "note": "共同學分門檻與25門必修相同；通識與自由選修細節另見下列覆蓋條目"
+    },
+    {
+      "path": "/course_catalog",
+      "sources": [
+        "source_v1",
+        "markdown"
+      ],
+      "decision": "GR-002"
+    },
+    {
+      "path": "/program_requirements",
+      "sources": [
+        "mvp_v1",
+        "program_map_114",
+        "user_decisions"
+      ],
+      "decision": "GR-003"
+    },
+    {
+      "path": "/program_requirements/certificate_policy",
+      "sources": [
+        "user_decisions"
+      ],
+      "decision": "GR-004"
+    },
+    {
+      "path": "/lecture_requirements",
+      "sources": [
+        "mvp_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-005"
+    },
+    {
+      "path": "/credit_requirements/free_elective",
+      "sources": [
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-006"
+    },
+    {
+      "path": "/credit_allocation",
+      "sources": [
+        "mvp_v1",
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-007"
+    },
+    {
+      "path": "/passing_and_recognition/optional_numeric_threshold",
+      "sources": [
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-008"
+    },
+    {
+      "path": "/passing_and_recognition",
+      "sources": [
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-009"
+    },
+    {
+      "path": "/passing_and_recognition/common_recognition_scope",
+      "sources": [
+        "user_decisions"
+      ],
+      "decision": "GR-010"
+    },
+    {
+      "path": "/credit_requirements/general_education",
+      "sources": [
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-011"
+    },
+    {
+      "path": "/excluded_conditions",
+      "sources": [
+        "mvp_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-012"
+    },
+    {
+      "path": "/sources",
+      "sources": [
+        "mvp_v1",
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-013"
+    },
+    {
+      "path": "/evaluation_contract",
+      "sources": [
+        "mvp_v1",
+        "source_v1",
+        "user_decisions"
+      ],
+      "decision": "GR-014"
+    },
+    {
+      "path": "/implementation_notes",
+      "sources": [
+        "user_decisions"
+      ],
+      "decision": "GR-015"
+    }
+  ]
+}

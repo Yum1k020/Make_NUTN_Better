@@ -102,3 +102,9 @@ Flask＋SQLite 已提供使用者資料、課程查詢與學生安排 API baseli
 Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重建與完整移除方式請見 [後端說明](backend/README.md)。已提供固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`；[API 規格與實測證據](docs/api/me.md) 記錄契約、限制與測試結果。前端尚未串接後端。
 
 另提供 `GET /api/v1/semesters`、`GET /api/v1/courses`、`GET /api/v1/courses/{id}`、`GET /api/v1/course-offerings` 四支唯讀測試資料 API；查詢條件、資料庫升級方式及實測結果見 [課程查詢 API 文件](docs/api/catalog.md)。
+
+## 規則整合與變更紀錄
+
+- [專案決策與變更紀錄](docs/decisions/CHANGE_DECISIONS.md)：逐項決定、新舊差異、影響分支與檔案，後續變更持續追加。
+- [115畢業規則整合說明](GRADUATION_PROGRESS_115.md) 與 [唯一整合JSON](nutn_csie_115_graduation_rules.json)。
+- 本次為文件與規則整合；後端仍使用mvp-v1快照，前端仍為示範資料。上方128學分驗收為早期示範，不是目前133學分整合規則。

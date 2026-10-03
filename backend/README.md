@@ -9,7 +9,7 @@
 - 課程查詢 API 分支：`feature/course-catalog-api`，由使用者資料 API 分支延伸；沿用已決定的 Flask，調整原規格的 FastAPI baseline。
 - 使用者資料 API 分支：`feature/user-profile-api`，從 `dev/backend-setup` 建立並保留原本未提交的環境檔案。
 - 前端與資料指南已合併至 `main`，原本的前端／文件功能分支已清理；此課程 API 分支尚未合併 `main` 的文件歷史。
-- 根目錄保留的 `DATA_GUIDE.md` 與規則 JSON 不直接匯入；初始化使用已納入 `backend/app/data/` 的版本化規則副本，正式課程對照仍待確認。
+- 根目錄的 `DATA_GUIDE.md` 與整合規則 JSON 不直接匯入；初始化使用已納入 `backend/app/data/` 的版本化規則副本，正式課程對照仍待確認。
 - 後端環境、使用者資料 API 與測試證據一併納入此功能分支；本機資料庫與虛擬環境由 .gitignore 排除。
 
 ## 開發工具
@@ -89,3 +89,7 @@ PYTHON_BIN=/absolute/path/to/python3.12 ./scripts/setup-backend.sh
 ## 後續待決定
 
 此 baseline 使用 Python 內建 sqlite3，無需額外資料庫服務或 ORM。登入方法、正式部署資料庫、資料遷移與部署環境仍待決定；目前固定身分僅供本機開發展示。
+
+## 畢業規則整合狀態（2026-10-03）
+
+根目錄的新 [整合規則](../nutn_csie_115_graduation_rules.json) 與 [決策紀錄](../docs/decisions/CHANGE_DECISIONS.md) 是目標規格。後端目前仍使用 `app/data/nutn_csie_115_graduation_rules_v1.json`，尚未實作共同認列範圍、證書推定狀態或可停用的60分政策。不要直接替換該快照；後續需完成程式與資料遷移。
