@@ -150,7 +150,7 @@ def validate_exclude(db, data, start, end):
 
 def calendar(db, first, last):
     events, warnings = occupied(db, at(first), at(last + timedelta(days=1)))
-    tasks = [t for t in records(db, "tasks") if first <= day(t["due_date"]) <= last]
+    tasks = [t for t in records(db, "tasks") if t["due_date"] is not None and first <= day(t["due_date"]) <= last]
     tasks.sort(key=lambda t: (t["due_date"], t["due_time"] is None, t["due_time"] or "", t["task_id"]))
     return {"from": first.isoformat(), "to": last.isoformat(), "timezone": "Asia/Taipei", "events": events,
             "task_deadlines": [{k: t[k] for k in ("task_id", "title", "type", "due_date", "due_time", "completed")} for t in tasks],

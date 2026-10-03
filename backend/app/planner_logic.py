@@ -108,6 +108,10 @@ def save(db, kind, payload, old=None):
                     conflict("修課紀錄已有課表引用，請先移除課表", "RELATED_RESOURCE")
         data["course_snapshot"] = old["course_snapshot"] if old and old["course_id"] == data["course_id"] else course_snapshot(db, data["course_id"])
     elif kind == "tasks":
+        if data["due_date"] is None:
+            if payload.get("due_time") is not None:
+                invalid("due_time", "截止時間需要截止日期")
+            data["due_time"] = None
         if data["event_id"] is not None:
             try:
                 owned(db, "personal-events", data["event_id"])

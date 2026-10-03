@@ -82,6 +82,15 @@ def transaction(write=False):
     return db
 
 
+@routes.get("/health")
+@endpoint
+def database_health():
+    query({})
+    db = transaction()
+    db.execute("SELECT COUNT(*) FROM planner_resources").fetchone()
+    return {"status": "ok"}
+
+
 def listed(data):
     return {"data": data, "meta": {"count": len(data)}}
 
@@ -92,10 +101,20 @@ def query_bool(value):
     return value == "true"
 
 
+def page_number(value, minimum=0, maximum=None):
+    if not value.isascii() or not value.isdecimal():
+        raise ValueError("須為非負整數")
+    number = int(value)
+    if number < minimum or maximum is not None and number > maximum:
+        raise ValueError("分頁參數超出範圍")
+    return number
+
+
 FILTERS = {
     "enrollments": {"semester_id": string, "enrollment_status": choice("in_progress", "finished")},
     "timetable-entries": {"semester_id": string},
-    "tasks": {"from": day, "to": day, "completed": query_bool, "course_id": string},
+    "tasks": {"from": day, "to": day, "completed": query_bool, "course_id": string,
+              "limit": lambda v: page_number(v, 1, 200), "offset": page_number},
     "personal-events": {"from": moment, "to": moment},
     "study-plans": {}, "planned-courses": {"target_semester_id": string},
 }
@@ -111,7 +130,9 @@ def resource_list(db, kind, params):
         invalid("to", "結束不能早於開始")
     result = []
     for r in records(db, kind):
-        if any(r[k] != v for k, v in params.items() if k not in ("from", "to")):
+        if any(r[k] != v for k, v in params.items() if k not in ("from", "to", "limit", "offset")):
+            continue
+        if kind == "tasks" and r["due_date"] is None and ("from" in params or "to" in params):
             continue
         if kind == "tasks" and ("from" in params and day(r["due_date"]) < params["from"] or "to" in params and day(r["due_date"]) > params["to"]):
             continue
@@ -119,7 +140,7 @@ def resource_list(db, kind, params):
             continue
         result.append(output(db, kind, r))
     if kind == "tasks":
-        result.sort(key=lambda t: (t["due_date"], t["due_time"] is None, t["due_time"] or "", t["task_id"]))
+        result.sort(key=lambda t: (t["due_date"] is None, t["due_date"] or "", t["due_time"] is None, t["due_time"] or "", t["task_id"]))
     if kind == "personal-events":
         result.sort(key=lambda e: (e["starts_at"], e["event_id"]))
     return result
@@ -130,7 +151,13 @@ def register_resource(kind):
     def collection():
         if request.method == "GET":
             params = query(FILTERS[kind])
-            return listed(resource_list(transaction(), kind, params))
+            result = resource_list(transaction(), kind, params)
+            if kind == "tasks":
+                limit, offset = params.get("limit", 50), params.get("offset", 0)
+                page = result[offset:offset + limit]
+                return {"data": page, "meta": {"count": len(page), "total": len(result),
+                                              "limit": limit, "offset": offset}}
+            return listed(result)
         query({})
         payload = body()
         # Reject unknown/missing fields before any reads.

@@ -69,7 +69,7 @@ def planned_check(db, semester_id, items):
 def dashboard(db, date):
     today = calendar(db, date, date)
     tasks = records(db, "tasks")
-    upcoming = [t for t in tasks if date <= day(t["due_date"]) < date + timedelta(days=7) and not t["completed"]]
+    upcoming = [t for t in tasks if t["due_date"] is not None and date <= day(t["due_date"]) < date + timedelta(days=7) and not t["completed"]]
     upcoming.sort(key=lambda t: (t["due_date"], t["due_time"] is None, t["due_time"] or "", t["task_id"]))
     monday = date - timedelta(days=date.weekday())
     start, end = at(monday), at(monday + timedelta(days=7))

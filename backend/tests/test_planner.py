@@ -571,7 +571,7 @@ def test_B15_openapi_paths(planner_app, evidence):
         assert {"get", "post"} <= spec["paths"][PREFIX + kind].keys()
     assert "put" in spec["paths"][PREFIX + "study-plans/{plan_id}/sessions"]
     task_input = spec["paths"][PREFIX + "tasks"]["post"]["requestBody"]["content"]["application/json"]["schema"]
-    assert task_input["additionalProperties"] is False and "due_date" in task_input["required"]
+    assert task_input["additionalProperties"] is False and task_input["required"] == ["title"]
     assert "201" in spec["paths"][PREFIX + "tasks"]["post"]["responses"]
     evidence.append({"openapi_paths": list(spec["paths"])})
 
