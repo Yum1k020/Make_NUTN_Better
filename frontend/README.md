@@ -30,4 +30,25 @@ npm run format:check
 - 資料證據：整理 Week 03 gate 的 proposal、source cards、3 個 fixed queries、top-k trace、generator comparison JSON 與 failure observation；目前使用學生系統 fixture 驗證，不把羽球場 baseline 範例當成產品需求。
 - 校區地圖：府城校區總覽、府城教室配置與榮譽教學中心配置；點選課表中的課程地點可開啟對應地圖，並能縮放及查看原圖。
 
-目前使用固定示範日期 **2026-09-17** 和本機示範資料。使用者的待辦、私人行程、複習建議與修課規劃會保存在瀏覽器 `localStorage`，尚未連接 API、登入、學校課務系統或 AI Agent。地圖圖片由使用者提供；教室與畢業條件仍以實際校方資料為準。
+## OpenAI 程式碼接口
+
+OpenAI API key 以程式碼設定讀取，不在畫面輸入。請複製 `.env.example` 成 `.env.local`，並只在 `.env.local` 填入自己的 key；`.env.local` 已被 `.gitignore` 排除，不要提交。
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+VITE_OPENAI_API_KEY=你的 OpenAI API key
+VITE_OPENAI_MODEL=gpt-5-mini
+```
+
+程式碼入口在 `src/lib/openaiAgent.js`：
+
+- `getOpenAIConfig()`：讀取 `VITE_OPENAI_API_KEY`、`VITE_OPENAI_MODEL` 與 Responses API endpoint。
+- `buildOpenAIRequest()`：把 Week 03 evidence gate 的 selected evidence 組成 OpenAI request body。
+- `generateEvidenceLockedAnswer()`：用設定好的 API key 呼叫 OpenAI Responses API。
+
+資料證據頁的 `Generator comparison` 區塊已接上 `generateEvidenceLockedAnswer()`；按下「OpenAI 產生」會用 selected evidence 產生 live 回答。若新增或修改 `.env.local`，請重新啟動 `npm run dev`，Vite 才會重新載入環境變數。
+
+目前使用固定示範日期 **2026-09-17** 和本機示範資料。使用者的待辦、私人行程、複習建議與修課規劃會保存在瀏覽器 `localStorage`。尚未連接登入、學校課務系統或正式後端代理。地圖圖片由使用者提供；教室與畢業條件仍以實際校方資料為準。

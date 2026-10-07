@@ -1756,6 +1756,17 @@ button.calendar-event:hover {
   background: #f7fffb;
   border-color: #c3eadb;
 }
+.generator-card.tone-openai {
+  background: #f8fbff;
+  border-color: #c8d9f4;
+}
+.generator-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  flex-wrap: wrap;
+}
 .generator-head {
   display: flex;
   align-items: flex-start;
@@ -1899,6 +1910,43 @@ button.calendar-event:hover {
 }
 .dialog .segment button {
   flex: 1;
+}
+.ai-dialog {
+  width: min(100%, 720px);
+}
+.ai-chat {
+  display: grid;
+  gap: 12px;
+}
+.ai-message {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 13px;
+}
+.ai-message span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.ai-message p {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.ai-message.user {
+  background: var(--blue-soft);
+  border-color: #c8d9f4;
+}
+.ai-message.system {
+  background: #f7f9fc;
+}
+.ai-message.assistant {
+  background: #f7fffb;
+  border-color: #c3eadb;
 }
 .inline-alert {
   display: flex;

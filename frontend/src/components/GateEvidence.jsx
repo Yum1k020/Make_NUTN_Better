@@ -15,6 +15,7 @@ import {
   getEvidenceGateMetrics,
   getSource,
 } from "../lib/evidence.js";
+import { generateEvidenceLockedAnswer } from "../lib/openaiAgent.js";
 
 function StatusTag({ children, tone = "blue" }) {
   return <span className={`gate-tag tone-${tone}`}>{children}</span>;
@@ -119,10 +120,112 @@ function GeneratorCard({ result, tone }) {
   );
 }
 
+function OpenAIGeneratorCard({ answer, error, isLoading, onOpenDialog }) {
+  return (
+    <article className="generator-card tone-openai">
+      <div className="generator-head">
+        <h3>OpenAI live generator</h3>
+        <div>
+          <StatusTag tone={error ? "red" : answer ? "mint" : "blue"}>
+            {error ? "needs setup" : answer ? "ready" : "not run"}
+          </StatusTag>
+        </div>
+      </div>
+      {error ? (
+        <p>{error}</p>
+      ) : (
+        <p>
+          {(answer && "OpenAI 回答已放在對話框。") ||
+            (isLoading
+              ? "OpenAI 正在根據 selected evidence 產生回答。"
+              : "按下「OpenAI 產生」後，回答會放進 AI 回答對話框。")}
+        </p>
+      )}
+      {(answer || error || isLoading) && (
+        <button
+          type="button"
+          className="text-link"
+          onClick={onOpenDialog}
+          aria-label="開啟 OpenAI 回答對話框"
+        >
+          開啟對話框
+        </button>
+      )}
+      <small>
+        API key 由 frontend/.env.local 的 VITE_OPENAI_API_KEY 讀取，不在 UI
+        輸入。
+      </small>
+    </article>
+  );
+}
+
+function OpenAIAnswerDialog({
+  answer,
+  error,
+  isLoading,
+  query,
+  selectedEvidenceCount,
+  onClose,
+}) {
+  return (
+    <div className="modal-backdrop">
+      <section
+        className="dialog ai-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ai-dialog-title"
+      >
+        <div className="dialog-heading">
+          <div>
+            <h2 id="ai-dialog-title">AI 回答對話框</h2>
+            <p>OpenAI 只會根據目前 selected evidence 產生回答。</p>
+          </div>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={onClose}
+            aria-label="關閉 AI 回答對話框"
+          >
+            <Icon name="close" size={18} />
+          </button>
+        </div>
+
+        <div className="ai-chat">
+          <article className="ai-message user">
+            <span>你問</span>
+            <p>{query?.question}</p>
+          </article>
+
+          <article className="ai-message system">
+            <span>使用證據</span>
+            <p>
+              目前會使用 {selectedEvidenceCount} 筆 selected
+              evidence；沒有證據時 OpenAI 應該拒答。
+            </p>
+          </article>
+
+          <article className="ai-message assistant">
+            <span>OpenAI 回答</span>
+            <p>
+              {error ||
+                answer ||
+                (isLoading ? "生成中，請稍候。" : "尚未產生回答。")}
+            </p>
+          </article>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function GateEvidence() {
   const [selectedQueryId, setSelectedQueryId] = useState(fixedQueries[0].id);
   const [jsonMode, setJsonMode] = useState("pretty");
   const [copyMessage, setCopyMessage] = useState("");
+  const [openAIAnswer, setOpenAIAnswer] = useState("");
+  const [openAIError, setOpenAIError] = useState("");
+  const [openAILoading, setOpenAILoading] = useState(false);
+  const [answerDialogOpen, setAnswerDialogOpen] = useState(false);
   const metrics = getEvidenceGateMetrics();
   const selectedQuery = fixedQueries.find(
     (query) => query.id === selectedQueryId,
@@ -145,6 +248,30 @@ export default function GateEvidence() {
       setCopyMessage("已複製 JSON");
     } catch {
       setCopyMessage("瀏覽器不允許複製，請直接選取 JSON");
+    }
+  }
+
+  function selectQuery(queryId) {
+    setSelectedQueryId(queryId);
+    setOpenAIAnswer("");
+    setOpenAIError("");
+    setAnswerDialogOpen(false);
+  }
+
+  async function runOpenAIGenerator() {
+    setAnswerDialogOpen(true);
+    setOpenAILoading(true);
+    setOpenAIAnswer("");
+    setOpenAIError("");
+    try {
+      const answer = await generateEvidenceLockedAnswer({
+        queryId: selectedQueryId,
+      });
+      setOpenAIAnswer(answer || "OpenAI 有回應，但沒有可顯示的文字。");
+    } catch (error) {
+      setOpenAIError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setOpenAILoading(false);
     }
   }
 
@@ -241,7 +368,7 @@ export default function GateEvidence() {
                   key={query.id}
                   query={query}
                   selected={query.id === selectedQueryId}
-                  onSelect={setSelectedQueryId}
+                  onSelect={selectQuery}
                 />
               ))}
             </div>
@@ -279,14 +406,31 @@ export default function GateEvidence() {
           <section className="panel generator-panel">
             <div className="panel-heading">
               <h2>Generator comparison</h2>
-              <span className="subtle">
-                missing {citationAudit.missing.length}・unused{" "}
-                {citationAudit.unused.length}
-              </span>
+              <div className="generator-actions">
+                <span className="subtle">
+                  missing {citationAudit.missing.length}・unused{" "}
+                  {citationAudit.unused.length}
+                </span>
+                <button
+                  type="button"
+                  className="secondary-button small"
+                  onClick={runOpenAIGenerator}
+                  disabled={openAILoading}
+                >
+                  <Icon name="check" size={15} />
+                  {openAILoading ? "產生中" : "OpenAI 產生"}
+                </button>
+              </div>
             </div>
             <div className="generator-list">
               <GeneratorCard result={comparison.baseline} tone="baseline" />
               <GeneratorCard result={comparison.evidenceLocked} tone="locked" />
+              <OpenAIGeneratorCard
+                answer={openAIAnswer}
+                error={openAIError}
+                isLoading={openAILoading}
+                onOpenDialog={() => setAnswerDialogOpen(true)}
+              />
             </div>
           </section>
 
@@ -346,6 +490,16 @@ export default function GateEvidence() {
           ))}
         </div>
       </section>
+      {answerDialogOpen && (
+        <OpenAIAnswerDialog
+          answer={openAIAnswer}
+          error={openAIError}
+          isLoading={openAILoading}
+          query={selectedQuery}
+          selectedEvidenceCount={comparisonJson.selected_evidence?.length || 0}
+          onClose={() => setAnswerDialogOpen(false)}
+        />
+      )}
     </>
   );
 }
