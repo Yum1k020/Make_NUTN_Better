@@ -11,12 +11,70 @@ import {
   weekStart,
   weekdayLabel,
 } from "../lib/planner.js";
+import {
+  requestStudyAgentPlan,
+  studyPlansMatch,
+} from "../lib/studyAgentClient.js";
 
 const periodOptions = [
   { id: "morning", label: "上午", start: "08:00", end: "12:00" },
   { id: "afternoon", label: "下午", start: "13:00", end: "18:00" },
   { id: "evening", label: "晚上", start: "18:00", end: "22:00" },
 ];
+
+function AgentExplanationPanel({ result, error, isLoading }) {
+  return (
+    <section className="panel agent-explanation-panel">
+      <div className="panel-heading">
+        <div>
+          <h2>Agent 規劃說明</h2>
+          <p className="subtle">框架負責工具協調與說明，排程仍由原規則計算。</p>
+        </div>
+        <span className="agent-framework-badge">OpenAI Agents SDK</span>
+      </div>
+
+      {isLoading ? (
+        <p className="agent-state" role="status">
+          <Icon name="check" size={18} />
+          Agent 正在呼叫規則工具並整理說明。
+        </p>
+      ) : error ? (
+        <p className="notice notice-warning" role="alert">
+          <Icon name="alert" size={18} />
+          {error} 已保留原本規則產生的安全排程。
+        </p>
+      ) : result ? (
+        <div className="agent-result">
+          <div className="agent-result-tags">
+            <span>function tool</span>
+            <span>structured output</span>
+            <span>規則結果一致</span>
+          </div>
+          <p>{result.summary}</p>
+          {result.warnings.length > 0 && (
+            <ul>
+              {result.warnings.map((warning) => (
+                <li key={warning}>{warning}</li>
+              ))}
+            </ul>
+          )}
+          <div className="agent-citations" aria-label="Agent 使用資料來源">
+            {result.citations.map((citation) => (
+              <span key={citation}>{citation}</span>
+            ))}
+          </div>
+          <small>
+            tool：{result.tool}・model：{result.model}・排程規則未交由 LLM
+          </small>
+        </div>
+      ) : (
+        <p className="empty-state">
+          按下「用 Agent 產生學習計畫」，可查看框架如何呼叫既有排程工具。
+        </p>
+      )}
+    </section>
+  );
+}
 
 export default function StudyPlanner({
   personalEvents,
@@ -32,6 +90,9 @@ export default function StudyPlanner({
     "evening",
   ]);
   const [planMessage, setPlanMessage] = useState("");
+  const [agentResult, setAgentResult] = useState(null);
+  const [agentError, setAgentError] = useState("");
+  const [agentLoading, setAgentLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
   const [editError, setEditError] = useState("");
@@ -66,7 +127,7 @@ export default function StudyPlanner({
     );
   }
 
-  function generatePlan(event) {
+  async function generatePlan(event) {
     event.preventDefault();
     if (
       !Number.isFinite(Number(hours)) ||
@@ -78,23 +139,68 @@ export default function StudyPlanner({
       return setPlanMessage("請至少選擇一個可安排時段。");
     if (examDate <= DEMO_DATE)
       return setPlanMessage("考試日期需晚於示範起始日 9 月 17 日。");
-    const result = planStudySessions({
+    const request = {
       startDate: DEMO_DATE,
       examDate,
-      hours,
+      hours: Number(hours),
       sessionHours,
       allowedPeriods,
       courseName,
+      personalEvents: personalEvents.map(
+        ({ id, title, date, start, end, location }) => ({
+          id,
+          title,
+          date,
+          start,
+          end,
+          location,
+        }),
+      ),
+    };
+    const baseline = planStudySessions({
+      ...request,
       weeklyClasses,
-      personalEvents,
     });
-    onUpdateSessions(result.sessions);
+
+    onUpdateSessions(baseline.sessions);
     setPlanMessage(
-      result.remainingMinutes > 0
-        ? `可安排時間不足，尚缺 ${result.remainingMinutes / 60} 小時。請增加可安排時段或調整複習需求。`
-        : `已在考試前安排 ${result.scheduledMinutes / 60} 小時，請檢視後自行調整。`,
+      baseline.remainingMinutes > 0
+        ? `可安排時間不足，尚缺 ${baseline.remainingMinutes / 60} 小時。請增加可安排時段或調整複習需求。`
+        : `已在考試前安排 ${baseline.scheduledMinutes / 60} 小時，正在請 Agent 說明結果。`,
     );
+    setAgentResult(null);
+    setAgentError("");
+    setAgentLoading(true);
     setEditingId(null);
+
+    try {
+      const response = await requestStudyAgentPlan({
+        payload: request,
+        signal:
+          typeof AbortSignal !== "undefined" &&
+          typeof AbortSignal.timeout === "function"
+            ? AbortSignal.timeout(45_000)
+            : undefined,
+      });
+      if (!studyPlansMatch(baseline, response.plan)) {
+        throw new Error("框架回傳排程與原規則不一致。");
+      }
+
+      onUpdateSessions(response.plan.sessions);
+      setAgentResult({
+        ...response.agent,
+        comparison: response.comparison,
+      });
+      setPlanMessage(
+        response.plan.remainingMinutes > 0
+          ? `規則與 Agent 結果一致；目前尚缺 ${response.plan.remainingMinutes / 60} 小時。`
+          : `規則與 Agent 結果一致，已安排 ${response.plan.scheduledMinutes / 60} 小時。`,
+      );
+    } catch (error) {
+      setAgentError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setAgentLoading(false);
+    }
   }
 
   function startEdit(session) {
@@ -122,12 +228,16 @@ export default function StudyPlanner({
         item.id === session.id ? { ...item, ...draft } : item,
       ),
     );
+    setAgentResult(null);
+    setAgentError("");
     setEditingId(null);
     setPlanMessage("已手動調整複習時段。");
   }
 
   function removeSession(sessionId) {
     onUpdateSessions(studySessions.filter((item) => item.id !== sessionId));
+    setAgentResult(null);
+    setAgentError("");
     setPlanMessage("已移除複習時段；需要時可重新產生計畫。");
   }
 
@@ -231,9 +341,17 @@ export default function StudyPlanner({
                   </label>
                 ))}
               </fieldset>
-              <button className="primary-button full-width" type="submit">
-                產生學習計畫
+              <button
+                className="primary-button full-width"
+                type="submit"
+                disabled={agentLoading}
+              >
+                {agentLoading ? "Agent 規劃中" : "用 Agent 產生學習計畫"}
               </button>
+              <p className="agent-disclosure">
+                按下後會將課程名稱、日期、可用時段與目前私人行程送至 OpenAI
+                產生說明；確定性排程會先在本機完成。
+              </p>
             </form>
           </section>
           <section className="panel availability-panel">
@@ -443,6 +561,11 @@ export default function StudyPlanner({
               </p>
             )}
           </section>
+          <AgentExplanationPanel
+            result={agentResult}
+            error={agentError}
+            isLoading={agentLoading}
+          />
           <section className="panel study-summary-panel">
             <div className="panel-heading">
               <h2>時數摘要</h2>

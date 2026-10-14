@@ -30,6 +30,8 @@
 
 學分計算與畢業條件比對依明確規則執行；AI Agent 負責資料整理、安排與說明。
 
+「智慧學習」已完成第一個局部框架替換：伺服器端 OpenAI Agents SDK 透過 function tool 呼叫既有排程規則，再以 structured output 說明結果。API key 不再放在瀏覽器端，且 Agent 失敗時仍保留原規則排程。選擇原因、前後差異與驗收案例請見 [`docs/week04-framework-replacement.md`](docs/week04-framework-replacement.md)。
+
 ## Acceptance Criteria（驗收條件）
 
 ### 1. 資料擷取與課表整合

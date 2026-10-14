@@ -180,7 +180,9 @@ export default function App() {
             onNavigate={setActivePage}
           />
         )}
-        {activePage === "evidence" && <GateEvidence />}
+        {activePage === "evidence" && (
+          <GateEvidence onNavigate={setActivePage} />
+        )}
       </main>
       <MobileNav activePage={activePage} onNavigate={setActivePage} />
       {dialog && (

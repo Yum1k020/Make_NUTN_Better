@@ -14,13 +14,36 @@ import {
   getEvidenceGateMetrics,
 } from "../src/lib/evidence.js";
 import {
-  buildOpenAIRequest,
-  extractOpenAIText,
-  generateEvidenceLockedAnswer,
-  getOpenAIConfig,
-  normalizeOpenAIError,
-  requireOpenAIConfig,
-} from "../src/lib/openaiAgent.js";
+  requestStudyAgentPlan,
+  studyPlansMatch,
+} from "../src/lib/studyAgentClient.js";
+import {
+  buildValidatedStudyPlan,
+  createStudyAgentService,
+  STUDY_PLAN_TOOL_NAME,
+} from "../server/studyAgent.js";
+
+function createStudyPlanRequest(overrides = {}) {
+  return {
+    startDate: "2026-09-17",
+    examDate: "2026-09-24",
+    hours: 6,
+    sessionHours: 2,
+    allowedPeriods: ["afternoon", "evening"],
+    courseName: "資料結構",
+    personalEvents: initialEvents.map(
+      ({ id, title, date, start, end, location }) => ({
+        id,
+        title,
+        date,
+        start,
+        end,
+        location,
+      }),
+    ),
+    ...overrides,
+  };
+}
 
 test("a Thursday resolves to the Monday of the same week", () => {
   assert.equal(weekStart("2026-09-17"), "2026-09-14");
@@ -111,89 +134,96 @@ test("comparison JSON records no-answer failure observation", () => {
   );
 });
 
-test("OpenAI request uses selected evidence without leaking an API key", () => {
-  const request = buildOpenAIRequest({
-    queryId: "today-schedule",
-    model: "gpt-5-mini",
-  });
-  const requestText = JSON.stringify(request);
-  assert.equal(request.model, "gpt-5-mini");
-  assert.equal(request.store, false);
-  assert.match(requestText, /class-data-structures/);
-  assert.equal(Object.hasOwn(request, "apiKey"), false);
-  assert.doesNotMatch(requestText, /Bearer/);
-  assert.doesNotMatch(requestText, /OPENAI_API_KEY/);
-});
-
-test("OpenAI response parser handles output_text and content arrays", () => {
-  assert.equal(
-    extractOpenAIText({ output_text: "  已根據證據回答。 " }),
-    "已根據證據回答。",
-  );
-  assert.equal(
-    extractOpenAIText({
-      output: [
-        {
-          content: [
-            { type: "output_text", text: "第一段" },
-            { type: "output_text", text: "第二段" },
-          ],
-        },
-      ],
-    }),
-    "第一段\n第二段",
-  );
-});
-
-test("OpenAI error messages are normalized for display", () => {
-  assert.equal(
-    normalizeOpenAIError({
-      error: { message: "  Incorrect API key provided.  " },
-    }),
-    "Incorrect API key provided.",
-  );
-});
-
-test("OpenAI config reads the code-level environment interface", () => {
-  const config = getOpenAIConfig({
-    VITE_OPENAI_API_KEY: "test-api-key",
-    VITE_OPENAI_MODEL: "gpt-test",
-    VITE_OPENAI_RESPONSES_ENDPOINT: "https://example.test/responses",
-  });
-  assert.deepEqual(config, {
+test("framework tool preserves the original deterministic study plan", async () => {
+  const request = createStudyPlanRequest();
+  const expectedPlan = buildValidatedStudyPlan(request);
+  let observedAgent;
+  let observedOptions;
+  const service = createStudyAgentService({
     apiKey: "test-api-key",
     model: "gpt-test",
-    endpoint: "https://example.test/responses",
-  });
-});
-
-test("OpenAI config reports a missing API key before fetching", () => {
-  assert.throws(
-    () => requireOpenAIConfig({ apiKey: "", model: "", endpoint: "" }),
-    /Missing VITE_OPENAI_API_KEY/,
-  );
-});
-
-test("OpenAI generation sends the API key only in the authorization header", async () => {
-  let captured;
-  const answer = await generateEvidenceLockedAnswer({
-    queryId: "study-plan",
-    config: {
-      apiKey: "test-api-key",
-      model: "gpt-test",
-      endpoint: "https://example.test/responses",
-    },
-    fetchImpl: async (url, options) => {
-      captured = { url, options };
+    runAgent: async (agent, _input, options) => {
+      observedAgent = agent;
+      observedOptions = options;
       return {
-        ok: true,
-        json: async () => ({ output_text: "已根據 selected evidence 回答。" }),
+        finalOutput: {
+          summary: "已依規則安排三個複習時段。",
+          warnings: [],
+          citations: [
+            "planner-rule",
+            "weekly-classes-fixture",
+            "tasks-events-local",
+          ],
+          refused: false,
+        },
       };
     },
   });
 
-  assert.equal(answer, "已根據 selected evidence 回答。");
-  assert.equal(captured.url, "https://example.test/responses");
-  assert.equal(captured.options.headers.Authorization, "Bearer test-api-key");
-  assert.doesNotMatch(captured.options.body, /test-api-key/);
+  const result = await service.run(request);
+
+  assert.deepEqual(result.plan, expectedPlan);
+  assert.equal(result.plan.scheduledMinutes, 360);
+  assert.equal(result.plan.remainingMinutes, 0);
+  assert.equal(result.plan.sessions.length, 3);
+  assert.equal(observedAgent.name, "NUTN Study Planning Agent");
+  assert.ok(
+    observedAgent.tools.some(
+      (agentTool) => agentTool.name === STUDY_PLAN_TOOL_NAME,
+    ),
+  );
+  assert.deepEqual(observedOptions.context.plan, expectedPlan);
+  assert.equal(result.agent.framework, "OpenAI Agents SDK");
+  assert.equal(result.agent.tool, STUDY_PLAN_TOOL_NAME);
+});
+
+test("framework input validation rejects an invalid planning range", () => {
+  assert.throws(
+    () =>
+      buildValidatedStudyPlan(
+        createStudyPlanRequest({ examDate: "2026-09-17" }),
+      ),
+    /考試日期必須晚於規劃起始日/,
+  );
+});
+
+test("frontend client sends only planning data and accepts structured output", async () => {
+  const payload = createStudyPlanRequest();
+  const plan = buildValidatedStudyPlan(payload);
+  let captured;
+  const responseBody = {
+    plan,
+    agent: {
+      summary: "已完成說明。",
+      warnings: [],
+      citations: ["planner-rule"],
+      refused: false,
+      framework: "OpenAI Agents SDK",
+      tool: STUDY_PLAN_TOOL_NAME,
+      model: "gpt-test",
+    },
+  };
+
+  const response = await requestStudyAgentPlan({
+    payload,
+    endpoint: "/api/study-agent/run",
+    fetchImpl: async (url, options) => {
+      captured = { url, options };
+      return {
+        ok: true,
+        json: async () => responseBody,
+      };
+    },
+  });
+
+  assert.deepEqual(response, responseBody);
+  assert.equal(captured.url, "/api/study-agent/run");
+  assert.equal(captured.options.headers.Authorization, undefined);
+  assert.doesNotMatch(captured.options.body, /test-api-key|OPENAI_API_KEY/);
+});
+
+test("frontend comparison detects framework changes to the rule result", () => {
+  const plan = buildValidatedStudyPlan(createStudyPlanRequest());
+  assert.equal(studyPlansMatch(plan, structuredClone(plan)), true);
+  assert.equal(studyPlansMatch(plan, { ...plan, remainingMinutes: 30 }), false);
 });

@@ -1169,6 +1169,93 @@ button.calendar-event:hover {
 .study-summary-panel .progress-track span {
   background: var(--blue);
 }
+.agent-explanation-panel {
+  border-color: #c8d9f4;
+  background: #fbfdff;
+}
+.agent-explanation-panel .panel-heading > div {
+  min-width: 0;
+}
+.agent-explanation-panel .panel-heading h2 {
+  margin-bottom: 4px;
+}
+.agent-explanation-panel .panel-heading p {
+  margin: 0;
+  line-height: 1.5;
+}
+.agent-framework-badge {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  border-radius: 5px;
+  background: var(--blue-soft);
+  color: var(--blue-deep);
+  font-size: 10px;
+  font-weight: 800;
+}
+.agent-disclosure {
+  margin: -3px 2px 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+.agent-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 17px 14px;
+  padding: 12px;
+  border-radius: 7px;
+  background: var(--blue-soft);
+  color: var(--blue-deep);
+  font-size: 12px;
+  font-weight: 700;
+}
+.agent-result {
+  padding: 0 17px 16px;
+}
+.agent-result > p {
+  margin: 10px 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.agent-result ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  color: var(--red);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.agent-result small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.agent-result-tags,
+.agent-citations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.agent-result-tags span,
+.agent-citations span {
+  border-radius: 5px;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: 750;
+}
+.agent-result-tags span {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+.agent-citations {
+  margin: 10px 0;
+}
+.agent-citations span {
+  background: #eef4fb;
+  color: #46556f;
+}
 
 /* Course planner */
 .metric-strip {

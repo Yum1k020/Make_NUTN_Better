@@ -4,7 +4,7 @@
 
 ## 啟動
 
-需 Node.js 20.19 以上版本。
+需 Node.js 22 以上版本。
 
 ```bash
 cd frontend
@@ -30,25 +30,37 @@ npm run format:check
 - 資料證據：整理 Week 03 gate 的 proposal、source cards、3 個 fixed queries、top-k trace、generator comparison JSON 與 failure observation；目前使用學生系統 fixture 驗證，不把羽球場 baseline 範例當成產品需求。
 - 校區地圖：府城校區總覽、府城教室配置與榮譽教學中心配置；點選課表中的課程地點可開啟對應地圖，並能縮放及查看原圖。
 
-## OpenAI 程式碼接口
+## OpenAI Agents SDK 接口
 
-OpenAI API key 以程式碼設定讀取，不在畫面輸入。請複製 `.env.example` 成 `.env.local`，並只在 `.env.local` 填入自己的 key；`.env.local` 已被 `.gitignore` 排除，不要提交。
+OpenAI API key 只由本機伺服器讀取，不在畫面輸入，也不會經由 Vite 的 `VITE_*` 變數提供給瀏覽器。請在專案根目錄複製 `.env.example` 成 `.env.local`，只在 `.env.local` 填入自己的 key；該檔已被 `.gitignore` 排除，不要提交。
 
 ```bash
+cd ..
 cp .env.example .env.local
 ```
 
 ```env
-VITE_OPENAI_API_KEY=你的 OpenAI API key
-VITE_OPENAI_MODEL=gpt-5-mini
+OPENAI_API_KEY=你的 OpenAI API key
+OPENAI_MODEL=gpt-5-mini
+OPENAI_AGENTS_TRACING=false
 ```
 
-程式碼入口在 `src/lib/openaiAgent.js`：
+主要程式碼入口：
 
-- `getOpenAIConfig()`：讀取 `VITE_OPENAI_API_KEY`、`VITE_OPENAI_MODEL` 與 Responses API endpoint。
-- `buildOpenAIRequest()`：把 Week 03 evidence gate 的 selected evidence 組成 OpenAI request body。
-- `generateEvidenceLockedAnswer()`：用設定好的 API key 呼叫 OpenAI Responses API。
+- `server/studyAgent.js`：建立單一 Agent、`get_validated_study_plan` function tool 與 structured output。
+- `server/studyAgentMiddleware.js`：提供同源 `/api/study-agent/run` API，並只在伺服器端讀取金鑰。
+- `src/lib/studyAgentClient.js`：前端送出規劃資料，不包含 API key。
+- `src/lib/planner.js`：保留原本可重複驗證的排程與衝突規則，是時段結果的唯一依據。
 
-資料證據頁的 `Generator comparison` 區塊已接上 `generateEvidenceLockedAnswer()`；按下「OpenAI 產生」會用 selected evidence 產生 live 回答。若新增或修改 `.env.local`，請重新啟動 `npm run dev`，Vite 才會重新載入環境變數。
+進入「智慧學習」按下「用 Agent 產生學習計畫」後，畫面會先保留原規則產生的排程，再請 Agent 呼叫規則工具並回傳說明。若框架結果與原規則不一致或 API 暫時失敗，前端不採用框架排程。若新增或修改 `.env.local`，請重新啟動 `npm run dev`。
+
+完成一般測試後，可執行一次需要網路及少量 API 用量的實際 smoke test。這個測試只送出合成課名、日期與空的私人行程，不會讀取畫面中的使用者資料：
+
+```bash
+cd frontend
+npm run agent:smoke
+```
+
+替換理由、驗收案例與限制記錄於 [`../docs/week04-framework-replacement.md`](../docs/week04-framework-replacement.md)。
 
 目前使用固定示範日期 **2026-09-17** 和本機示範資料。使用者的待辦、私人行程、複習建議與修課規劃會保存在瀏覽器 `localStorage`。尚未連接登入、學校課務系統或正式後端代理。地圖圖片由使用者提供；教室與畢業條件仍以實際校方資料為準。
