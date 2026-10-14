@@ -1,0 +1,35 @@
+name: Week 05 Agentic Validation
+
+on:
+  pull_request:
+    branches:
+      - feature/agentic-weeks02-04
+  workflow_dispatch:
+
+jobs:
+  week05:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-agentic-ai.txt
+
+      - name: Run full Agentic regression suite
+        run: python -m pytest -c pytest_agentic.ini -v
+
+      - name: Generate Week 05 comparison evidence
+        run: python -m week05.run_acceptance
+
+      - name: Upload Week 05 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: week05-comparison
+          path: week05/evidence/week05_comparison.json
+          if-no-files-found: error
