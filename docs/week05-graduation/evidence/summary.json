@@ -1,0 +1,93 @@
+{
+  "base_commit": "c06b69f50d4ee66cdc38cf43e1843057c0728f3c",
+  "topic": "graduation planning",
+  "ab_passed": 8,
+  "regression_baseline_passed": 262,
+  "regression_candidate_passed": 262,
+  "skipped_each": 4,
+  "deselected_each": 3,
+  "model_calls": 0,
+  "live_status": "NOT_IMPLEMENTED_NO_MODEL_ADAPTER",
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "framework_version": "1.0.3",
+  "original_progress_body_ast_equal": true,
+  "study_plan_code_unchanged": true,
+  "tests": [
+    {
+      "case": "partial",
+      "expected": {
+        "http_status": 200,
+        "earned_credits": 3,
+        "overall_status": "not_met",
+        "no_double_allocation": true
+      },
+      "both_pass": true
+    },
+    {
+      "case": "missing_rule",
+      "expected": {
+        "http_status": 200,
+        "earned_credits": null,
+        "overall_status": "needs_confirmation"
+      },
+      "both_pass": true
+    },
+    {
+      "case": "overflow",
+      "expected": {
+        "http_status": 200,
+        "earned_credits": 24,
+        "overall_status": "not_met",
+        "no_double_allocation": true
+      },
+      "both_pass": true
+    },
+    {
+      "case": "lecture_gap",
+      "expected": {
+        "http_status": 200,
+        "earned_credits": 133,
+        "overall_status": "not_met",
+        "no_double_allocation": true
+      },
+      "both_pass": true
+    },
+    {
+      "case": "full_met",
+      "expected": {
+        "http_status": 200,
+        "earned_credits": 133,
+        "overall_status": "met",
+        "no_double_allocation": true
+      },
+      "both_pass": true
+    },
+    {
+      "case": "unknown_classification",
+      "expected": {
+        "http_status": 200,
+        "earned_credits": 3,
+        "overall_status": "not_met",
+        "no_double_allocation": true
+      },
+      "both_pass": true
+    },
+    {
+      "case": "checksum_error",
+      "expected": {
+        "http_status": 500,
+        "error": "INTERNAL_ERROR"
+      },
+      "both_pass": true
+    },
+    {
+      "case": "storage_error",
+      "expected": {
+        "http_status": 500,
+        "error": "INTERNAL_ERROR"
+      },
+      "both_pass": true
+    }
+  ]
+}

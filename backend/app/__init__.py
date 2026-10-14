@@ -22,6 +22,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.json.ensure_ascii = False
     app.config.from_mapping(
+        GRADUATION_ENGINE=os.environ.get("GRADUATION_ENGINE", "legacy"),
         API_TITLE="Make NUTN Better API",
         API_VERSION="0.1.0",
         OPENAPI_VERSION="3.0.3",
@@ -34,6 +35,9 @@ def create_app(test_config=None):
     )
     if test_config:
         app.config.update(test_config)
+
+    if app.config["GRADUATION_ENGINE"] not in {"legacy", "langgraph"}:
+        raise ValueError("GRADUATION_ENGINE must be legacy or langgraph")
 
     # Serve documentation assets locally: no CDN or network needed after install.
     app.register_blueprint(FlaskBlueprint(
