@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { createStudyAgentService } from "./studyAgent.js";
+import { StudyPlanWorkflowError } from "./studyPlanWorkflow.js";
 
 const MAX_BODY_BYTES = 100_000;
 
@@ -70,6 +71,15 @@ export function createStudyAgentMiddleware({
             path: issue.path.join("."),
             message: issue.message,
           })),
+        });
+      }
+      if (error instanceof StudyPlanWorkflowError) {
+        console.error("[study-agent] workflow stopped:", error.code);
+        return sendJson(response, error.statusCode, {
+          error: error.message,
+          code: error.code,
+          workflow: error.workflow,
+          ...(error.issues.length ? { issues: error.issues } : {}),
         });
       }
       if (error instanceof Error && error.message === "REQUEST_TOO_LARGE") {

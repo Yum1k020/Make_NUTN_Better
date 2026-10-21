@@ -1256,6 +1256,99 @@ button.calendar-event:hover {
   background: #eef4fb;
   color: #46556f;
 }
+.workflow-trace {
+  margin: 0 17px 16px;
+  padding: 13px;
+  border: 1px solid #d8e3f3;
+  border-radius: 8px;
+  background: #fff;
+}
+.workflow-trace-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.workflow-state,
+.workflow-step-status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-size: 9px;
+  font-weight: 800;
+}
+.workflow-state.is-completed,
+.workflow-trace li.is-completed .workflow-step-status {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+.workflow-state.is-stopped,
+.workflow-trace li.is-rejected .workflow-step-status,
+.workflow-trace li.is-failed .workflow-step-status {
+  background: var(--red-soft);
+  color: var(--red);
+}
+.workflow-trace ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workflow-trace li {
+  display: grid;
+  grid-template-columns: 11px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid #edf1f6;
+}
+.workflow-trace li > div strong,
+.workflow-trace li > div small {
+  display: block;
+}
+.workflow-trace li > div strong {
+  color: var(--ink);
+  font-size: 11px;
+}
+.workflow-trace li > div small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+.workflow-step-marker {
+  width: 9px;
+  height: 9px;
+  margin-top: 2px;
+  border: 2px solid var(--blue);
+  border-radius: 50%;
+  background: var(--blue-soft);
+}
+.workflow-trace li.is-rejected .workflow-step-marker,
+.workflow-trace li.is-failed .workflow-step-marker {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+.workflow-stop-reason {
+  margin: 9px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 10px;
+}
+.workflow-stop-reason code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+}
+.workflow-run-id {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.5;
+}
 
 /* Course planner */
 .metric-strip {

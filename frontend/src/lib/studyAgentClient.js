@@ -28,7 +28,12 @@ export async function requestStudyAgentPlan({
   const body = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(body.error || `Agent API 回傳 HTTP ${response.status}`);
+    const error = new Error(
+      body.error || `Agent API 回傳 HTTP ${response.status}`,
+    );
+    error.code = body.code;
+    error.workflow = body.workflow;
+    throw error;
   }
   if (!body.plan || !body.agent) {
     throw new Error("Agent API 回傳資料不完整。");

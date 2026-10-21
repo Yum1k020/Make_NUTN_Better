@@ -33,6 +33,7 @@ console.log(
       warnings: result.agent.warnings,
       citations: result.agent.citations,
       comparison: result.comparison,
+      workflow: result.workflow,
     },
     null,
     2,

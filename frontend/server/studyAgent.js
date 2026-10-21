@@ -7,48 +7,15 @@ import {
 } from "@openai/agents";
 import { z } from "zod";
 import { weeklyClasses } from "../src/data/demo.js";
-import { planStudySessions } from "../src/lib/planner.js";
+import {
+  buildDeterministicStudyPlan,
+  runStudyPlanWorkflow,
+  studyPlanRequestSchema,
+  verifyStudyPlan,
+} from "./studyPlanWorkflow.js";
 
 const DEFAULT_MODEL = "gpt-5-mini";
 const STUDY_PLAN_TOOL_NAME = "get_validated_study_plan";
-const PERIODS = ["morning", "afternoon", "evening"];
-
-const isoDateSchema = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "日期格式必須是 YYYY-MM-DD。");
-const timeSchema = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "時間格式必須是 HH:MM。");
-
-const personalEventSchema = z
-  .object({
-    id: z.string().min(1).max(120),
-    title: z.string().min(1).max(200),
-    date: isoDateSchema,
-    start: timeSchema,
-    end: timeSchema,
-    location: z.string().max(200).default(""),
-  })
-  .strict()
-  .refine((event) => event.end > event.start, {
-    message: "私人行程的結束時間必須晚於開始時間。",
-  });
-
-export const studyPlanRequestSchema = z
-  .object({
-    startDate: isoDateSchema,
-    examDate: isoDateSchema,
-    hours: z.number().min(0.5).max(100),
-    sessionHours: z.number().min(0.5).max(4),
-    allowedPeriods: z.array(z.enum(PERIODS)).min(1),
-    courseName: z.string().trim().min(1).max(120),
-    personalEvents: z.array(personalEventSchema).max(200),
-  })
-  .strict()
-  .refine((request) => request.examDate > request.startDate, {
-    message: "考試日期必須晚於規劃起始日。",
-    path: ["examDate"],
-  });
 
 const agentOutputSchema = z
   .object({
@@ -70,10 +37,10 @@ const agentOutputSchema = z
 
 export function buildValidatedStudyPlan(request) {
   const input = studyPlanRequestSchema.parse(request);
-  return planStudySessions({
-    ...input,
-    weeklyClasses,
-  });
+  const plan = buildDeterministicStudyPlan(input);
+  const issues = verifyStudyPlan(input, plan);
+  if (issues.length) throw new Error(issues.join(" "));
+  return plan;
 }
 
 const getValidatedStudyPlan = tool({
@@ -146,32 +113,40 @@ export function createStudyAgentService({
   return {
     model: normalizedModel,
     async run(request) {
-      const normalizedRequest = studyPlanRequestSchema.parse(request);
-      const plan = buildValidatedStudyPlan(normalizedRequest);
-      const result = await runAgent(
-        agent,
-        `請說明「${normalizedRequest.courseName}」在 ${normalizedRequest.examDate} 前的複習安排。`,
-        {
-          context: { request: normalizedRequest, plan },
-          maxTurns: 4,
-        },
-      );
-      const explanation = agentOutputSchema.parse(result.finalOutput);
+      const workflowResult = await runStudyPlanWorkflow({
+        request,
+        explainPlan: async ({ request: normalizedRequest, plan }) => {
+          const result = await runAgent(
+            agent,
+            `請說明「${normalizedRequest.courseName}」在 ${normalizedRequest.examDate} 前的複習安排。`,
+            {
+              context: { request: normalizedRequest, plan },
+              maxTurns: 4,
+            },
+          );
+          const explanation = agentOutputSchema.parse(result.finalOutput);
 
-      if (explanation.refused) {
-        throw new Error("Agent refused a validated study-plan request.");
-      }
+          if (explanation.refused) {
+            throw new Error("Agent refused a validated study-plan request.");
+          }
+
+          return {
+            ...explanation,
+            warnings:
+              plan.remainingMinutes > 0
+                ? explanation.warnings.length
+                  ? explanation.warnings
+                  : [`尚缺 ${plan.remainingMinutes} 分鐘，請增加可安排時段。`]
+                : [],
+          };
+        },
+      });
+      const { plan, explanation, workflow } = workflowResult;
 
       return {
         plan,
         agent: {
           ...explanation,
-          warnings:
-            plan.remainingMinutes > 0
-              ? explanation.warnings.length
-                ? explanation.warnings
-                : [`尚缺 ${plan.remainingMinutes} 分鐘，請增加可安排時段。`]
-              : [],
           framework: "OpenAI Agents SDK",
           tool: STUDY_PLAN_TOOL_NAME,
           model: normalizedModel,
@@ -182,9 +157,10 @@ export function createStudyAgentService({
           remainingMinutes: plan.remainingMinutes,
           sessionCount: plan.sessions.length,
         },
+        workflow,
       };
     },
   };
 }
 
-export { DEFAULT_MODEL, STUDY_PLAN_TOOL_NAME };
+export { DEFAULT_MODEL, STUDY_PLAN_TOOL_NAME, studyPlanRequestSchema };

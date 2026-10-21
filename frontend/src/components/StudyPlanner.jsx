@@ -22,7 +22,72 @@ const periodOptions = [
   { id: "evening", label: "晚上", start: "18:00", end: "22:00" },
 ];
 
-function AgentExplanationPanel({ result, error, isLoading }) {
+const workflowStatusLabels = {
+  completed: "通過",
+  rejected: "拒絕",
+  failed: "失敗",
+};
+
+function formatStageEvidence(stage) {
+  const evidence = stage.evidence || {};
+  if (stage.id === "validate-request") {
+    return stage.status === "completed"
+      ? `${evidence.fieldCount} 個欄位・${evidence.personalEventCount} 筆私人行程`
+      : `${evidence.issueCount} 項問題・下游 ${evidence.downstreamCalls} 次`;
+  }
+  if (stage.id === "build-plan") {
+    return stage.status === "completed"
+      ? `${evidence.sessionCount} 個時段・已安排 ${evidence.scheduledMinutes} 分鐘・尚缺 ${evidence.remainingMinutes} 分鐘`
+      : `${evidence.errorSource}・嘗試 ${evidence.attemptCount} 次`;
+  }
+  if (stage.id === "verify-plan") {
+    return stage.status === "completed"
+      ? `檢查 ${evidence.checkedSessionCount} 個時段・${evidence.issueCount} 項問題`
+      : `${evidence.issueCount} 項問題・下游 ${evidence.downstreamCalls} 次`;
+  }
+  return stage.status === "completed"
+    ? `${evidence.provider}・${evidence.citationCount} 個來源・嘗試 ${evidence.attemptCount} 次`
+    : `${evidence.errorSource}・嘗試 ${evidence.attemptCount} 次`;
+}
+
+function WorkflowTrace({ workflow }) {
+  if (!workflow) return null;
+  return (
+    <div className="workflow-trace" aria-label="Prompt chaining 執行軌跡">
+      <div className="workflow-trace-heading">
+        <strong>Prompt chaining 執行軌跡</strong>
+        <span className={`workflow-state is-${workflow.status}`}>
+          {workflow.status === "completed" ? "完成" : "已停止"}
+        </span>
+      </div>
+      <ol>
+        {workflow.stages.map((stage) => (
+          <li className={`is-${stage.status}`} key={stage.id}>
+            <span className="workflow-step-marker" aria-hidden="true" />
+            <div>
+              <strong>{stage.label}</strong>
+              <small>{formatStageEvidence(stage)}</small>
+            </div>
+            <span className="workflow-step-status">
+              {workflowStatusLabels[stage.status] || stage.status}
+            </span>
+          </li>
+        ))}
+      </ol>
+      {workflow.stopReason && (
+        <p className="workflow-stop-reason">
+          停止原因：<code>{workflow.stopReason}</code>
+        </p>
+      )}
+      <small className="workflow-run-id">
+        workflow：{workflow.name}・version：{workflow.version}・run ID：
+        {workflow.runId}
+      </small>
+    </div>
+  );
+}
+
+function AgentExplanationPanel({ result, error, isLoading, workflow }) {
   return (
     <section className="panel agent-explanation-panel">
       <div className="panel-heading">
@@ -72,6 +137,7 @@ function AgentExplanationPanel({ result, error, isLoading }) {
           按下「用 Agent 產生學習計畫」，可查看框架如何呼叫既有排程工具。
         </p>
       )}
+      <WorkflowTrace workflow={workflow} />
     </section>
   );
 }
@@ -92,6 +158,7 @@ export default function StudyPlanner({
   const [planMessage, setPlanMessage] = useState("");
   const [agentResult, setAgentResult] = useState(null);
   const [agentError, setAgentError] = useState("");
+  const [agentWorkflow, setAgentWorkflow] = useState(null);
   const [agentLoading, setAgentLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
@@ -170,6 +237,7 @@ export default function StudyPlanner({
     );
     setAgentResult(null);
     setAgentError("");
+    setAgentWorkflow(null);
     setAgentLoading(true);
     setEditingId(null);
 
@@ -191,6 +259,7 @@ export default function StudyPlanner({
         ...response.agent,
         comparison: response.comparison,
       });
+      setAgentWorkflow(response.workflow);
       setPlanMessage(
         response.plan.remainingMinutes > 0
           ? `規則與 Agent 結果一致；目前尚缺 ${response.plan.remainingMinutes / 60} 小時。`
@@ -198,6 +267,7 @@ export default function StudyPlanner({
       );
     } catch (error) {
       setAgentError(error instanceof Error ? error.message : String(error));
+      setAgentWorkflow(error?.workflow || null);
     } finally {
       setAgentLoading(false);
     }
@@ -230,6 +300,7 @@ export default function StudyPlanner({
     );
     setAgentResult(null);
     setAgentError("");
+    setAgentWorkflow(null);
     setEditingId(null);
     setPlanMessage("已手動調整複習時段。");
   }
@@ -238,6 +309,7 @@ export default function StudyPlanner({
     onUpdateSessions(studySessions.filter((item) => item.id !== sessionId));
     setAgentResult(null);
     setAgentError("");
+    setAgentWorkflow(null);
     setPlanMessage("已移除複習時段；需要時可重新產生計畫。");
   }
 
@@ -565,6 +637,7 @@ export default function StudyPlanner({
             result={agentResult}
             error={agentError}
             isLoading={agentLoading}
+            workflow={agentWorkflow}
           />
           <section className="panel study-summary-panel">
             <div className="panel-heading">
