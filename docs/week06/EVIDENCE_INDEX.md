@@ -2,14 +2,29 @@
 
 | 證據 | 位置 | 狀態 |
 |---|---|---|
-| Workflow 程式 | backend/week06_chaining.py | candidate |
-| Gemini Live client | week06/gemini_client.py | candidate |
-| Live runner | week06/live_chaining.py | 可執行，尚未有本週真實成功紀錄 |
-| 四條控制測試 | tests/test_week06_chaining.py | 待 CI |
-| 同案例 offline comparison | week06/evidence/offline_comparison.json | 由 CI 產生 |
+| Workflow 程式 | backend/week06_chaining.py | implementation SHA 0fb360c4b98ff9fe59aac31dc7ac499d2cb10321 |
+| Gemini Live client | week06/gemini_client.py | 已實作 |
+| Live runner | week06/live_chaining.py | 已實作；Case 1 尚未真實執行 |
+| 四條控制測試 | tests/test_week06_chaining.py | PASS in CI |
+| 同案例 offline comparison | week06/evidence/offline_comparison.json | offline_all_pass=true |
 | Case 1 normal main flow | week06/evidence/W06-LIVE-*.json | LIVE_NOT_RUN |
-| ADR | docs/week06/ADR.md | 已寫 |
-| Before / After | docs/week06/COMPARISON.md | candidate SHA 待 CI 後補 |
+| ADR | docs/week06/ADR.md | 已完成 |
+| Before / After | docs/week06/COMPARISON.md | 已補實測結果 |
+
+## CI
+
+- Run ID：39535318301
+- Job ID：119010509951
+- Pytest：23 passed, 1 xfailed
+- Artifact ID：12316908293
+- Workflow conclusion：success
+
+## 四條案例狀態
+
+1. 正常主流程：LIVE_NOT_RUN。課堂要求真實 Gemini，CI 無私人 key，不以 fixture 冒充。
+2. 非法輸入：PASS_OFFLINE。空輸入在 extractor 前停止，model/tool/summary 均 0。
+3. Provider failure：PASS_INJECTED。錯誤來源明示，stop_reason=provider_failure，tool 0。
+4. Chaining 邊界：PASS_OFFLINE。抽取後 Gate 拒絕，preview tool=0、summary=0。
 
 ## 清理規則
 
