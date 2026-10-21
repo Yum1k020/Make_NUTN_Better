@@ -1,0 +1,35 @@
+name: Week 06 Agentic Workflow Validation
+
+on:
+  pull_request:
+    branches:
+      - feature/agentic-week05-langgraph
+  workflow_dispatch:
+
+jobs:
+  week06:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-agentic-ai.txt
+
+      - name: Run full Agentic regression suite
+        run: python -m pytest -c pytest_agentic.ini -v
+
+      - name: Generate Week 06 offline comparison
+        run: python -m week06.run_acceptance
+
+      - name: Upload Week 06 offline evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: week06-offline-comparison
+          path: week06/evidence/offline_comparison.json
+          if-no-files-found: error
