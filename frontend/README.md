@@ -54,6 +54,12 @@ OPENAI_AGENTS_TRACING=false
 
 進入「智慧學習」按下「用 Agent 產生學習計畫」後，畫面會先保留原規則產生的排程，再請 Agent 呼叫規則工具並回傳說明。若框架結果與原規則不一致或 API 暫時失敗，前端不採用框架排程。若新增或修改 `.env.local`，請重新啟動 `npm run dev`。
 
+## Week 06 Prompt Chaining
+
+「智慧學習」的 Agent 入口現在會依序執行「需求驗證 → 規則排程 → 衝突與完整性 Gate → Agent 說明」。前一階段失敗時不會執行後續階段；畫面會顯示階段狀態、外部證據計數、stop reason 與 run ID，但不顯示個人行程內容或模型內部推理。
+
+程式位於 `server/studyPlanWorkflow.js`，四條必備案例位於 `tests/studyPlanWorkflow.test.js`；完整比較、ADR 與證據索引請見 [`../docs/week06/README.md`](../docs/week06/README.md)。
+
 完成一般測試後，可執行一次需要網路及少量 API 用量的實際 smoke test。這個測試只送出合成課名、日期與空的私人行程，不會讀取畫面中的使用者資料：
 
 ```bash
