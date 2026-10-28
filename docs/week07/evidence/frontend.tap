@@ -1,0 +1,105 @@
+TAP version 13
+# Subtest: unknown is distinct from a confirmed zero
+ok 1 - unknown is distinct from a confirmed zero
+  ---
+  duration_ms: 0.5568
+  ...
+# Subtest: failure and revision cap never appear as verified
+ok 2 - failure and revision cap never appear as verified
+  ---
+  duration_ms: 0.1759
+  ...
+# Subtest: HTTP failure rejects instead of returning old demo data
+ok 3 - HTTP failure rejects instead of returning old demo data
+  ---
+  duration_ms: 0.4772
+  ...
+# Subtest: normal first read, TTL boundary removes clauses, later reads do not extend TTL
+ok 4 - normal first read, TTL boundary removes clauses, later reads do not extend TTL
+  ---
+  duration_ms: 1.6142
+  ...
+# Subtest: source update on recheck removes explanation
+ok 5 - source update on recheck removes explanation
+  ---
+  duration_ms: 0.1836
+  ...
+# Subtest: session change removes explanation; no model call on verify
+ok 6 - session change removes explanation; no model call on verify
+  ---
+  duration_ms: 0.1545
+  ...
+# Subtest: failed source check fails closed with no stale clauses
+ok 7 - failed source check fails closed with no stale clauses
+  ---
+  duration_ms: 0.2118
+  ...
+# Subtest: old model response after clear cannot overwrite a new session
+ok 8 - old model response after clear cannot overwrite a new session
+  ---
+  duration_ms: 0.177
+  ...
+# Subtest: old revalidation cannot restore cleared state
+ok 9 - old revalidation cannot restore cleared state
+  ---
+  duration_ms: 0.1339
+  ...
+# Subtest: source changed during model request is rejected before first display
+ok 10 - source changed during model request is rejected before first display
+  ---
+  duration_ms: 0.2345
+  ...
+# Subtest: dispose prevents late response after navigation/unmount
+ok 11 - dispose prevents late response after navigation/unmount
+  ---
+  duration_ms: 0.1132
+  ...
+# Subtest: explicit new session calls reset API and removes all clauses
+ok 12 - explicit new session calls reset API and removes all clauses
+  ---
+  duration_ms: 0.3493
+  ...
+# Subtest: expiry checked using server time, never client-provided identity
+ok 13 - expiry checked using server time, never client-provided identity
+  ---
+  duration_ms: 0.2866
+  ...
+# Subtest: server-expired in-flight result reports expiry instead of source update
+ok 14 - server-expired in-flight result reports expiry instead of source update
+  ---
+  duration_ms: 0.1785
+  ...
+# Subtest: a Thursday resolves to the Monday of the same week
+ok 15 - a Thursday resolves to the Monday of the same week
+  ---
+  duration_ms: 1.8368
+  ...
+# Subtest: weekly classes and personal events appear together
+ok 16 - weekly classes and personal events appear together
+  ---
+  duration_ms: 0.2592
+  ...
+# Subtest: a private event overlapping a class is reported
+ok 17 - a private event overlapping a class is reported
+  ---
+  duration_ms: 0.253
+  ...
+# Subtest: study sessions fit before the exam without overlapping existing events
+ok 18 - study sessions fit before the exam without overlapping existing events
+  ---
+  duration_ms: 0.4713
+  ...
+# Subtest: insufficient available time is reported instead of creating conflicts
+ok 19 - insufficient available time is reported instead of creating conflicts
+  ---
+  duration_ms: 0.2594
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1045.684

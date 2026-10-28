@@ -1,0 +1,949 @@
+diff --git a/backend/app/__init__.py b/backend/app/__init__.py
+index 2bee1ba..12cc8f4 100644
+--- a/backend/app/__init__.py
++++ b/backend/app/__init__.py
+@@ -1,6 +1,7 @@
+ """Local Flask application with a fixed-identity user profile baseline."""
+ 
+ import os
++import secrets
+ 
+ from flask import Flask, Blueprint as FlaskBlueprint, redirect
+ from flask.views import MethodView
+@@ -22,6 +23,10 @@ def create_app(test_config=None):
+     app = Flask(__name__)
+     app.json.ensure_ascii = False
+     app.config.from_mapping(
++        SECRET_KEY=os.environ.get("GRADUATION_SESSION_SECRET") or secrets.token_hex(32),
++        SESSION_COOKIE_NAME="graduation_scope",
++        SESSION_COOKIE_HTTPONLY=True,
++        SESSION_COOKIE_SAMESITE="Strict",
+         GRADUATION_ENGINE=os.environ.get("GRADUATION_ENGINE", "legacy"),
+         API_TITLE="Make NUTN Better API",
+         API_VERSION="0.1.0",
+diff --git a/backend/app/graduation_explanation_api.py b/backend/app/graduation_explanation_api.py
+index c215271..d714023 100644
+--- a/backend/app/graduation_explanation_api.py
++++ b/backend/app/graduation_explanation_api.py
+@@ -3,13 +3,14 @@
+ import sqlite3
+ import os
+ 
+-from flask import Blueprint, current_app, jsonify, request
++from flask import Blueprint, current_app, jsonify, request, session
+ 
+ from .db import get_db
+ from .graduation_explanation_core import explain
+ from .graduation_gemini import generate
+ from .planner_core import Problem, invalid, query
+ from .planner_graduation import progress
++from .graduation_validity import context, lease, current_rule_digest
+ 
+ routes = Blueprint("graduation_explanations", __name__)
+ 
+@@ -18,11 +19,7 @@ routes = Blueprint("graduation_explanations", __name__)
+ def explanation_route():
+     try:
+         query({})
+-        origin = request.headers.get("Origin")
+-        allowed = {request.host_url.rstrip("/")} | {
+-            value.strip() for value in os.environ.get("GRADUATION_ALLOWED_ORIGINS", "").split(",") if value.strip()}
+-        if request.headers.get("Sec-Fetch-Site") == "cross-site" or (origin and origin not in allowed):
+-            raise Problem(403, "CROSS_ORIGIN_DENIED", "請從本系統頁面產生說明")
++        same_origin()
+         if request.get_data():
+             invalid("body", "此操作不接受內容；使用目前使用者的資料")
+         # Release the read transaction before waiting for the provider.
+@@ -31,21 +28,99 @@ def explanation_route():
+         db.execute("BEGIN")
+         try:
+             result = progress(db)
++            initial = context(result, current_rule_digest(db, result["rule_set_id"]))
+         finally:
+             db.rollback()
+         provider = current_app.config.get("GRADUATION_EXPLANATION_PROVIDER", generate) if current_app.testing else generate
+         output = explain(result, provider)
++        # Check again after provider I/O: data may have changed while it ran.
++        db.execute("BEGIN")
++        try:
++            latest = progress(db)
++            final = context(latest, current_rule_digest(db, latest["rule_set_id"]))
++        finally:
++            db.rollback()
++        if final["source_sha256"] != initial["source_sha256"]:
++            output.update(status="stale", stop_reason="SOURCE_CHANGED", explanation=[])
++            result = latest
++        output["validity"] = lease(initial)
++        if final["server_now_ms"] >= output["validity"]["expires_at_ms"]:
++            output.update(status="stale", stop_reason="EXPIRED", explanation=[])
++
+         current_app.logger.info("graduation explanation completed", extra={
+             "run_id": output["run_id"], "stop_reason": output["stop_reason"], "model_calls": output["model_calls"]})
+-        return jsonify(data={"progress": result, "workflow": output})
++        response = jsonify(data={"progress": result, "workflow": output})
++        response.headers["Cache-Control"] = "no-store"
++        return response
+     except Problem as error:
+         return jsonify(error={"code": error.code, "message": error.message, "fields": error.fields}), error.status
+     except (ValueError, TypeError, KeyError, sqlite3.Error):
+         return jsonify(error={"code": "GRADUATION_DATA_ERROR", "message": "無法讀取畢業進度，請確認規則與資料庫", "fields": []}), 500
+ 
+ 
++
++def same_origin():
++    origin = request.headers.get("Origin")
++    allowed = {request.host_url.rstrip("/")} | {
++        value.strip() for value in os.environ.get("GRADUATION_ALLOWED_ORIGINS", "").split(",") if value.strip()}
++    if request.headers.get("Sec-Fetch-Site") == "cross-site" or (origin and origin not in allowed):
++        raise Problem(403, "CROSS_ORIGIN_DENIED", "請從本系統頁面產生說明")
++
++
++def read_current():
++    db = get_db()
++    db.execute("PRAGMA query_only = ON")
++    db.execute("BEGIN")
++    try:
++        result = progress(db)
++        return context(result, current_rule_digest(db, result["rule_set_id"]))
++    finally:
++        db.rollback()
++
++
++@routes.get("/api/v1/graduation-context")
++def context_route():
++    try:
++        query({})
++        same_origin()
++        if request.get_data():
++            invalid("body", "此操作不接受內容")
++        response = jsonify(data=read_current())
++        response.headers["Cache-Control"] = "no-store"
++        return response
++    except Problem as error:
++        return jsonify(error={"code": error.code, "message": error.message, "fields": error.fields}), error.status
++    except (ValueError, TypeError, KeyError, sqlite3.Error):
++        return jsonify(error={"code": "GRADUATION_DATA_ERROR", "message": "無法確認目前資料，舊說明暫停使用"}), 500
++
++
++@routes.post("/api/v1/graduation-session/reset")
++def reset_route():
++    try:
++        query({})
++        same_origin()
++        if request.get_data():
++            invalid("body", "此操作不接受內容")
++        session.pop("graduation_scope", None)
++        return jsonify(data=read_current())
++    except Problem as error:
++        return jsonify(error={"code": error.code, "message": error.message, "fields": error.fields}), error.status
++    except (ValueError, TypeError, KeyError, sqlite3.Error):
++        return jsonify(error={"code": "GRADUATION_DATA_ERROR", "message": "無法建立新工作階段"}), 500
++
++
+ def register(app, api):
+     app.register_blueprint(routes)
++    for endpoint, path, method, summary in (
++        ("context_route", "/api/v1/graduation-context", "get", "重查工作階段與畢業來源指紋；無模型呼叫"),
++        ("reset_route", "/api/v1/graduation-session/reset", "post", "開始新說明工作階段；不修改修課或規則資料"),
++    ):
++        route = next(r for r in app.url_map.iter_rules() if r.endpoint == "graduation_explanations." + endpoint)
++        api.spec.path(path=path, rule=route, operations={method: {
++            "summary": summary, "tags": ["graduation"],
++            "responses": {"200": {"description": "scope_id、source_sha256、server_now_ms；Cache-Control: no-store"},
++                          "422": {"description": "不接受額外輸入"}, "403": {"description": "拒絕跨來源"},
++                          "500": {"description": "資料無效；不得沿用舊說明"}}}})
+     rule = next(rule for rule in app.url_map.iter_rules() if rule.endpoint == "graduation_explanations.explanation_route")
+     api.spec.path(path="/api/v1/graduation-explanation", rule=rule, operations={"post": {
+         "summary": "使用目前規則的去識別摘要產生說明；最多修正一次，無資料庫寫入",
+diff --git a/backend/app/graduation_validity.py b/backend/app/graduation_validity.py
+new file mode 100644
+index 0000000..e9b8931
+--- /dev/null
++++ b/backend/app/graduation_validity.py
+@@ -0,0 +1,32 @@
++"""Week 07 C: bounded lifetime for derived explanations, no academic-data writes."""
++from hashlib import sha256
++from time import time
++from uuid import uuid4
++from flask import current_app, session
++from .planner_core import dump
++
++TTL_SECONDS = 300
++
++def clock_ms():
++    clock = current_app.config.get("GRADUATION_CLOCK", time) if current_app.testing else time
++    return int(clock() * 1000)
++
++def source_digest(result, rule_digest):
++    stable = {k: v for k, v in result.items() if k != "evaluated_at"}
++    return sha256(dump({"progress": stable, "rule_digest": rule_digest}).encode()).hexdigest()
++
++def context(result, rule_digest):
++    if "graduation_scope" not in session:
++        session["graduation_scope"] = str(uuid4())
++    return {"scope_id": session["graduation_scope"],
++            "source_sha256": source_digest(result, rule_digest), "server_now_ms": clock_ms(),
++            "execution_mode": "synthetic_fixture" if current_app.testing and current_app.config.get("GRADUATION_FIXTURE_ONLY") else "standard"}
++
++def lease(current):
++    return {**current, "issued_at_ms": current["server_now_ms"],
++            "expires_at_ms": current["server_now_ms"] + TTL_SECONDS * 1000,
++            "ttl_seconds": TTL_SECONDS}
++
++def current_rule_digest(db, rule_id):
++    row = db.execute("SELECT digest FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
++    return row["digest"] if row else None
+diff --git a/backend/tests/test_graduation_validity.py b/backend/tests/test_graduation_validity.py
+new file mode 100644
+index 0000000..3a59273
+--- /dev/null
++++ b/backend/tests/test_graduation_validity.py
+@@ -0,0 +1,124 @@
++"""C-route HTTP tests; synthetic data and injected provider, not Gemini live."""
++from copy import deepcopy
++from hashlib import sha256
++import json
++import sqlite3
++import pytest
++from app import create_app
++from app.db import init_db
++from app.graduation_explanation_core import valid_draft
++from app.graduation_validity import source_digest
++from app.planner_core import dump
++
++@pytest.fixture
++def setup_app(tmp_path):
++    now = [1000.0]
++    app = create_app({"TESTING": True, "SECRET_KEY": "synthetic-test-only", "DATABASE": str(tmp_path / "db.sqlite3"),
++                      "GRADUATION_CLOCK": lambda: now[0], "GRADUATION_ENGINE": "langgraph",
++                      "GRADUATION_EXPLANATION_PROVIDER": lambda c,p,f: (valid_draft(c), {"provider":"fixture", "usage":{}})})
++    with app.app_context(): init_db()
++    client = app.test_client()
++    assert client.patch('/api/v1/me', json={"department_id":"dept-nutn-csie", "admission_year":115,
++                                           "current_semester_id":"semester-115-1"}).status_code == 200
++    return app, client, now
++
++def get_context(client):
++    r = client.get('/api/v1/graduation-context')
++    assert r.status_code == 200
++    assert r.headers['Cache-Control'] == 'no-store'
++    return r.json['data']
++
++def test_normal_ttl_no_database_writes(setup_app, evidence):
++    app, c, now = setup_app
++    with sqlite3.connect(app.config['DATABASE']) as db: before = list(db.iterdump())
++    initial = get_context(c)
++    r = c.post('/api/v1/graduation-explanation')
++    w = r.json['data']['workflow']
++    assert w['status'] == 'verified'
++    assert w['validity']['expires_at_ms'] == 1300000
++    assert w['validity']['scope_id'] == initial['scope_id']
++    assert w['validity']['source_sha256'] == initial['source_sha256']
++    now[0] = 1300
++    current = get_context(c)
++    assert current['server_now_ms'] == w['validity']['expires_at_ms']
++    with sqlite3.connect(app.config['DATABASE']) as db: assert list(db.iterdump()) == before
++    evidence.append({'kind':'fixture_normal_ttl','expected':'verified; deadline reached; no DB writes','actual':r.json,'at_deadline':current})
++
++def test_lecture_update_changes_source(setup_app, evidence):
++    app,c,_ = setup_app
++    old = get_context(c)
++    assert c.put('/api/v1/lecture-progress',json={'professional_count':10,'general_count':12}).status_code == 200
++    new = get_context(c)
++    assert old['scope_id'] == new['scope_id'] and old['source_sha256'] != new['source_sha256']
++    evidence.append({'expected':'source fingerprint changes','before':old,'after':new})
++
++def test_same_rule_id_changed_content_changes_source(setup_app, evidence):
++    app,c,_ = setup_app
++    old = get_context(c)
++    with sqlite3.connect(app.config['DATABASE']) as db:
++        rule, text = db.execute('SELECT rule_set_id,document FROM graduation_rule_documents').fetchone()
++        d = json.loads(text)
++        d['credit_requirements']['minimum_total_credits'] += 1
++        encoded = dump(d)
++        db.execute('UPDATE graduation_rule_documents SET document=?,digest=? WHERE rule_set_id=?',
++                   (encoded,sha256(encoded.encode()).hexdigest(),rule))
++    new = get_context(c)
++    assert old['source_sha256'] != new['source_sha256']
++    evidence.append({'kind':'synthetic_source_update','expected':'same ID, changed content invalidates','before':old,'after':new})
++
++def test_source_changes_during_provider_discards_clauses(setup_app, evidence):
++    app,c,_ = setup_app
++    def provider(ctx,previous,feedback):
++        with sqlite3.connect(app.config['DATABASE']) as db:
++            db.execute("INSERT OR REPLACE INTO lecture_progress VALUES ('user-demo-001',10,12,'synthetic-update')")
++        return valid_draft(ctx), {'provider':'fixture','usage':{}}
++    app.config['GRADUATION_EXPLANATION_PROVIDER'] = provider
++    w = c.post('/api/v1/graduation-explanation').json['data']['workflow']
++    assert w['status'] == 'stale' and w['stop_reason'] == 'SOURCE_CHANGED' and w['explanation'] == []
++    evidence.append({'expected':'in-flight stale clauses discarded','actual':w})
++
++def test_expiry_during_provider_discards_clauses(setup_app):
++    app,c,now = setup_app
++    def provider(ctx,previous,feedback):
++        now[0] += 301
++        return valid_draft(ctx), {'provider':'fixture','usage':{}}
++    app.config['GRADUATION_EXPLANATION_PROVIDER'] = provider
++    w = c.post('/api/v1/graduation-explanation').json['data']['workflow']
++    assert w['status'] == 'stale' and w['stop_reason'] == 'EXPIRED' and not w['explanation']
++
++def test_reset_and_separate_browsers_have_distinct_scope(setup_app, evidence):
++    app,c,_ = setup_app
++    old = get_context(c)
++    other = get_context(app.test_client())
++    assert other['scope_id'] != old['scope_id']
++    new = c.post('/api/v1/graduation-session/reset').json['data']
++    assert new['scope_id'] != old['scope_id']
++    evidence.append({'kind':'browser_scope_only_NOT_user_auth','expected':'distinct browser/reset scope', 'old':old,'other':other,'new':new})
++
++@pytest.mark.parametrize('route,method,kwargs,status',[
++    ('graduation-context?user_id=other','GET',{},422),
++    ('graduation-context','GET',{'data':'{}'},422),
++    ('graduation-context','GET',{'headers':{'Origin':'https://other.example'}},403),
++    ('graduation-session/reset','POST',{'json':{'user_id':'other'}},422),
++    ('graduation-session/reset','POST',{'headers':{'Sec-Fetch-Site':'cross-site'}},403),
++])
++def test_reject_overrides_and_cross_origin(setup_app,route,method,kwargs,status):
++    app,c,_=setup_app
++    before=get_context(c)
++    assert c.open('/api/v1/'+route,method=method,**kwargs).status_code == status
++    assert get_context(c)['scope_id'] == before['scope_id']
++
++def test_corrupt_source_fails_closed(setup_app):
++    app,c,_=setup_app
++    with sqlite3.connect(app.config['DATABASE']) as db: db.execute("UPDATE graduation_rule_documents SET digest='broken'")
++    assert c.get('/api/v1/graduation-context').status_code == 500
++
++def test_volatile_evaluation_time_not_source_change():
++    a={'evaluated_at':'first','user_id':'synthetic-u1','checks':[]}
++    b={**a,'evaluated_at':'second'}
++    assert source_digest(a,'r1') == source_digest(b,'r1')
++    assert source_digest(a,'r1') != source_digest({**a,'user_id':'synthetic-u2'},'r1')
++
++@pytest.mark.skip(reason='NOT_RUN: baseline has one fixed user and no authentication; browser-scope isolation is not C02 multi-user acceptance')
++def test_C02_authenticated_user_isolation():
++    pass
+diff --git a/backend/week07_acceptance.py b/backend/week07_acceptance.py
+new file mode 100644
+index 0000000..60b3955
+--- /dev/null
++++ b/backend/week07_acceptance.py
+@@ -0,0 +1,123 @@
++"""Week 07 acceptance: exact baseline/candidate processes; synthetic data only by default."""
++import argparse
++from hashlib import sha256
++import json
++import os
++from pathlib import Path
++import sqlite3
++import subprocess
++import sys
++from time import perf_counter
++from uuid import uuid4
++from unittest.mock import patch
++
++ROOT = Path(__file__).resolve().parents[1]
++BASELINE = "cbbd524"
++
++def run(root, live=False):
++    sys.path.insert(0,str(root/'backend'))
++    from week06_acceptance import prepare, snapshot
++    from app.graduation_explanation_core import valid_draft
++    run_id=str(uuid4())
++    folder=ROOT/'.cache/week07'
++    folder.mkdir(parents=True,exist_ok=True)
++    # Identical synthetic resource IDs and timestamps on both exact source versions.
++    ids=iter(['synthetic-enrollment-1','synthetic-enrollment-2','synthetic-plan-1'])
++    with patch('app.planner_core.uuid4', side_effect=lambda: next(ids)), \
++         patch('app.planner_core.timestamp', return_value='2026-10-28T10:00:00+08:00'), \
++         patch('app.planner.timestamp', return_value='2026-10-28T10:00:00+08:00'):
++        app,inputs=prepare(folder/(run_id+'.sqlite3'))
++    client=app.test_client()
++    app.config['GRADUATION_CLOCK']=lambda:1000.0
++    def fixture(c,p,f):return valid_draft(c),{'provider':'fixture','usage':{},'latency_ms':0}
++    configured=bool(os.environ.get('GEMINI_API_KEY') and os.environ.get('GEMINI_MODEL'))
++    if not live:app.config['GRADUATION_EXPLANATION_PROVIDER']=fixture
++    before=snapshot(app)
++    started=perf_counter()
++    normal=client.post('/api/v1/graduation-explanation') if not live or configured else None
++    elapsed=round((perf_counter()-started)*1000)
++    w=normal.json['data']['workflow'] if normal else None
++    normal_readonly=snapshot(app)==before
++    first_context=client.get('/api/v1/graduation-context')
++    client.put('/api/v1/lecture-progress',json={'professional_count':10,'general_count':12})
++    after_context=client.get('/api/v1/graduation-context')
++    new_progress=client.get('/api/v1/graduation-progress').json['data']
++    # Reproduce a source update during model I/O, using the same provider on both versions.
++    def updating(c,p,f):
++        with sqlite3.connect(app.config['DATABASE']) as db:
++            db.execute("UPDATE lecture_progress SET general_count=11,updated_at='synthetic-inflight' WHERE user_id='user-demo-001'")
++        return fixture(c,p,f)
++    app.config['GRADUATION_EXPLANATION_PROVIDER']=updating
++    inflight=client.post('/api/v1/graduation-explanation').json['data']
++    calls=[0]
++    def forbidden(*args):calls[0]+=1;raise AssertionError('invalid input reached provider')
++    app.config['GRADUATION_EXPLANATION_PROVIDER']=forbidden
++    invalid=client.post('/api/v1/graduation-explanation',json={'user_id':'synthetic-other'})
++    assert invalid.status_code==422 and calls[0]==0 and normal_readonly
++    paths=['backend/app/graduation_explanation_api.py','backend/app/graduation_explanation_core.py',
++           'backend/app/graduation_validity.py','frontend/src/lib/graduationMemory.js',
++           'frontend/src/components/GraduationProgress.jsx']
++    return {'run_id':run_id,'root_kind':'candidate' if root==ROOT else 'exact_integrated_baseline',
++            'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),
++            'source_sha256':{p:sha256((root/p).read_bytes()).hexdigest() for p in paths if (root/p).exists()},
++            'data_kind':'synthetic','inputs':inputs,'normal_kind':'gemini' if live and configured else 'NOT_RUN' if live else 'fixture',
++            'live_status':('LIVE_PASS' if w and w['status']=='verified' and all(a['metrics'].get('provider')=='gemini' for a in w['attempts']) else 'LIVE_FAIL') if live and configured else 'LIVE_NOT_RUN',
++            'normal':normal.json if normal else None,'normal_latency_ms':elapsed if normal else None,
++            'normal_database_unchanged':normal_readonly,
++            'before_context':{'status':first_context.status_code,'body':first_context.json},
++            'after_context':{'status':after_context.status_code,'body':after_context.json},
++            'updated_progress':new_progress,'inflight_update':inflight,
++            'invalid':{'status':invalid.status_code,'provider_calls':calls[0],'body':invalid.json},
++            'token_note':'fixture usage unavailable; never zero-cost claim',
++            'C02':'NOT_RUN: fixed identity, no authenticated user mapping',
++            'W01_W02':'N/A: no new business-data write tools; session cookie reset only'}
++
++def main():
++    parser=argparse.ArgumentParser()
++    parser.add_argument('--root',type=Path)
++    parser.add_argument('--out',type=Path)
++    parser.add_argument('--live',action='store_true')
++    parser.add_argument('--compare',action='store_true')
++    parser.add_argument('--serve-fixture',action='store_true')
++    args=parser.parse_args()
++    if args.serve_fixture:
++        sys.path.insert(0,str(ROOT/'backend'))
++        from week06_acceptance import prepare
++        from app.graduation_explanation_core import valid_draft
++        folder=ROOT/'.cache/week07';folder.mkdir(parents=True,exist_ok=True)
++        app,_=prepare(folder/(str(uuid4())+'.sqlite3'))
++        app.config['GRADUATION_FIXTURE_ONLY']=True
++        app.config['GRADUATION_EXPLANATION_PROVIDER']=lambda c,p,f:(valid_draft(c),{'provider':'fixture','usage':{}})
++        os.environ['GRADUATION_ALLOWED_ORIGINS']='http://127.0.0.1:5173,http://localhost:5173'
++        print('SYNTHETIC FIXTURE ONLY; not Gemini live evidence',flush=True)
++        app.run(host='127.0.0.1',port=5000,debug=False)
++        return
++    if args.compare:
++        folder=ROOT/'docs/week07/evidence';folder.mkdir(parents=True,exist_ok=True)
++        for name,root in [('baseline',ROOT/'.cache/week07-baseline'),('candidate',ROOT)]:
++            subprocess.run([sys.executable,'-X','utf8',__file__,'--root',str(root),'--out',str(folder/(name+'.json'))],check=True)
++        a=json.loads((folder/'baseline.json').read_text(encoding='utf-8'))
++        b=json.loads((folder/'candidate.json').read_text(encoding='utf-8'))
++        def facts(r):return {k:v for k,v in r['normal']['data']['progress'].items() if k!='evaluated_at'}
++        assert facts(a)==facts(b)
++        assert a['inflight_update']['workflow']['status']=='verified'
++        assert b['inflight_update']['workflow']['status']=='stale'
++        assert b['inflight_update']['workflow']['explanation']==[]
++        summary={'baseline_sha':a['source_commit'],'candidate_sha':b['source_commit'],
++                 'same_normal_facts':True,'baseline_inflight_status':'verified_on_old_snapshot',
++                 'candidate_inflight_status':'stale_clauses_removed',
++                 'baseline_TTL':'absent','candidate_TTL_seconds':300,
++                 'baseline_context_http':a['before_context']['status'],'candidate_context_http':b['before_context']['status'],
++                 'baseline_model_calls':a['normal']['data']['workflow']['model_calls'],
++                 'candidate_model_calls':b['normal']['data']['workflow']['model_calls'],
++                 'normal_latency_ms':{'baseline_fixture':a['normal_latency_ms'],'candidate_fixture':b['normal_latency_ms']},
++                 'quality_and_cost_separate':True,'C02':'NOT_RUN','LIVE':'LIVE_NOT_RUN'}
++        (folder/'comparison.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
++        print(json.dumps(summary,ensure_ascii=False));return
++    report=run(args.root.resolve() if args.root else ROOT,args.live)
++    out=args.out or ROOT/'docs/week07/evidence/live.json'
++    out.parent.mkdir(parents=True,exist_ok=True)
++    out.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
++    print(json.dumps({'report':str(out),'run_id':report['run_id'],'live':report['live_status']}))
++
++if __name__=='__main__':main()
+diff --git a/frontend/src/components/GraduationProgress.jsx b/frontend/src/components/GraduationProgress.jsx
+index e9a3821..8094d3a 100644
+--- a/frontend/src/components/GraduationProgress.jsx
++++ b/frontend/src/components/GraduationProgress.jsx
+@@ -1,4 +1,4 @@
+-import React, { useEffect, useState } from "react";
++import React, { useEffect, useState, useRef } from "react";
+ import {
+   GRADUATION_STATUS,
+   CHECK_NAMES,
+@@ -8,6 +8,10 @@ import {
+   workflowMessage,
+ } from "../lib/graduation.js";
+ import "./GraduationProgress.css";
++import {
++  GraduationMemory,
++  VALIDITY_MESSAGES,
++} from "../lib/graduationMemory.js";
+ 
+ export default function GraduationProgress({ onNavigate }) {
+   const [progress, setProgress] = useState(null);
+@@ -18,8 +22,60 @@ export default function GraduationProgress({ onNavigate }) {
+   const [loading, setLoading] = useState(true);
+   const [busy, setBusy] = useState(false);
+   const [reload, setReload] = useState(0);
++  const [memoryReason, setMemoryReason] = useState("");
++  const [fixtureMode, setFixtureMode] = useState(false);
++  const memory = useRef(null);
++  useEffect(() => {
++    const store = new GraduationMemory({
++      request: (path, options = {}) =>
++        graduationRequest(path, {
++          ...options,
++          cache: "no-store",
++          signal: AbortSignal.timeout(
++            path === "graduation-explanation" ? 60000 : 5000,
++          ),
++        }),
++      update: (state) => {
++        setWorkflow(state.workflow);
++        setMemoryReason(state.reason);
++        setBusy(state.busy);
++        if (state.progress) setProgress(state.progress);
++      },
++    });
++    memory.current = store;
++    let seconds = 0;
++    const timer = setInterval(() => {
++      store.tick();
++      if (++seconds % 15 === 0) void store.verify();
++    }, 1000);
++    const focus = () => void store.verify();
++    const visibility = () => {
++      if (document.visibilityState === "visible") focus();
++      else setWorkflow(null);
++    };
++    window.addEventListener("focus", focus);
++    document.addEventListener("visibilitychange", visibility);
++    return () => {
++      store.dispose();
++      clearInterval(timer);
++      window.removeEventListener("focus", focus);
++      document.removeEventListener("visibilitychange", visibility);
++    };
++  }, []);
+   useEffect(() => {
+     const controller = new AbortController();
++    memory.current?.clear();
++    graduationRequest("graduation-context", {
++      signal: controller.signal,
++      cache: "no-store",
++    })
++      .then((context) => {
++        if (!controller.signal.aborted)
++          setFixtureMode(context.execution_mode === "synthetic_fixture");
++      })
++      .catch(() => {
++        if (!controller.signal.aborted) setFixtureMode(false);
++      });
+     setLoading(true);
+     setProgress(null);
+     setPlanned(null);
+@@ -43,24 +99,8 @@ export default function GraduationProgress({ onNavigate }) {
+     return () => controller.abort();
+   }, [reload]);
+ 
+-  async function generateExplanation() {
+-    setBusy(true);
+-    setError("");
+-    setWorkflow(null);
+-    try {
+-      const data = await graduationRequest("graduation-explanation", {
+-        method: "POST",
+-        signal: AbortSignal.timeout(60000),
+-      });
+-      setProgress(data.progress);
+-      setWorkflow(data.workflow);
+-    } catch (e) {
+-      setError(
+-        e.name === "TimeoutError" ? "說明等待逾時，請稍後重試。" : e.message,
+-      );
+-    } finally {
+-      setBusy(false);
+-    }
++  function generateExplanation() {
++    void memory.current?.generate();
+   }
+ 
+   return (
+@@ -80,6 +120,13 @@ export default function GraduationProgress({ onNavigate }) {
+           重新整理
+         </button>
+       </header>
++      <button
++        className="text-link"
++        disabled={busy || loading}
++        onClick={() => void memory.current?.reset()}
++      >
++        開始新的說明工作階段
++      </button>
+       {loading && <p role="status">正在讀取畢業進度…</p>}
+       {error && (
+         <p role="alert" className="graduation-notice">
+@@ -161,19 +208,37 @@ export default function GraduationProgress({ onNavigate }) {
+           <section className="panel graduation-section" aria-live="polite">
+             <h2>缺項說明與下一步</h2>
+             <p>
+-              按下後會將去識別的規則版本、學分／場次及達標狀態送至 Google
+-              Gemini，不傳姓名、學號或成績明細。
++              {fixtureMode
++                ? "合成測試模式：使用虛構資料與固定測試回應，不連線 Gemini，不傳送學業資料。"
++                : "按下後會將去識別的規則版本、學分／場次及達標狀態送至 Google Gemini，不傳姓名、學號或成績明細。"}
+             </p>
+             <button
+               className="primary-button"
+               disabled={busy || loading || !progress.checks.length}
+               onClick={generateExplanation}
+             >
+-              {busy ? "正在產生並檢查說明…" : "產生說明"}
++              {busy
++                ? "正在產生並檢查說明…"
++                : fixtureMode
++                  ? "產生合成測試說明"
++                  : "產生說明"}
+             </button>
++            <p>
++              說明最多保留 5 分鐘；每 15
++              秒及回到頁面時重查來源。重新整理或新工作階段會清除說明。
++            </p>
++            {memoryReason && (
++              <p role="status">{VALIDITY_MESSAGES[memoryReason]}</p>
++            )}
+             {workflow && (
+               <>
+                 <p role="status">{workflowMessage(workflow)}</p>
++                <p>
++                  產生時間：
++                  {new Date(workflow.validity.issued_at_ms).toLocaleString()}
++                  ；到期時間：
++                  {new Date(workflow.validity.expires_at_ms).toLocaleString()}
++                </p>
+                 <ul className="graduation-explanations">
+                   {workflow.explanation.map((item) => (
+                     <li key={item.check_id}>
+diff --git a/frontend/src/lib/graduationMemory.js b/frontend/src/lib/graduationMemory.js
+new file mode 100644
+index 0000000..f2c03d5
+--- /dev/null
++++ b/frontend/src/lib/graduationMemory.js
+@@ -0,0 +1,131 @@
++// C route: derived explanations live only in this mounted page; never localStorage.
++export const VALIDITY_MESSAGES = {
++  EXPIRED: "說明已到期，請重新產生。",
++  SOURCE_CHANGED: "修課資料或規則已更新，舊說明停止使用；請重新整理進度。",
++  SESSION_CHANGED: "工作階段已變更，舊說明已清除。",
++  UNAVAILABLE: "目前無法確認資料有效性，舊說明已停止使用。",
++};
++
++export function validityReason(validity, current) {
++  if (!validity || !current) return "UNAVAILABLE";
++  if (validity.scope_id !== current.scope_id) return "SESSION_CHANGED";
++  if (validity.source_sha256 !== current.source_sha256) return "SOURCE_CHANGED";
++  if (current.server_now_ms >= validity.expires_at_ms) return "EXPIRED";
++  return "";
++}
++
++export class GraduationMemory {
++  constructor({ request, update, now = () => performance.now() }) {
++    this.request = request;
++    this.update = update;
++    this.now = now;
++    this.sequence = 0;
++    this.checkSequence = 0;
++    this.workflow = null;
++    this.deadline = 0;
++    this.active = true;
++  }
++  clear(reason = "") {
++    this.sequence += 1;
++    this.checkSequence += 1;
++    this.workflow = null;
++    this.deadline = 0;
++    if (this.active) this.update({ workflow: null, reason, busy: false });
++  }
++  dispose() {
++    this.active = false;
++    this.clear();
++  }
++  async generate() {
++    this.clear();
++    const sequence = this.sequence;
++    this.update({ workflow: null, reason: "", busy: true });
++    try {
++      // Establish a server-issued browser scope before any model request.
++      await this.request("graduation-context");
++      if (!this.active || sequence !== this.sequence) return;
++      const data = await this.request("graduation-explanation", {
++        method: "POST",
++      });
++      if (!this.active || sequence !== this.sequence) return;
++      const started = this.now();
++      const current = await this.request("graduation-context");
++      if (!this.active || sequence !== this.sequence) return;
++      const reason =
++        data.workflow.status === "stale"
++          ? data.workflow.stop_reason === "EXPIRED"
++            ? "EXPIRED"
++            : "SOURCE_CHANGED"
++          : validityReason(data.workflow.validity, current);
++      if (reason) {
++        this.clear(reason);
++        return;
++      }
++      this.workflow = data.workflow;
++      // Server time defines remaining life; round-trip delay only shortens it.
++      this.deadline =
++        started + data.workflow.validity.expires_at_ms - current.server_now_ms;
++      if (this.now() >= this.deadline) {
++        this.clear("EXPIRED");
++        return;
++      }
++      this.update({
++        workflow: this.workflow,
++        progress: data.progress,
++        reason: "",
++        busy: false,
++      });
++    } catch (error) {
++      if (this.active && sequence === this.sequence) this.clear("UNAVAILABLE");
++    }
++  }
++  tick() {
++    if (this.workflow && this.now() >= this.deadline) this.clear("EXPIRED");
++  }
++  async verify() {
++    this.tick();
++    if (!this.workflow) return;
++    const sequence = this.sequence;
++    const check = ++this.checkSequence;
++    // Hide clauses while revalidating on timer/focus. A failed request cannot reuse them.
++    this.update({ workflow: null, reason: "", busy: false });
++    const started = this.now();
++    try {
++      const current = await this.request("graduation-context");
++      if (
++        !this.active ||
++        sequence !== this.sequence ||
++        check !== this.checkSequence
++      )
++        return;
++      const reason = validityReason(this.workflow.validity, current);
++      if (reason) {
++        this.clear(reason);
++        return;
++      }
++      this.deadline = Math.min(
++        this.deadline,
++        started + this.workflow.validity.expires_at_ms - current.server_now_ms,
++      );
++      this.tick();
++      if (this.workflow)
++        this.update({ workflow: this.workflow, reason: "", busy: false });
++    } catch (error) {
++      if (
++        this.active &&
++        sequence === this.sequence &&
++        check === this.checkSequence
++      )
++        this.clear("UNAVAILABLE");
++    }
++  }
++  async reset() {
++    this.clear("SESSION_CHANGED");
++    const sequence = this.sequence;
++    try {
++      await this.request("graduation-session/reset", { method: "POST" });
++    } catch (error) {
++      if (sequence === this.sequence) this.clear("UNAVAILABLE");
++    }
++  }
++}
+diff --git a/frontend/tests/graduationMemory.test.js b/frontend/tests/graduationMemory.test.js
+new file mode 100644
+index 0000000..c852367
+--- /dev/null
++++ b/frontend/tests/graduationMemory.test.js
+@@ -0,0 +1,188 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import {
++  GraduationMemory,
++  validityReason,
++} from "../src/lib/graduationMemory.js";
++
++const context = (time = 1000, source = "v1", scope = "s1") => ({
++  scope_id: scope,
++  source_sha256: source,
++  server_now_ms: time,
++});
++const data = () => ({
++  progress: { earned_credits: 3 },
++  workflow: {
++    status: "verified",
++    run_id: "synthetic-run",
++    explanation: [{ text: "3 credits" }],
++    validity: { ...context(), issued_at_ms: 1000, expires_at_ms: 301000 },
++  },
++});
++function setup(request) {
++  let now = 1000;
++  const updates = [];
++  const store = new GraduationMemory({
++    request,
++    update: (s) => updates.push(s),
++    now: () => now,
++  });
++  return {
++    store,
++    updates,
++    advance: (value) => {
++      now = value;
++    },
++  };
++}
++
++test("normal first read, TTL boundary removes clauses, later reads do not extend TTL", async () => {
++  const { store, updates, advance } = setup(async (path) =>
++    path === "graduation-explanation" ? data() : context(),
++  );
++  await store.generate();
++  assert.equal(updates.at(-1).workflow.run_id, "synthetic-run");
++  advance(2000);
++  await store.verify();
++  advance(301000);
++  store.tick();
++  assert.equal(updates.at(-1).workflow, null);
++  assert.equal(updates.at(-1).reason, "EXPIRED");
++});
++
++test("source update on recheck removes explanation", async () => {
++  let source = "v1";
++  const { store, updates } = setup(async (path) =>
++    path === "graduation-explanation" ? data() : context(1000, source),
++  );
++  await store.generate();
++  source = "v2";
++  await store.verify();
++  assert.equal(updates.at(-1).reason, "SOURCE_CHANGED");
++  assert.equal(store.workflow, null);
++});
++
++test("session change removes explanation; no model call on verify", async () => {
++  let scope = "s1",
++    calls = 0;
++  const { store, updates } = setup(async (path) => {
++    if (path === "graduation-explanation") {
++      calls++;
++      return data();
++    }
++    return context(1000, "v1", scope);
++  });
++  await store.generate();
++  scope = "s2";
++  await store.verify();
++  assert.equal(updates.at(-1).reason, "SESSION_CHANGED");
++  assert.equal(calls, 1);
++});
++
++test("failed source check fails closed with no stale clauses", async () => {
++  let failed = false;
++  const { store, updates } = setup(async (path) => {
++    if (failed) throw Error("injected timeout");
++    return path === "graduation-explanation" ? data() : context();
++  });
++  await store.generate();
++  failed = true;
++  await store.verify();
++  assert.equal(updates.at(-1).reason, "UNAVAILABLE");
++  assert.equal(store.workflow, null);
++});
++
++test("old model response after clear cannot overwrite a new session", async () => {
++  let resolve;
++  const held = new Promise((r) => {
++    resolve = r;
++  });
++  const { store, updates } = setup(async (path) =>
++    path === "graduation-explanation" ? held : context(),
++  );
++  const pending = store.generate();
++  await Promise.resolve();
++  await Promise.resolve();
++  store.clear("SESSION_CHANGED");
++  resolve(data());
++  await pending;
++  assert.equal(updates.at(-1).workflow, null);
++  assert.equal(updates.at(-1).reason, "SESSION_CHANGED");
++});
++
++test("old revalidation cannot restore cleared state", async () => {
++  let hold = false,
++    resolve;
++  const held = new Promise((r) => {
++    resolve = r;
++  });
++  const { store, updates } = setup(async (path) =>
++    path === "graduation-explanation" ? data() : hold ? held : context(),
++  );
++  await store.generate();
++  hold = true;
++  const pending = store.verify();
++  store.clear("SESSION_CHANGED");
++  resolve(context());
++  await pending;
++  assert.equal(updates.at(-1).reason, "SESSION_CHANGED");
++});
++
++test("source changed during model request is rejected before first display", async () => {
++  const d = data();
++  d.workflow.status = "stale";
++  d.workflow.explanation = [];
++  d.workflow.stop_reason = "SOURCE_CHANGED";
++  const { store, updates } = setup(async (path) =>
++    path === "graduation-explanation" ? d : context(),
++  );
++  await store.generate();
++  assert.equal(updates.at(-1).reason, "SOURCE_CHANGED");
++  assert.ok(updates.every((s) => s.workflow === null));
++});
++
++test("dispose prevents late response after navigation/unmount", async () => {
++  let resolve;
++  const held = new Promise((r) => {
++    resolve = r;
++  });
++  const { store, updates } = setup(async () => held);
++  const pending = store.generate();
++  store.dispose();
++  const count = updates.length;
++  resolve(context());
++  await pending;
++  assert.equal(updates.length, count);
++});
++
++test("explicit new session calls reset API and removes all clauses", async () => {
++  const routes = [];
++  const { store, updates } = setup(async (path) => {
++    routes.push(path);
++    return path === "graduation-explanation" ? data() : context();
++  });
++  await store.generate();
++  await store.reset();
++  assert.equal(routes.at(-1), "graduation-session/reset");
++  assert.equal(updates.at(-1).workflow, null);
++});
++
++test("expiry checked using server time, never client-provided identity", () => {
++  assert.equal(
++    validityReason(data().workflow.validity, context(301000)),
++    "EXPIRED",
++  );
++  assert.equal(validityReason(null, context()), "UNAVAILABLE");
++});
++
++test("server-expired in-flight result reports expiry instead of source update", async () => {
++  const d = data();
++  d.workflow.status = "stale";
++  d.workflow.stop_reason = "EXPIRED";
++  d.workflow.explanation = [];
++  const { store, updates } = setup(async (path) =>
++    path === "graduation-explanation" ? d : context(),
++  );
++  await store.generate();
++  assert.equal(updates.at(-1).reason, "EXPIRED");
++});

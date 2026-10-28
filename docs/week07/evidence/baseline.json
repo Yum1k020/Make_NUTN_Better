@@ -1,0 +1,82 @@
+{
+  "run_id": "36371332-36f0-4d03-9147-6ede79487924",
+  "root_kind": "exact_integrated_baseline",
+  "source_commit": "32ec10231d70448ca43013036eec1f0869a21ce8",
+  "source_sha256": {
+    "backend/app/graduation_explanation_api.py": "bb6edc11608a0685a003a14935ea664a55103571c5c7742297986c7671486366",
+    "backend/app/graduation_explanation_core.py": "435b81cfcde03f2c45091e25f725e728587fd43d7616760865ca92dbaa46c7a9",
+    "frontend/src/components/GraduationProgress.jsx": "8dbf84376e5d2369ba5f75f7962f08e98f82bb813dcac18d40973d22290ff62e"
+  },
+  "data_kind": "synthetic",
+  "normal_kind": "fixture",
+  "live_status": "LIVE_NOT_RUN",
+  "normal_latency_ms": 944,
+  "normal_database_unchanged": true,
+  "before_context": {
+    "status": 404,
+    "body": {
+      "code": 404,
+      "status": "Not Found"
+    }
+  },
+  "after_context": {
+    "status": 404,
+    "body": {
+      "code": 404,
+      "status": "Not Found"
+    }
+  },
+  "C02": "NOT_RUN: fixed identity, no authenticated user mapping",
+  "W01_W02": "N/A: no new business-data write tools; session cookie reset only",
+  "normal": {
+    "run_id": "a949a7dd-c46c-43bb-83f6-186750796514",
+    "status": "verified",
+    "stop_reason": "RUBRIC_PASS",
+    "model_calls": 1,
+    "tool_calls": 1,
+    "evidence_sha256": "eb0226c76c524434a308c10a01e71bcfd0617d8e6fdd196c9460f8d55ea35b24",
+    "validity": null,
+    "latency_ms": 0,
+    "clauses_count": 18,
+    "attempts": [
+      {
+        "label": "A",
+        "passed": true,
+        "errors": [],
+        "metrics": {
+          "latency_ms": 0,
+          "provider": "fixture",
+          "usage": {}
+        }
+      }
+    ]
+  },
+  "inflight_update": {
+    "run_id": "c3abb356-5788-4e0a-bf0f-fda6d2b26ef7",
+    "status": "verified",
+    "stop_reason": "RUBRIC_PASS",
+    "model_calls": 1,
+    "tool_calls": 1,
+    "evidence_sha256": "95d6785b27c4d708a6d138b67677aeea95167cc1e005956a1260fdd040d7d4bf",
+    "validity": null,
+    "latency_ms": 8,
+    "clauses_count": 18,
+    "attempts": [
+      {
+        "label": "A",
+        "passed": true,
+        "errors": [],
+        "metrics": {
+          "latency_ms": 0,
+          "provider": "fixture",
+          "usage": {}
+        }
+      }
+    ]
+  },
+  "invalid": {
+    "status": 422,
+    "provider_calls": 0
+  },
+  "publication_note": "SYNTHETIC_ONLY; academic progress, course metadata, grades, inputs and response clauses intentionally omitted. Reproduce with committed fixture generator."
+}

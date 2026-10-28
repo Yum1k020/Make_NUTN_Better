@@ -1,0 +1,43 @@
+{
+  "published_baseline_sha": "32ec10231d70448ca43013036eec1f0869a21ce8",
+  "published_candidate_sha": "6d97f7e8b969253bf4b3ef52df9db36959105c0a",
+  "tested_local_baseline_sha": "cbbd524941b830eb1e71897f332ace2925a8b305",
+  "tested_local_implementation_sha": "548fce335ffd8058f91a0cb155a77fa741f8a955",
+  "baseline_tree": "c0a8df6a613d9e9bc83cf36eda431e1f3cebf7b1",
+  "implementation_tree": "eac25bd44eaa0307c3851846422e62908af8f261",
+  "published_and_tested_source_trees_identical": true,
+  "backend_regression": {
+    "passed": 301,
+    "skipped": 5,
+    "failed": 0,
+    "deselected": 3,
+    "exit_code": 0,
+    "original_base_commit_in_report": "548fce335ffd8058f91a0cb155a77fa741f8a955"
+  },
+  "frontend": {
+    "passed": 19,
+    "failed": 0,
+    "build": "PASS",
+    "changed_files_format": "PASS"
+  },
+  "focused": {
+    "passed": 39,
+    "skipped": 1
+  },
+  "live": "LIVE_NOT_RUN",
+  "live_reason": "GEMINI_API_KEY/GEMINI_MODEL not configured",
+  "C02": "NOT_RUN: fixed user baseline has no authenticated user mapping",
+  "W01_W02": "N/A: no new business-data write tools",
+  "windows_exclusions": [
+    "test_X09_real_http_process_restart",
+    "test_E07_real_http",
+    "test_B19_real_http_and_restart"
+  ],
+  "windows_reason": "Existing POSIX select on subprocess pipe fails with WinError 10038; not modified by this increment",
+  "dependency_note": "npm ci reported 2 existing high-severity advisories; package manifests/locks unchanged; no audit fix applied",
+  "commands": {
+    "backend": "python -X utf8 -m pytest -c backend/pytest.ini backend/tests --basetemp .cache/pytest-week07-committed -k 'not test_X09_real_http_process_restart and not test_E07_real_http and not test_B19_real_http_and_restart' --tb=short --evidence docs/week07/evidence/regression.json",
+    "frontend": "node --test --test-reporter=tap tests/*.test.js; npm run build; prettier --check changed files"
+  },
+  "report_note": "Public regression keeps original observed commit/outcomes, omits all HTTP/academic payload records. Published and tested source trees match; reproduce details with source fixtures."
+}

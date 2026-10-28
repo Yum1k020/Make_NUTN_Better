@@ -1,0 +1,108 @@
+{
+  "run_id": "3acf4467-223e-4590-9c72-089c01a337aa",
+  "root_kind": "candidate",
+  "source_commit": "6d97f7e8b969253bf4b3ef52df9db36959105c0a",
+  "source_sha256": {
+    "backend/app/graduation_explanation_api.py": "219203246110e85dad89af1738ed9e316508191bd3232fb964cd51b8b41c03be",
+    "backend/app/graduation_explanation_core.py": "435b81cfcde03f2c45091e25f725e728587fd43d7616760865ca92dbaa46c7a9",
+    "backend/app/graduation_validity.py": "ba890b568a99b02360bab882702c5b429e1389b676c4de4aad96bf88fa2cf150",
+    "frontend/src/lib/graduationMemory.js": "8b43bef5adea693d57635bb983aea0cae40be05865293888f4dff4a3c5774a17",
+    "frontend/src/components/GraduationProgress.jsx": "249acdb70e5f9aede92960125df452bfbf318c37e7263b1e23ae4c4c71159527"
+  },
+  "data_kind": "synthetic",
+  "normal_kind": "fixture",
+  "live_status": "LIVE_NOT_RUN",
+  "normal_latency_ms": 991,
+  "normal_database_unchanged": true,
+  "before_context": {
+    "status": 200,
+    "body": {
+      "data": {
+        "execution_mode": "standard",
+        "scope_id": "6f27b02c-3187-44df-8f29-cf82d2635fe1",
+        "server_now_ms": 1000000,
+        "source_sha256": "f6528ba8c0333dc7e6df88f902a1361afcc278b69c1b34e1c9c30f39bf740630"
+      }
+    }
+  },
+  "after_context": {
+    "status": 200,
+    "body": {
+      "data": {
+        "execution_mode": "standard",
+        "scope_id": "6f27b02c-3187-44df-8f29-cf82d2635fe1",
+        "server_now_ms": 1000000,
+        "source_sha256": "e23a7f2e0fae4defb792fae5f0251f22450f9426337dfd08e8ff023199de3c1c"
+      }
+    }
+  },
+  "C02": "NOT_RUN: fixed identity, no authenticated user mapping",
+  "W01_W02": "N/A: no new business-data write tools; session cookie reset only",
+  "normal": {
+    "run_id": "cca54837-a254-4569-9cc0-7bec2b912464",
+    "status": "verified",
+    "stop_reason": "RUBRIC_PASS",
+    "model_calls": 1,
+    "tool_calls": 1,
+    "evidence_sha256": "eb0226c76c524434a308c10a01e71bcfd0617d8e6fdd196c9460f8d55ea35b24",
+    "validity": {
+      "execution_mode": "standard",
+      "expires_at_ms": 1300000,
+      "issued_at_ms": 1000000,
+      "scope_id": "6f27b02c-3187-44df-8f29-cf82d2635fe1",
+      "server_now_ms": 1000000,
+      "source_sha256": "f6528ba8c0333dc7e6df88f902a1361afcc278b69c1b34e1c9c30f39bf740630",
+      "ttl_seconds": 300
+    },
+    "latency_ms": 0,
+    "clauses_count": 18,
+    "attempts": [
+      {
+        "label": "A",
+        "passed": true,
+        "errors": [],
+        "metrics": {
+          "latency_ms": 0,
+          "provider": "fixture",
+          "usage": {}
+        }
+      }
+    ]
+  },
+  "inflight_update": {
+    "run_id": "fc13a003-41b2-499b-855f-bed9c392e888",
+    "status": "stale",
+    "stop_reason": "SOURCE_CHANGED",
+    "model_calls": 1,
+    "tool_calls": 1,
+    "evidence_sha256": "95d6785b27c4d708a6d138b67677aeea95167cc1e005956a1260fdd040d7d4bf",
+    "validity": {
+      "execution_mode": "standard",
+      "expires_at_ms": 1300000,
+      "issued_at_ms": 1000000,
+      "scope_id": "6f27b02c-3187-44df-8f29-cf82d2635fe1",
+      "server_now_ms": 1000000,
+      "source_sha256": "e23a7f2e0fae4defb792fae5f0251f22450f9426337dfd08e8ff023199de3c1c",
+      "ttl_seconds": 300
+    },
+    "latency_ms": 8,
+    "clauses_count": 0,
+    "attempts": [
+      {
+        "label": "A",
+        "passed": true,
+        "errors": [],
+        "metrics": {
+          "latency_ms": 0,
+          "provider": "fixture",
+          "usage": {}
+        }
+      }
+    ]
+  },
+  "invalid": {
+    "status": 422,
+    "provider_calls": 0
+  },
+  "publication_note": "SYNTHETIC_ONLY; academic progress, course metadata, grades, inputs and response clauses intentionally omitted. Reproduce with committed fixture generator."
+}

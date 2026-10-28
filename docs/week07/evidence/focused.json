@@ -1,0 +1,374 @@
+{
+  "base_commit": "6d97f7e8b969253bf4b3ef52df9db36959105c0a",
+  "branch": "codex/week07-graduation-memory-scope",
+  "source_sha256": {
+    "backend\\app\\__init__.py": "f86a40d6e77396843fe9de83e5afd4ad4d3d63e7964d02d73239174db6211995",
+    "backend\\app\\catalog.py": "ca02991dbeaf1734bdfa7d2c17488ed2cf80d332766438db4aa69d794fadd8b6",
+    "backend\\app\\catalog_schemas.py": "9f15554542afe4ff6facb759f19069f509f2e030cd2bff1ac644eb322d380a1c",
+    "backend\\app\\catalog_seed.py": "5e962e5008a392ba85234be129f3702922ec3a6546f20160b60caa2b9aa4773d",
+    "backend\\app\\data\\nutn_csie_115_graduation_rules_v1.json": "46d2f42a1da8babee675a0aaa51ca6096cdaa810aed73d581e031af193ad0aec",
+    "backend\\app\\db.py": "8eb27fdfaa308e531f1a13c2a8ba28cb7d7045f7268e43b4b4675633f1530277",
+    "backend\\app\\graduation_explanation_api.py": "219203246110e85dad89af1738ed9e316508191bd3232fb964cd51b8b41c03be",
+    "backend\\app\\graduation_explanation_core.py": "435b81cfcde03f2c45091e25f725e728587fd43d7616760865ca92dbaa46c7a9",
+    "backend\\app\\graduation_gemini.py": "54c38c29cb2dd903588e9113a2d941ebbeea50364823dfacf76a7fe9803cf992",
+    "backend\\app\\graduation_validity.py": "ba890b568a99b02360bab882702c5b429e1389b676c4de4aad96bf88fa2cf150",
+    "backend\\app\\graduation_workflow.py": "87310ea08f85391b04896e715de5c7f28bd676b8708d28d3db7a674266c6bc98",
+    "backend\\app\\planner.py": "bf28768a03f8682396b6b5f2b0145023e05d78bff48dd6f6e87ee5dda4d073a6",
+    "backend\\app\\planner_checks.py": "2831bdab218589781c36e93bae3463245cbaa615d0269eb5005bc14146de915e",
+    "backend\\app\\planner_core.py": "a3bf15cdbba9c0c7fae317e583e7dceaae614dd25d001dd4ee34b34fbd2c6fd4",
+    "backend\\app\\planner_graduation.py": "cca8a0e4d8da2608acc53e737b6fafade16d850b3bc6261cdb2bcfe546c8d4dd",
+    "backend\\app\\planner_logic.py": "390609dd9db91f1d806196ea0e6f7dc9c2733b76c82a0396b0f080662d26c672",
+    "backend\\app\\planner_openapi.py": "f1951d1b9039cfa090db259768b1f5bf20f6b215aff37e1f4322ba18ee1d39c8",
+    "backend\\app\\planner_schedule.py": "320b0d5b34e190779f3f7d834c2d6b2ce29d13b81a8549df5ed0b40009c2beca",
+    "backend\\app\\profile.py": "7b0e47436c8cdcc4dfc7f5c8b08c56249b0e2a250c80ee5095e723fa8d574362",
+    "backend\\tests\\conftest.py": "363ecd667a832368ea21367061415a7a75703f8c2a80003ac9b8b984391292e2",
+    "backend\\tests\\test_app.py": "508e741b266b67e9d41ec6764a762bd9a86ba9b0030c7cf85a69aefc05f4dd68",
+    "backend\\tests\\test_catalog.py": "e605b9d4d2292bb060d76f118ae9d1d0761cb03a4772bd78cc57807fb4e08105",
+    "backend\\tests\\test_graduation_explanations.py": "74fb4ba1aa128827546f2a60ef5fd87747f7c7834ebcce3339dd30f2a6ab6a43",
+    "backend\\tests\\test_graduation_validity.py": "79d6db87cf8afcc29098e1018ae0ab4d52207e96939bf9a8e2c2e4977f15f8d1",
+    "backend\\tests\\test_me.py": "acf4f164a6da7a0f4260c09eb441beae88dafefe0982dec663bcb82c5be5ecfc",
+    "backend\\tests\\test_planner.py": "03fc66980e65368877702fa72fd0e00bad8148160d248719a76f2877e9b7740b",
+    "backend\\tests\\test_task_enhancements.py": "cf6b36432ce491b329e0249aadf3fe63546144f1753820f7346d65763eb244ad",
+    "scripts\\init-backend-db.sh": "349ff1459629a725c109fe086bd06a4c21bbc991af30dbb0a9341c3fa2c24caa",
+    "scripts\\run-backend.sh": "6cc392dedff8f70eaf99c09c0137f36e74542b8543bbab93164ad17658624802",
+    "scripts\\setup-backend.sh": "52708e0f1e37258b0256fa97a8bbb6907e7f13a7b3b8413b00bc48dfefb9edf6",
+    "scripts\\test-backend.sh": "ddbb40248d48dcbcaf800950e7b17345b0972458c926f826dede20f4ae807da1",
+    "backend\\requirements-dev.lock.txt": "1b0cafc981dfc32934f3c8724172e80d3f3678823437f0058d64f065ae52d016",
+    "backend\\pytest.ini": "e06dfed9dc87725c836b6289dfbaa9f795cdf7d9552bd7219f0b9535c5f500f9"
+  },
+  "source_fingerprint": "c1c069153f5aa3dfbe3d85a3cd864c66aa90b966eba8c10b1e50dfb29fe1eeec",
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "packages": {
+    "Flask": "3.1.3",
+    "flask-smorest": "0.47.0",
+    "marshmallow": "4.3.1",
+    "pytest": "9.1.1"
+  },
+  "started_at": "2026-10-28T10:39:02.005058+08:00",
+  "finished_at": "2026-10-28T10:39:09.978656+08:00",
+  "exit_code": 0,
+  "publication_note": "Execution outcomes only; all HTTP/academic payload records omitted. Sources and fixture runner reproduce the assertions.",
+  "tests": [
+    {
+      "id": "tests/test_graduation_validity.py::test_normal_ttl_no_database_writes",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.39994429994840175,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_lecture_update_changes_source",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02930890000425279,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_same_rule_id_changed_content_changes_source",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03412669990211725,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_source_changes_during_provider_discards_clauses",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.022537500015459955,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_expiry_during_provider_discards_clauses",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09221739997155964,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reset_and_separate_browsers_have_distinct_scope",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.15342380001675338,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-context?user_id=other-GET-kwargs0-422]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09750499995425344,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-context-GET-kwargs1-422]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09705350000876933,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-context-GET-kwargs2-403]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03972799994517118,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-session/reset-POST-kwargs3-422]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06801759998779744,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-session/reset-POST-kwargs4-403]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07334219990298152,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_corrupt_source_fails_closed",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11884429992642254,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_volatile_evaluation_time_not_source_change",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005947999889031053,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_C02_authenticated_user_isolation",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 0.0004395999712869525,
+      "reason": "('C:\\\\Users\\\\wendy\\\\Documents\\\\Codex\\\\2026-10-28\\\\5\\\\work\\\\Make_NUTN_Better\\\\backend\\\\tests\\\\test_graduation_validity.py', 122, 'Skipped: NOT_RUN: baseline has one fixed user and no authentication; browser-scope isolation is not C02 multi-user acceptance')",
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_valid_first_draft",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.000734600005671382,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[credits]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004531999584287405,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[source]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00045139994472265244,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[unknown]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004483999218791723,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[scope]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004936999175697565,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[action]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004624000284820795,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[duplicate]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00043699995148926973,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[prose]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00038620003033429384,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[boolean]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005588999483734369,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_boundary_revision_gets_feedback_and_same_context",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.001549400039948523,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_boundary_revision_limit",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0013129999861121178,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_failure_is_bounded",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0006437000120058656,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_missing_rule_skips_provider",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004480999195948243,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_cannot_modify_authoritative_context",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0008422998944297433,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_http_read_only_and_same_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.15211609995458275,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[?user_id=other-kwargs0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1120728999376297,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[-kwargs1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11859860003460199,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[-kwargs2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.17951769998762757,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_database_error_zero_downstream",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11108099995180964,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_source_projection_excludes_identity",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00046950008254498243,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_missing_config_zero_requests",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0006704000988975167,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_request_and_thought_filter",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.002364999963901937,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_timeout_is_sanitized",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.001409800024703145,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_http_provider_failure_keeps_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2560391000006348,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_cross_site_cannot_trigger_model",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.008228700025938451,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_explicit_dev_proxy_origin",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09474850003607571,
+      "reason": null,
+      "record_count": 0
+    }
+  ]
+}

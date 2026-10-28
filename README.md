@@ -117,3 +117,7 @@ Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重�
 - [專案決策與變更紀錄](docs/decisions/CHANGE_DECISIONS.md)：逐項決定、新舊差異、影響分支與檔案，後續變更持續追加。
 - [115畢業規則整合說明](GRADUATION_PROGRESS_115.md) 與 [唯一整合JSON](nutn_csie_115_graduation_rules.json)。
 - 本次為文件與規則整合；後端仍使用mvp-v1快照，前端仍為示範資料。上方128學分驗收為早期示範，不是目前133學分整合規則。
+
+## Week 07：畢業說明記憶範圍（C 路線）
+
+[作業說明、程式差異、測試與證據索引](docs/week07/README.md)。本週對既有畢業缺項說明加入五分鐘 TTL、來源重查與工作階段清除；不改畢業判定。離線證據已提供；真實 Gemini 為 LIVE_NOT_RUN，正式跨 user 驗收為 NOT_RUN，完成提交不代表所有功能驗收通過。

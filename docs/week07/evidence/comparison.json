@@ -1,0 +1,20 @@
+{
+  "baseline_sha": "32ec10231d70448ca43013036eec1f0869a21ce8",
+  "candidate_sha": "6d97f7e8b969253bf4b3ef52df9db36959105c0a",
+  "same_normal_facts": true,
+  "baseline_inflight_status": "verified_on_old_snapshot",
+  "candidate_inflight_status": "stale_clauses_removed",
+  "baseline_TTL": "absent",
+  "candidate_TTL_seconds": 300,
+  "baseline_context_http": 404,
+  "candidate_context_http": 200,
+  "baseline_model_calls": 1,
+  "candidate_model_calls": 1,
+  "normal_latency_ms": {
+    "baseline_fixture": 944,
+    "candidate_fixture": 991
+  },
+  "quality_and_cost_separate": true,
+  "C02": "NOT_RUN",
+  "LIVE": "LIVE_NOT_RUN"
+}

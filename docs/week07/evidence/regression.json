@@ -1,0 +1,2502 @@
+{
+  "base_commit": "548fce335ffd8058f91a0cb155a77fa741f8a955",
+  "branch": "codex/week07-graduation-memory-scope",
+  "source_sha256": {
+    "backend\\app\\__init__.py": "f86a40d6e77396843fe9de83e5afd4ad4d3d63e7964d02d73239174db6211995",
+    "backend\\app\\catalog.py": "ca02991dbeaf1734bdfa7d2c17488ed2cf80d332766438db4aa69d794fadd8b6",
+    "backend\\app\\catalog_schemas.py": "9f15554542afe4ff6facb759f19069f509f2e030cd2bff1ac644eb322d380a1c",
+    "backend\\app\\catalog_seed.py": "5e962e5008a392ba85234be129f3702922ec3a6546f20160b60caa2b9aa4773d",
+    "backend\\app\\data\\nutn_csie_115_graduation_rules_v1.json": "46d2f42a1da8babee675a0aaa51ca6096cdaa810aed73d581e031af193ad0aec",
+    "backend\\app\\db.py": "8eb27fdfaa308e531f1a13c2a8ba28cb7d7045f7268e43b4b4675633f1530277",
+    "backend\\app\\graduation_explanation_api.py": "219203246110e85dad89af1738ed9e316508191bd3232fb964cd51b8b41c03be",
+    "backend\\app\\graduation_explanation_core.py": "435b81cfcde03f2c45091e25f725e728587fd43d7616760865ca92dbaa46c7a9",
+    "backend\\app\\graduation_gemini.py": "54c38c29cb2dd903588e9113a2d941ebbeea50364823dfacf76a7fe9803cf992",
+    "backend\\app\\graduation_validity.py": "ba890b568a99b02360bab882702c5b429e1389b676c4de4aad96bf88fa2cf150",
+    "backend\\app\\graduation_workflow.py": "87310ea08f85391b04896e715de5c7f28bd676b8708d28d3db7a674266c6bc98",
+    "backend\\app\\planner.py": "bf28768a03f8682396b6b5f2b0145023e05d78bff48dd6f6e87ee5dda4d073a6",
+    "backend\\app\\planner_checks.py": "2831bdab218589781c36e93bae3463245cbaa615d0269eb5005bc14146de915e",
+    "backend\\app\\planner_core.py": "a3bf15cdbba9c0c7fae317e583e7dceaae614dd25d001dd4ee34b34fbd2c6fd4",
+    "backend\\app\\planner_graduation.py": "cca8a0e4d8da2608acc53e737b6fafade16d850b3bc6261cdb2bcfe546c8d4dd",
+    "backend\\app\\planner_logic.py": "390609dd9db91f1d806196ea0e6f7dc9c2733b76c82a0396b0f080662d26c672",
+    "backend\\app\\planner_openapi.py": "f1951d1b9039cfa090db259768b1f5bf20f6b215aff37e1f4322ba18ee1d39c8",
+    "backend\\app\\planner_schedule.py": "320b0d5b34e190779f3f7d834c2d6b2ce29d13b81a8549df5ed0b40009c2beca",
+    "backend\\app\\profile.py": "7b0e47436c8cdcc4dfc7f5c8b08c56249b0e2a250c80ee5095e723fa8d574362",
+    "backend\\tests\\conftest.py": "363ecd667a832368ea21367061415a7a75703f8c2a80003ac9b8b984391292e2",
+    "backend\\tests\\test_app.py": "508e741b266b67e9d41ec6764a762bd9a86ba9b0030c7cf85a69aefc05f4dd68",
+    "backend\\tests\\test_catalog.py": "e605b9d4d2292bb060d76f118ae9d1d0761cb03a4772bd78cc57807fb4e08105",
+    "backend\\tests\\test_graduation_explanations.py": "74fb4ba1aa128827546f2a60ef5fd87747f7c7834ebcce3339dd30f2a6ab6a43",
+    "backend\\tests\\test_graduation_validity.py": "79d6db87cf8afcc29098e1018ae0ab4d52207e96939bf9a8e2c2e4977f15f8d1",
+    "backend\\tests\\test_me.py": "acf4f164a6da7a0f4260c09eb441beae88dafefe0982dec663bcb82c5be5ecfc",
+    "backend\\tests\\test_planner.py": "03fc66980e65368877702fa72fd0e00bad8148160d248719a76f2877e9b7740b",
+    "backend\\tests\\test_task_enhancements.py": "cf6b36432ce491b329e0249aadf3fe63546144f1753820f7346d65763eb244ad",
+    "scripts\\init-backend-db.sh": "349ff1459629a725c109fe086bd06a4c21bbc991af30dbb0a9341c3fa2c24caa",
+    "scripts\\run-backend.sh": "6cc392dedff8f70eaf99c09c0137f36e74542b8543bbab93164ad17658624802",
+    "scripts\\setup-backend.sh": "52708e0f1e37258b0256fa97a8bbb6907e7f13a7b3b8413b00bc48dfefb9edf6",
+    "scripts\\test-backend.sh": "ddbb40248d48dcbcaf800950e7b17345b0972458c926f826dede20f4ae807da1",
+    "backend\\requirements-dev.lock.txt": "1b0cafc981dfc32934f3c8724172e80d3f3678823437f0058d64f065ae52d016",
+    "backend\\pytest.ini": "e06dfed9dc87725c836b6289dfbaa9f795cdf7d9552bd7219f0b9535c5f500f9"
+  },
+  "source_fingerprint": "c1c069153f5aa3dfbe3d85a3cd864c66aa90b966eba8c10b1e50dfb29fe1eeec",
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "packages": {
+    "Flask": "3.1.3",
+    "flask-smorest": "0.47.0",
+    "marshmallow": "4.3.1",
+    "pytest": "9.1.1"
+  },
+  "started_at": "2026-10-28T10:33:05.997169+08:00",
+  "finished_at": "2026-10-28T10:35:00.724304+08:00",
+  "exit_code": 0,
+  "publication_note": "Execution outcomes only; all HTTP/academic payload records omitted. Sources and fixture runner reproduce the assertions.",
+  "tests": [
+    {
+      "id": "tests/test_app.py::test_health_and_documentation_are_available_locally",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.12181319994851947,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_app.py::test_json_validation_and_unicode_roundtrip",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.025639700004830956,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_catalog.py::test_S01_all_semesters_sorted",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.003959599998779595,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S02_filter_year",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.007550399983301759,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[abc]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.004215499968267977,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.003920899936929345,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.005994799896143377,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[115.0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.005469899973832071,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[true]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.007102499948814511,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.005208499962463975,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[ 115]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.005674900021404028,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S03_invalid_year[+115]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.010298200068064034,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S04_year_without_data[999]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03593010001350194,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S04_year_without_data[9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02767360000871122,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_S05_invalid_stored_dates[2020-01-01]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09263400000054389,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_S05_invalid_stored_dates[2027-02-30]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.025237899972125888,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_S05_invalid_stored_dates[2027-1-31]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.027046400005929172,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_C01_all_courses_without_implicit_rule",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.08952749997843057,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C02_search_name_or_code[\\u8cc7\\u6599-ids0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.045940699987113476,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C02_search_name_or_code[ demo-prog -ids1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04521760006900877,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C03_no_matches_literal_search[\\u4e0d\\u5b58\\u5728]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.015593599993735552,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C03_no_matches_literal_search[%]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04332420008722693,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C03_no_matches_literal_search[_]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.057179999887011945,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C03_no_matches_literal_search[' OR 1=1 --]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.009945900063030422,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C04_invalid_search[]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.006946200039237738,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C04_invalid_search[  ]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.019224799936637282,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C04_invalid_search[\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57\\u5b57]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.006730200024321675,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C05_invalid_department",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.01302930002566427,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C06_invalid_rule[courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.039390299934893847,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C06_invalid_rule[courses/course-demo-001]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.043996999971568584,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C07_unclassified_retained",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00997559993993491,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C08_detail",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.017748999991454184,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C09_missing_course",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04102870007045567,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C10_unknown_prerequisites",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.013200600049458444,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C11_confirmed_no_prerequisites",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.008743899990804493,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_C12_known_prerequisites[course-demo-004-all]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02674450003542006,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_catalog.py::test_C12_known_prerequisites[course-demo-005-any]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.026718599954620004,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_catalog.py::test_C13_list_detail_consistency[None]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0850069000152871,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_catalog.py::test_C13_list_detail_consistency[rules-csie-115-v1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05427419999614358,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_catalog.py::test_C13_list_detail_consistency[rules-demo-114-v1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07277990004513413,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_catalog.py::test_C14_rule_specific_classification",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04803309997078031,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_O01_offerings_for_semester",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.08682389999739826,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_catalog.py::test_O02_missing_semester",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02556189999449998,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O03_invalid_semester",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.008461400051601231,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O04_semester_without_offerings",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.01012819993775338,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O05_invalid_course",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.01040659996215254,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O06_multiple_sections",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05067880009301007,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O07_multiple_meetings_count_offerings",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.009375900030136108,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O08_unknown_location",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.01179629995021969,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O09_unknown_schedule",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.017511799931526184,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_O10_invalid_stored_meeting[weekday-8]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.027598900021985173,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_O10_invalid_stored_meeting[weekday-1.5]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.031991500058211386,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_O10_invalid_stored_meeting[end_time-08:00]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02969160000793636,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_O10_invalid_stored_meeting[end_time-09:00]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.037713599973358214,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_O10_invalid_stored_meeting[start_time-25:00]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02744680002797395,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_X01_unknown_query[semesters]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.010975299985148013,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_X01_unknown_query[courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.031050799996592104,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_X01_unknown_query[courses/course-demo-001]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0072623000014573336,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_X01_unknown_query[course-offerings?semester_id=semester-115-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.009678200003691018,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_X02_database_read_failure[semesters]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04343919991515577,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_X02_database_read_failure[courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.047648899955675006,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_X02_database_read_failure[courses/course-demo-001]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.041432099998928607,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_X02_database_read_failure[course-offerings?semester_id=semester-115-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.025863999966531992,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_X02_database_read_failure[courses?department_id=dept-csie]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.014106499962508678,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E01_combined_filters",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09532500000204891,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_catalog.py::test_E02_repeated_query_rejected[semesters-academic_year]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.020785000058822334,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_E02_repeated_query_rejected[courses-q]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03316419990733266,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_E02_repeated_query_rejected[courses/course-demo-001-rule_set_id]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00827320001553744,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_E02_repeated_query_rejected[course-offerings-semester_id]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.009166399948298931,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE courses SET credits=-1-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.027949700015597045,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE courses SET name=''-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03378050005994737,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE courses SET offering_department_id='missing'-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04339630005415529,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE courses SET prerequisite_source=NULL WHERE course_id='course-demo-002'-courses/course-demo-002]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09403619996737689,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[DELETE FROM course_prerequisites WHERE course_id='course-demo-004'-courses/course-demo-004]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03858260007109493,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE course_prerequisites SET prerequisite_id='missing' WHERE prerequisite_id='course-demo-002'-courses/course-demo-004]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09087339998222888,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE course_classifications SET credit_category='invalid'-courses?rule_set_id=rules-csie-115-v1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0935948999831453,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE course_offerings SET schedule_status='unknown' WHERE offering_id='offering-demo-001'-course-offerings?semester_id=semester-115-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06960359995719045,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE course_offerings SET schedule_status='scheduled' WHERE offering_id='offering-demo-003'-course-offerings?semester_id=semester-115-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10719769995193928,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE class_meetings SET campus_id='missing'-course-offerings?semester_id=semester-115-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1016179999569431,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E03_invalid_stored_contract[UPDATE course_offerings SET course_id='missing'-course-offerings?semester_id=semester-115-1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.030090600019320846,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_catalog.py::test_E04_init_idempotent_preserves_changes",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09724770009052008,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_catalog.py::test_E05_upgrade_original_profile_database",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.42511089995969087,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_catalog.py::test_E06_openapi",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.050720499944873154,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_valid_first_draft",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0008097999962046742,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[credits]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0008426000131294131,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[source]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0010478999465703964,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[unknown]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.001034799963235855,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[scope]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0006133000133559108,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[action]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0008447999134659767,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[duplicate]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005229000234976411,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[prose]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004273999948054552,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[boolean]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004902000073343515,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_boundary_revision_gets_feedback_and_same_context",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0009988999227061868,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_boundary_revision_limit",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0008507000748068094,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_failure_is_bounded",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0006158000323921442,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_missing_rule_skips_provider",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0004013999132439494,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_cannot_modify_authoritative_context",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0009468999924138188,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_http_read_only_and_same_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 2.5078801999334246,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[?user_id=other-kwargs0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10686669999267906,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[-kwargs1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09871839999686927,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[-kwargs2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.12852110003586859,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_database_error_zero_downstream",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06367740000132471,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_source_projection_excludes_identity",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0015100999735295773,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_missing_config_zero_requests",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0032580000115558505,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_request_and_thought_filter",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.009571600006893277,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_timeout_is_sanitized",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.005245200009085238,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_http_provider_failure_keeps_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09875780006404966,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_cross_site_cannot_trigger_model",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0014432999305427074,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_explicit_dev_proxy_origin",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03401639999356121,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_normal_ttl_no_database_writes",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.21840530005283654,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_lecture_update_changes_source",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07411120005417615,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_same_rule_id_changed_content_changes_source",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0546252999920398,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_source_changes_during_provider_discards_clauses",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10942979995161295,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_expiry_during_provider_discards_clauses",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.034377000061795115,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reset_and_separate_browsers_have_distinct_scope",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06578239996451885,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-context?user_id=other-GET-kwargs0-422]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.035857300041243434,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-context-GET-kwargs1-422]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.08338580001145601,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-context-GET-kwargs2-403]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11806629993952811,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-session/reset-POST-kwargs3-422]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1205195999937132,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_reject_overrides_and_cross_origin[graduation-session/reset-POST-kwargs4-403]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11810989992227405,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_corrupt_source_fails_closed",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09216920007020235,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_volatile_evaluation_time_not_source_change",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0010853001149371266,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_graduation_validity.py::test_C02_authenticated_user_isolation",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 0.0005257000448182225,
+      "reason": "('C:\\\\Users\\\\wendy\\\\Documents\\\\Codex\\\\2026-10-28\\\\5\\\\work\\\\Make_NUTN_Better\\\\backend\\\\tests\\\\test_graduation_validity.py', 122, 'Skipped: NOT_RUN: baseline has one fixed user and no authentication; browser-scope isolation is not C02 multi-user acceptance')",
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_me.py::test_G01_complete_profile",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04372680000960827,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_me.py::test_G02_missing_values",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.014454800053499639,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_G03_unauthenticated",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 0.0003826000029221177,
+      "reason": "('C:\\\\Users\\\\wendy\\\\Documents\\\\Codex\\\\2026-10-28\\\\5\\\\work\\\\Make_NUTN_Better\\\\backend\\\\tests\\\\test_me.py', 79, 'Skipped: 未執行：baseline 未實作登入驗證，G03 401 留待正式版')",
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_me.py::test_P01_full_patch_and_get",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04010720003861934,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_me.py::test_P02_partial_patch",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06511239998508245,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[abc]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04622469993773848,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[115]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09956889995373785,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[115.0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05310030002146959,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[True]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.049455999978818,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[value4]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05125140002928674,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P03_strict_integer[value5]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05567599995993078,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P04_unknown_department",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.011673200060613453,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P05_unknown_semester",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.013395700021646917,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.014734400087036192,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.011017999961040914,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.014360000030137599,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P06_empty_or_null[payload3]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.010539100039750338,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P07_readonly_or_unknown_field[user_id]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.011900900048203766,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P07_readonly_or_unknown_field[rule_set_id]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.011494999984279275,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P07_readonly_or_unknown_field[unexpected]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05247410002630204,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_P08_atomic_validation",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.047842999920248985,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_me.py::test_P09_missing_rule_and_rematch[change0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.08418420003727078,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_me.py::test_P09_missing_rule_and_rematch[change1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.08108319994062185,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_me.py::test_P10_database_failure_rolls_back",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1389449000125751,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_me.py::test_P11_malformed_json",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02954800007864833,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X01_unsupported_reference[payload0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02769250003620982,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X01_unsupported_reference[payload1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.01252560003194958,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X01_unsupported_reference[payload2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.013366000028327107,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[null]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.011199900065548718,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[[]]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.010371500044129789,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[\"text\"]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.011425699922256172,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X02_nonobject_json[115]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.04163200000766665,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X03_media_type",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02828670002054423,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X04_incomplete_with_matching_rule",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.028984999982640147,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_me.py::test_X05_related_records_and_other_profile_preserved",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05067349993623793,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_me.py::test_X06_init_idempotent",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1411838000640273,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_me.py::test_X07_invalid_response_rolls_back",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05599410005379468,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_me.py::test_X08_openapi",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.02558580006007105,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_me.py::test_X10_authenticated_user_isolation",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 0.0003877000417560339,
+      "reason": "('C:\\\\Users\\\\wendy\\\\Documents\\\\Codex\\\\2026-10-28\\\\5\\\\work\\\\Make_NUTN_Better\\\\backend\\\\tests\\\\test_me.py', 279, 'Skipped: 未執行：固定身分 baseline 無法提供兩位登入使用者隔離；合成資料保留測試不代表登入隔離')",
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_me.py::test_X11_missing_database_returns_json_500",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07288919994607568,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_me.py::test_X12_inconsistent_stored_rule_returns_500",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05437789997085929,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_X01_X02_X04_crud_roundtrip[enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4887496998999268,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X01_X02_X04_crud_roundtrip[timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5269456999376416,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X01_X02_X04_crud_roundtrip[tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.6712591000832617,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X01_X02_X04_crud_roundtrip[personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4955508999992162,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X01_X02_X04_crud_roundtrip[study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.6953978000674397,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X01_X02_X04_crud_roundtrip[planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5442525000544265,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload0-enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14578809996601194,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload0-timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.15974010003264993,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload0-tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1537023999262601,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload0-personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2298848000355065,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload0-study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.15549619996454567,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload0-planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14604889997281134,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload1-enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.20012909988872707,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload1-timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.16453180008102208,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload1-tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14063510007690638,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload1-personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.16200460004620254,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload1-study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.18680630007293075,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload1-planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14323759998660535,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload2-enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.13989519991446286,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload2-timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.26340919989161193,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload2-tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.20646120002493262,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload2-personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.29511940001975745,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload2-study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.37586080003529787,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X03_readonly_or_empty_patch[payload2-planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.13534399995114654,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[GET-enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.13737530005164444,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[GET-timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10259680007584393,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[GET-tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06544859998393804,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[GET-personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06363540003076196,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[GET-study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14967409998644143,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[GET-planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09705650003161281,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[PATCH-enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10359610000159591,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[PATCH-timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06795980001334101,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[PATCH-tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0686379000544548,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[PATCH-personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06080840004142374,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[PATCH-study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07715239992830902,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[PATCH-planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.05780029995366931,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[DELETE-enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09204340004362166,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[DELETE-timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07493970007635653,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[DELETE-tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11094609997235239,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[DELETE-personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0819597999798134,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[DELETE-study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1438390000257641,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X05_missing_resource[DELETE-planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1394136999733746,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_X06_baseline_owner_filter[enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5691651999950409,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X06_baseline_owner_filter[timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4727939000586048,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X06_baseline_owner_filter[tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.3574922000989318,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X06_baseline_owner_filter[personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.34327139996457845,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X06_baseline_owner_filter[study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5063228999497369,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X06_baseline_owner_filter[planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5288948999950662,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_X07_formal_authentication",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 0.0007160999812185764,
+      "reason": "('C:\\\\Users\\\\wendy\\\\Documents\\\\Codex\\\\2026-10-28\\\\5\\\\work\\\\Make_NUTN_Better\\\\backend\\\\tests\\\\test_planner.py', 170, 'Skipped: 正式版 X06/X07 登入與雙使用者身分映射未實作；baseline 的 SQL 歸屬測試不等於正式登入驗收')",
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_planner.py::test_X08_storage_failure[enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.26825999992433935,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_X08_storage_failure[timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.27232690004166216,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_X08_storage_failure[tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2928358999779448,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_X08_storage_failure[personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2992342000361532,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_X08_storage_failure[study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2347335999365896,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_X08_storage_failure[planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.21738639997784048,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_X09_X10_bad_json_and_user_id[enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.16528730001300573,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X09_X10_bad_json_and_user_id[timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.12947759998496622,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X09_X10_bad_json_and_user_id[tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.135809600003995,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X09_X10_bad_json_and_user_id[personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14711450005415827,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X09_X10_bad_json_and_user_id[study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.17858469998463988,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_X09_X10_bad_json_and_user_id[planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.12836109998170286,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_E01_E02_E03_enrollment",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4465422999346629,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_T01_E04_timetable_link",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4049069000175223,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_T02_bad_weekday",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.13035699992906302,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_T03_conflicting_timetable",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.25810330000240356,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_T04_link_write_rollback",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.22526650002691895,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_CA01_calendar_dedup_and_deadlines",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.9502710000379011,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_CA02_invalid_calendar_range[from=2026-10-06&to=2026-10-05]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09578340000007302,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_CA02_invalid_calendar_range[from=2026-10-01&to=2026-11-01]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1558151999488473,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_CA03_outside_semester",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.32333369995467365,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_TA01_TA02_TA03_task",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.3931023000041023,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_PE01_PE02_cross_day",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.41699950001202524,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_PE03_conflict_with_study",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.3915135998977348,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_CF01_CF02_overlap_and_boundary",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.44528600003104657,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_CF03_GE03_unknown_class",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.3866310999728739,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_AV01_AV02_AV03_availability",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5018679000204429,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_SP01_SP02_SP03_plan_validation",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.620013999985531,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_GE01_GE02_generation",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.38646950002294034,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_GE04_future_ai",
+      "phase": "setup",
+      "outcome": "skipped",
+      "duration_seconds": 0.0003535000141710043,
+      "reason": "('C:\\\\Users\\\\wendy\\\\Documents\\\\Codex\\\\2026-10-28\\\\5\\\\work\\\\Make_NUTN_Better\\\\backend\\\\tests\\\\test_planner.py', 321, 'Skipped: GE04：baseline 不接外部 AI；502 驗收未執行')",
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_planner.py::test_SS01_SS02_SS03_recheck_and_version",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5027837000088766,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_SS04_SS05_session_adjustment",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5345101000275463,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_PC01_PC02_planning_does_not_earn_credits",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.42630709998775274,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_CK01_CK02_planning_check",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.18400939996354282,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_GR01_GR02_PR01_PR02_rules",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.31136700010392815,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_LP01_LP02_LP03_lectures",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4474432000424713,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_GP01_GP02_GP03_GP04_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.76427069993224,
+      "reason": null,
+      "record_count": 8
+    },
+    {
+      "id": "tests/test_planner.py::test_GP05_allocation_once",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4375650999136269,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_DB01_DB02_dashboard",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.7766135000856593,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_MP01_MP02_maps",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2028332999907434,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_B01_task_event_reference_cleanup",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 1.0846469000680372,
+      "reason": null,
+      "record_count": 8
+    },
+    {
+      "id": "tests/test_planner.py::test_B02_exam_links_guarded",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.6899045000318438,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_B03_plan_sessions_isolation_tail_and_clear",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.9578166999854147,
+      "reason": null,
+      "record_count": 10
+    },
+    {
+      "id": "tests/test_planner.py::test_B04_put_rollback_after_delete",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.3788191999774426,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_B05_invalid_session_sets[sessions0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2027810999425128,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_B05_invalid_session_sets[sessions1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.21853509999345988,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_B05_invalid_session_sets[sessions2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.17013869993388653,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_B06_exclusion_ownership_and_self_edit",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5608669000212103,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_B07_enrollment_calendar_and_manual_override",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.407366200000979,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_B08_catalog_entry_and_mismatched_offering",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.28535300004296005,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_B09_task_filter_order_null_and_partial_dates",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5944391000084579,
+      "reason": null,
+      "record_count": 7
+    },
+    {
+      "id": "tests/test_planner.py::test_B10_timezone_and_read_only_preview",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2605890000704676,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_B11_missing_rule_dashboard_no_fake_numbers",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.13757859996985644,
+      "reason": null,
+      "record_count": 2
+    },
+    {
+      "id": "tests/test_planner.py::test_B12_snapshot_immutable_and_invalid_output",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5239585000090301,
+      "reason": null,
+      "record_count": 6
+    },
+    {
+      "id": "tests/test_planner.py::test_B13_unknown_query_all_crud[enrollments]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10994739993475378,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B13_unknown_query_all_crud[timetable-entries]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10361240000929683,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B13_unknown_query_all_crud[tasks]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.12575630005449057,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B13_unknown_query_all_crud[personal-events]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09026269998867065,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B13_unknown_query_all_crud[study-plans]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1264954999787733,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B13_unknown_query_all_crud[planned-courses]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06296350003685802,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B14_sql_read_error_is_500",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.1434645999688655,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B15_openapi_paths",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06309449998661876,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B16_week_boundary_study_minutes",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.3352306999731809,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_B17_lecture_storage_rollback",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.4070944000268355,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_B18_init_preserves_data_and_rule_version",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.36832759995013475,
+      "reason": null,
+      "record_count": 5
+    },
+    {
+      "id": "tests/test_planner.py::test_B20_fully_mapped_synthetic_graduation_met",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.5322737999958917,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_B21_successful_session_patch_and_version",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.601934100035578,
+      "reason": null,
+      "record_count": 4
+    },
+    {
+      "id": "tests/test_planner.py::test_B22_in_progress_is_not_passed_prerequisite",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2582088999915868,
+      "reason": null,
+      "record_count": 3
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[GET-calendar]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.08698550006374717,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[POST-schedule/conflicts]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11100989999249578,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[POST-schedule/availability]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07371440005954355,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[POST-study-plans/unknown/generate]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06111879996024072,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[PUT-study-plans/unknown/sessions]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.20494520000647753,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[POST-planned-courses/check]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.14649259997531772,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[GET-graduation-rules/nutn-csie-115-mvp-v1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.12130909995175898,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[GET-programs]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11399320000782609,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[PUT-lecture-progress]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06543070008046925,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[GET-graduation-progress]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.17339279991574585,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[GET-dashboard]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11501989990938455,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_planner.py::test_B23_unknown_query_calculation_endpoints[GET-campus-maps]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11489299999084324,
+      "reason": null,
+      "record_count": 1
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_fields_patch_and_restart",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.2554378999629989,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_legacy_read_does_not_write",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.11567940004169941,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_undated_calendar_dashboard_and_clear",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10092470003291965,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_invalid_patch_is_atomic[payload0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09348609996959567,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_invalid_patch_is_atomic[payload1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10241010005120188,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_invalid_patch_is_atomic[payload2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.03616340004373342,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_invalid_patch_is_atomic[payload3]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09145680000074208,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_invalid_patch_is_atomic[payload4]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.09985719993710518,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_invalid_patch_is_atomic[payload5]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.07025599991902709,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_pagination_defaults_filters_and_stable_order",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 2.629023600020446,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_linked_exam_cannot_lose_date",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.06591710005886853,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_openapi_contract",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.10612379992380738,
+      "reason": null,
+      "record_count": 0
+    },
+    {
+      "id": "tests/test_task_enhancements.py::test_database_health_detects_missing_table",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.104194900020957,
+      "reason": null,
+      "record_count": 0
+    }
+  ]
+}
