@@ -25,6 +25,7 @@ npm run format:check
 - 今日／本週：週課表與單日時間軸切換、日期切換、待辦完成狀態、新增／編輯／刪除待辦與私人行程。
 - 私人行程與既有課程或其他私人行程時間重疊時，表單會提示衝突並要求調整。
 - 智慧學習：先預覽本週課程與個人行程，再設定考試日期、複習時數和可安排時段，計算不與課程和行程重疊的複習建議；時段不足會顯示缺少時數，亦可手動調整或移除建議。
+- 學習偏好記憶：使用者可明確確認一個常用學習時段；新 session 會讀回並預選，可更正、到期與撤回。暫時勾選的時段不會自動保存。
 - 修課規劃：加入或移除下學期課程，檢視先修提醒與規劃學分。
 - 畢業進度：顯示測試規則中的已取得學分、必修與講座缺項；規劃中的課程不計入已取得學分。
 - 資料證據：整理 Week 03 gate 的 proposal、source cards、3 個 fixed queries、top-k trace、generator comparison JSON 與 failure observation；目前使用學生系統 fixture 驗證，不把羽球場 baseline 範例當成產品需求。
@@ -68,5 +69,11 @@ npm run agent:smoke
 ```
 
 替換理由、驗收案例與限制記錄於 [`../docs/week04-framework-replacement.md`](../docs/week04-framework-replacement.md)。
+
+## Week 07 已確認偏好記憶
+
+「智慧學習」會透過同源 `/api/study-memory/preference` API 讀寫一筆常用學習時段。只有按下「確認並保存」才會寫入；記憶包含 owner、來源、版本與 30 天期限，撤回或到期後不再回填。記憶只預選 UI 時段，原排程仍重新檢查課表、私人行程與本次輸入。
+
+預設資料檔是 `data/study-memory.json`，已由專案根目錄 `.gitignore` 排除。這是本機課堂原型，示範 user header 不是正式登入驗證；不要在該檔放入真實個資。實作、測試矩陣、比較表與 ADR 請見 [`../docs/week07/README.md`](../docs/week07/README.md)。
 
 目前使用固定示範日期 **2026-09-17** 和本機示範資料。使用者的待辦、私人行程、複習建議與修課規劃會保存在瀏覽器 `localStorage`。尚未連接登入、學校課務系統或正式後端代理。地圖圖片由使用者提供；教室與畢業條件仍以實際校方資料為準。

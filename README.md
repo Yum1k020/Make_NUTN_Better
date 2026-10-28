@@ -36,6 +36,8 @@
 
 Week 06 將這段子流程改成可驗證的 Prompt chaining：需求驗證 → 規則排程 → 衝突與完整性 Gate → Agent 說明。程式差異、四條案例、前後比較、ADR 與證據索引請見 [`docs/week06/README.md`](docs/week06/README.md)。
 
+Week 07 在同一條主流程加入一筆「已確認的常用學習時段」記憶：新 session 可讀回，並具備更正、30 天到期、撤回、跨使用者隔離、版本檢查與冪等重送。記憶不包含私人行程，也不會送給模型；完整資料契約、比較表、測試矩陣與 ADR 請見 [`docs/week07/README.md`](docs/week07/README.md)。
+
 ## Acceptance Criteria（驗收條件）
 
 ### 1. 課表與截止事項顯示
