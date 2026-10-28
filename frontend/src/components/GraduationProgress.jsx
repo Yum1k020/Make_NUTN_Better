@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   GRADUATION_STATUS,
   CHECK_NAMES,
@@ -8,6 +8,10 @@ import {
   workflowMessage,
 } from "../lib/graduation.js";
 import "./GraduationProgress.css";
+import {
+  GraduationMemory,
+  VALIDITY_MESSAGES,
+} from "../lib/graduationMemory.js";
 
 export default function GraduationProgress({ onNavigate }) {
   const [progress, setProgress] = useState(null);
@@ -18,8 +22,60 @@ export default function GraduationProgress({ onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [reload, setReload] = useState(0);
+  const [memoryReason, setMemoryReason] = useState("");
+  const [fixtureMode, setFixtureMode] = useState(false);
+  const memory = useRef(null);
+  useEffect(() => {
+    const store = new GraduationMemory({
+      request: (path, options = {}) =>
+        graduationRequest(path, {
+          ...options,
+          cache: "no-store",
+          signal: AbortSignal.timeout(
+            path === "graduation-explanation" ? 60000 : 5000,
+          ),
+        }),
+      update: (state) => {
+        setWorkflow(state.workflow);
+        setMemoryReason(state.reason);
+        setBusy(state.busy);
+        if (state.progress) setProgress(state.progress);
+      },
+    });
+    memory.current = store;
+    let seconds = 0;
+    const timer = setInterval(() => {
+      store.tick();
+      if (++seconds % 15 === 0) void store.verify();
+    }, 1000);
+    const focus = () => void store.verify();
+    const visibility = () => {
+      if (document.visibilityState === "visible") focus();
+      else setWorkflow(null);
+    };
+    window.addEventListener("focus", focus);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      store.dispose();
+      clearInterval(timer);
+      window.removeEventListener("focus", focus);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
+    memory.current?.clear();
+    graduationRequest("graduation-context", {
+      signal: controller.signal,
+      cache: "no-store",
+    })
+      .then((context) => {
+        if (!controller.signal.aborted)
+          setFixtureMode(context.execution_mode === "synthetic_fixture");
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setFixtureMode(false);
+      });
     setLoading(true);
     setProgress(null);
     setPlanned(null);
@@ -43,24 +99,8 @@ export default function GraduationProgress({ onNavigate }) {
     return () => controller.abort();
   }, [reload]);
 
-  async function generateExplanation() {
-    setBusy(true);
-    setError("");
-    setWorkflow(null);
-    try {
-      const data = await graduationRequest("graduation-explanation", {
-        method: "POST",
-        signal: AbortSignal.timeout(60000),
-      });
-      setProgress(data.progress);
-      setWorkflow(data.workflow);
-    } catch (e) {
-      setError(
-        e.name === "TimeoutError" ? "說明等待逾時，請稍後重試。" : e.message,
-      );
-    } finally {
-      setBusy(false);
-    }
+  function generateExplanation() {
+    void memory.current?.generate();
   }
 
   return (
@@ -80,6 +120,13 @@ export default function GraduationProgress({ onNavigate }) {
           重新整理
         </button>
       </header>
+      <button
+        className="text-link"
+        disabled={busy || loading}
+        onClick={() => void memory.current?.reset()}
+      >
+        開始新的說明工作階段
+      </button>
       {loading && <p role="status">正在讀取畢業進度…</p>}
       {error && (
         <p role="alert" className="graduation-notice">
@@ -161,19 +208,37 @@ export default function GraduationProgress({ onNavigate }) {
           <section className="panel graduation-section" aria-live="polite">
             <h2>缺項說明與下一步</h2>
             <p>
-              按下後會將去識別的規則版本、學分／場次及達標狀態送至 Google
-              Gemini，不傳姓名、學號或成績明細。
+              {fixtureMode
+                ? "合成測試模式：使用虛構資料與固定測試回應，不連線 Gemini，不傳送學業資料。"
+                : "按下後會將去識別的規則版本、學分／場次及達標狀態送至 Google Gemini，不傳姓名、學號或成績明細。"}
             </p>
             <button
               className="primary-button"
               disabled={busy || loading || !progress.checks.length}
               onClick={generateExplanation}
             >
-              {busy ? "正在產生並檢查說明…" : "產生說明"}
+              {busy
+                ? "正在產生並檢查說明…"
+                : fixtureMode
+                  ? "產生合成測試說明"
+                  : "產生說明"}
             </button>
+            <p>
+              說明最多保留 5 分鐘；每 15
+              秒及回到頁面時重查來源。重新整理或新工作階段會清除說明。
+            </p>
+            {memoryReason && (
+              <p role="status">{VALIDITY_MESSAGES[memoryReason]}</p>
+            )}
             {workflow && (
               <>
                 <p role="status">{workflowMessage(workflow)}</p>
+                <p>
+                  產生時間：
+                  {new Date(workflow.validity.issued_at_ms).toLocaleString()}
+                  ；到期時間：
+                  {new Date(workflow.validity.expires_at_ms).toLocaleString()}
+                </p>
                 <ul className="graduation-explanations">
                   {workflow.explanation.map((item) => (
                     <li key={item.check_id}>

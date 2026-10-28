@@ -1,6 +1,7 @@
 """Local Flask application with a fixed-identity user profile baseline."""
 
 import os
+import secrets
 
 from flask import Flask, Blueprint as FlaskBlueprint, redirect
 from flask.views import MethodView
@@ -22,6 +23,10 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.json.ensure_ascii = False
     app.config.from_mapping(
+        SECRET_KEY=os.environ.get("GRADUATION_SESSION_SECRET") or secrets.token_hex(32),
+        SESSION_COOKIE_NAME="graduation_scope",
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Strict",
         GRADUATION_ENGINE=os.environ.get("GRADUATION_ENGINE", "legacy"),
         API_TITLE="Make NUTN Better API",
         API_VERSION="0.1.0",
