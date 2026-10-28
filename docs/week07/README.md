@@ -4,55 +4,39 @@
 
 原題目仍是「學生個人安排系統」，原 repo 不變。本週選 Route A：保存一個已確認偏好。
 
-固定欄位：
+固定欄位：study_session_minutes（使用者確認的每次複習分鐘數），並保存 owner、source、version、expiry、superseded / revoked 狀態。
 
-- preference_type = study_session_minutes
-- value = 使用者確認的每次複習分鐘數
-- owner_id
-- source.source_type / source.source_id
-- version
-- created_at
-- expires_at
-- superseded_at
-- revoked_at
+## 缺口與接法
 
-## 缺口
+Baseline SHA：9e2407a9a9a160b5ca5b51fc6e4a090ba077768e
 
-原本智慧排程每次都必須重新提供 session_minutes；換新 session 後，系統沒有一個受控、可更正、可撤回的偏好來源。
+原本智慧排程換新 session 後，session_minutes 必須重新提供。Candidate 在 request 缺少 session_minutes 時，受控讀回目前有效偏好，再接回既有 preview_study_plan；若本輪 request 已明確指定 session_minutes，當前輸入優先。
 
-## 候選流程
+## Route A 實際驗收
 
-    使用者提出偏好
-        ↓
-    Gemini / UI 形成 proposal
-        ↓
-    validator
-        ↓
-    明確確認
-        ├─ NO → 不寫
-        ↓ YES
-    save_confirmed_preference
-        ↓
-    memory.json（owner / source / version / expiry）
-        ↓ 新 session
-    read_preference
-        ↓
-    preview_with_memory
-        ↓
-    原 preview_study_plan
+GitHub Actions run：40618188523
 
-偏好只在本次 request 沒有明確 session_minutes 時補上；若 request 已經明確指定分鐘數，當前輸入優先。
+Job：122585522782
 
-## Route A 驗收
+Implementation SHA：72380961e4d096b8d334d87d53546f750d4292ac
 
-- 新 session 可讀回 v1 並接回原排程。
-- 跨 user 不可讀。
-- 更正建立 v2，之後只讀目前有效版本。
-- 撤回後讀不到。
-- 未確認不寫。
-- 相同 request_id 重送不新增第二筆。
-- 過期後不再讀回。
+Artifact：12786022642
+
+完整 regression：31 passed, 1 xfailed。
+
+offline_all_pass=true。
+
+已驗證：
+- 新 session 讀回 v1=60，原排程仍完成 180 分鐘。
+- 跨 user U002 讀 U001 → forbidden。
+- 更正 60 → 30 產生 v2，之後只讀 v2。
+- 撤回 v2 後 → not_found。
+- 未確認 → confirmation_required，0 write。
+- 同 request_id 重送 → replayed=true，records 不增加。
+- expiry 到期後不再回填。
 - 非法分鐘數有限停止。
+
+原本的一項 xfail 是先前保留的 known failure，不是 Week 07 新退步。
 
 ## 程式
 
@@ -60,22 +44,18 @@
 - tests/test_week07_memory.py
 - week07/run_acceptance.py
 - week07/live_memory.py
-
-## 離線執行
-
-    py -m pytest -c pytest_agentic.ini -v
-    py -m week07.run_acceptance
+- week07/evidence/offline_comparison.json
 
 ## 真實 Gemini
+
+課堂把 LIVE 狀態獨立驗收。GitHub CI 沒有私人 Gemini API key，因此目前仍是 LIVE_NOT_RUN，不用 fixture 冒充。
+
+私有環境執行：
 
     $env:GEMINI_API_KEY="你的私人 key"
     $env:GEMINI_MODEL="你的可用模型"
     py -m week07.live_memory
 
-只有真實送出本週 Gemini 請求，並完成 proposal → human confirmation → memory write → 新 session read → 原排程 → Gemini summary，才標示 LIVE_PASS。
+只有完成 Gemini proposal → human confirmation → memory write → 新 session read → 原排程 → Gemini summary 才標示 LIVE_PASS。
 
-CI 沒有私人 API key，因此不拿 fixture 冒充 Live。
-
-## 資料範圍
-
-week07/runtime/ 只保存本機合成測試資料，不提交 GitHub。Evidence 不應含 API key、token、ADC JSON 或真實個資。
+week07/runtime/ 已 gitignore；不得提交 API key、token、ADC JSON、.env 或真實個資。

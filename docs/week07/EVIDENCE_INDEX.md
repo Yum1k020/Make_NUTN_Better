@@ -1,31 +1,35 @@
 # Week 07 Evidence Index
 
-| 證據 | 位置 | 初始狀態 |
+| 證據 | 位置 | 狀態 |
 |---|---|---|
-| Memory implementation | backend/week07_memory.py | candidate |
-| Route A tests | tests/test_week07_memory.py | 待 CI |
-| Offline comparison | week07/evidence/offline_comparison.json | 由 CI 產生 |
+| Memory implementation | backend/week07_memory.py | implementation SHA 72380961e4d096b8d334d87d53546f750d4292ac |
+| Route A tests | tests/test_week07_memory.py | PASS |
+| Offline comparison | week07/evidence/offline_comparison.json | offline_all_pass=true |
 | Gemini Live runner | week07/live_memory.py | 已實作 |
 | Live evidence | week07/evidence/W07-LIVE-*.json | LIVE_NOT_RUN |
-| ADR | docs/week07/ADR.md | 已寫 |
-| Baseline / Candidate | docs/week07/COMPARISON.md | 已寫 |
+| ADR | docs/week07/ADR.md | Accepted offline |
+| Baseline / Candidate | docs/week07/COMPARISON.md | 已補實測 |
 
-## 共同案例
+## CI Evidence
 
-- C01：確認偏好後，新 session 讀回並完成原 study-plan preview。
-- C02：跨 user 不可見。
-- 非法輸入：不寫入。
-- 錯誤有限停止：ValueError / forbidden / not_found 均明示。
-- LIVE：必須是本週真實 Gemini，與 offline 狀態分開。
+- Run ID：40618188523
+- Job ID：122585522782
+- Pytest：31 passed, 1 xfailed
+- Artifact ID：12786022642
+- Workflow：success
 
-## Route A 邊界
+## 共同與 Route A 案例
 
-- 更正 v2。
-- 撤回後不可讀。
-- W01 未確認不寫。
-- W02 同 request_id 不重複。
-- expiry 到期排除。
+- C01：PASS；確認 v1 後，新 session 讀回 60 並完成 180 分鐘 preview。
+- C02：PASS；跨 user forbidden。
+- A 更正：PASS；60 → 30，讀 v2。
+- A 撤回：PASS；撤回後 not_found。
+- W01：PASS；未確認不寫。
+- W02：PASS；同 request_id replay，不增加 records。
+- Expiry：PASS；到期排除。
+- Illegal value：PASS；有限停止，沒有檔案副作用。
+- LIVE：LIVE_NOT_RUN；需本週真實 Gemini。
 
 ## 清理
 
-Evidence 只能含合成 user id、來源 id、版本、工具結果與 provider error。不得提交 API key、token、ADC JSON、.env 或真實個資。
+Evidence 只含合成 user id、來源 id、版本、工具結果與 provider error。不得提交 API key、token、ADC JSON、.env 或真實個資。
