@@ -4,3 +4,5 @@ frontend/dist/
 .env
 .env.*
 !.env.example
+frontend/data/study-memory.json
+frontend/data/study-memory.json.*.tmp

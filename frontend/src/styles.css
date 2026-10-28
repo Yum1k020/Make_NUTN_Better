@@ -1198,6 +1198,94 @@ button.calendar-event:hover {
   font-size: 10px;
   line-height: 1.55;
 }
+.memory-panel {
+  border-color: #d7c9f4;
+  background: #fdfbff;
+}
+.memory-panel .panel-heading > div {
+  min-width: 0;
+}
+.memory-panel .panel-heading h2 {
+  margin-bottom: 4px;
+}
+.memory-panel .panel-heading p {
+  margin: 0;
+  line-height: 1.5;
+}
+.memory-state {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 9px;
+  font-weight: 800;
+}
+.memory-state.is-active {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+.memory-state.is-empty {
+  background: var(--lavender-soft);
+  color: var(--lavender);
+}
+.memory-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 0 17px 13px;
+}
+.memory-actions {
+  display: flex;
+  gap: 7px;
+}
+.memory-actions button {
+  min-height: 38px;
+}
+.memory-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 17px 12px;
+  padding: 11px;
+  border: 1px solid #e4dcf5;
+  border-radius: 7px;
+  background: #fff;
+}
+.memory-evidence div {
+  min-width: 0;
+}
+.memory-evidence dt,
+.memory-evidence dd {
+  margin: 0;
+}
+.memory-evidence dt {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+.memory-evidence dd {
+  overflow-wrap: anywhere;
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 10px;
+}
+.memory-message,
+.memory-boundary {
+  margin: 0 17px 10px;
+  font-size: 10px;
+  line-height: 1.55;
+}
+.memory-message {
+  color: var(--blue-deep);
+  font-weight: 700;
+}
+.memory-message.is-error {
+  color: var(--red);
+}
+.memory-boundary {
+  margin-bottom: 15px;
+  color: var(--muted);
+}
 .agent-state {
   display: flex;
   align-items: center;
@@ -2585,6 +2673,16 @@ button.calendar-event:hover {
   }
   .availability-list small {
     grid-column: 3;
+  }
+  .memory-controls {
+    grid-template-columns: 1fr;
+  }
+  .memory-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .memory-evidence {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Icon from "./Icon.jsx";
+import StudyMemoryPanel from "./StudyMemoryPanel.jsx";
 import { DEMO_DATE, courses, weeklyClasses } from "../data/demo.js";
 import {
   addDays,
@@ -185,6 +186,9 @@ export default function StudyPlanner({
       eventsOnDate(date, weeklyClasses, personalEvents),
     ]),
   );
+  const applyRememberedPeriod = useCallback((period) => {
+    setAllowedPeriods([period]);
+  }, []);
 
   function togglePeriod(period) {
     setAllowedPeriods((current) =>
@@ -426,6 +430,7 @@ export default function StudyPlanner({
               </p>
             </form>
           </section>
+          <StudyMemoryPanel onApplyPreference={applyRememberedPeriod} />
           <section className="panel availability-panel">
             <div className="panel-heading">
               <h2>本週時間預覽</h2>
