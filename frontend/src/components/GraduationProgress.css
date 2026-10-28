@@ -1,0 +1,58 @@
+.graduation-live .graduation-hero {
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.graduation-checks {
+  margin-top: 24px;
+  padding: 24px;
+}
+.graduation-check {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 1fr;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e4e8ee;
+}
+.graduation-check small {
+  display: block;
+  color: #596579;
+  overflow-wrap: anywhere;
+}
+.graduation-check > small {
+  grid-column: 1 / -1;
+}
+.graduation-section {
+  margin-top: 20px;
+  padding: 24px;
+}
+.graduation-section p {
+  margin: 12px 0;
+  line-height: 1.7;
+}
+.graduation-notice {
+  padding: 16px;
+  border: 1px solid #d39a47;
+  border-radius: 12px;
+}
+.graduation-explanations {
+  padding-left: 22px;
+}
+.graduation-explanations li {
+  margin: 20px 0;
+}
+.graduation-explanations small {
+  overflow-wrap: anywhere;
+}
+.graduation-section details {
+  margin-top: 20px;
+  overflow-wrap: anywhere;
+}
+.graduation-live button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+@media (max-width: 600px) {
+  .graduation-check {
+    grid-template-columns: 1fr;
+  }
+}

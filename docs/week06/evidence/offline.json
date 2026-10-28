@@ -1,0 +1,1798 @@
+{
+  "tests": [
+    {
+      "id": "tests/test_graduation_explanations.py::test_valid_first_draft",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00031129998387768865,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[credits]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00020640000002458692,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[source]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0002035000070463866,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[unknown]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00016029999824240804,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[scope]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0001543999824207276,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[action]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00016930000856518745,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[duplicate]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0001905999961309135,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[prose]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0001453999720979482,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_same_rubric_rejects_wrong_claims[boolean]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00019099999917671084,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_boundary_revision_gets_feedback_and_same_context",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0005626000056508929,
+      "reason": null,
+      "records": [
+        {
+          "kind": "injected_boundary",
+          "expected": "A rejected, B passes same rubric",
+          "actual": {
+            "run_id": "85c3cc06-c5be-48af-8fc3-e566560ec77f",
+            "evaluated_at": "2026-10-21T11:17:10.942979+08:00",
+            "rubric": "graduation-explanation-v1",
+            "evidence_sha256": "c1e79b0d2e9dcde250970727f84353ce4e74976c4e6cd3bd8ab683cf4a46e4ca",
+            "evidence": {
+              "rule_set_id": "synthetic-v1",
+              "overall_status": "not_met",
+              "earned_credits": 3,
+              "scope": "project_rules_only",
+              "checks": [
+                {
+                  "check_id": "total_credits",
+                  "name": "總學分",
+                  "actual_value": 3,
+                  "remaining_value": 130,
+                  "required_value": 133,
+                  "unit": "credits",
+                  "status": "not_met"
+                },
+                {
+                  "check_id": "lecture_general",
+                  "name": "一般講座",
+                  "actual_value": null,
+                  "remaining_value": null,
+                  "required_value": 12,
+                  "unit": "credits",
+                  "status": "needs_confirmation"
+                },
+                {
+                  "check_id": "lecture_professional",
+                  "name": "專業講座",
+                  "actual_value": 10,
+                  "remaining_value": 0,
+                  "required_value": 10,
+                  "unit": "credits",
+                  "status": "met"
+                }
+              ]
+            },
+            "attempts": [
+              {
+                "label": "A",
+                "draft": {
+                  "rule_set_id": "synthetic-v1",
+                  "scope": "project_rules_only",
+                  "overall_status": "not_met",
+                  "earned_credits": 130,
+                  "items": [
+                    {
+                      "check_id": "total_credits",
+                      "actual_value": 3,
+                      "remaining_value": 130,
+                      "status": "not_met",
+                      "source_ids": [],
+                      "action": "review_requirement"
+                    },
+                    {
+                      "check_id": "lecture_general",
+                      "actual_value": null,
+                      "remaining_value": null,
+                      "status": "needs_confirmation",
+                      "source_ids": [
+                        "synthetic-v1:lecture_general"
+                      ],
+                      "action": "provide_evidence"
+                    },
+                    {
+                      "check_id": "lecture_professional",
+                      "actual_value": 10,
+                      "remaining_value": 0,
+                      "status": "met",
+                      "source_ids": [
+                        "synthetic-v1:lecture_professional"
+                      ],
+                      "action": "keep_record"
+                    }
+                  ]
+                },
+                "errors": [
+                  "FACT_MISMATCH:earned_credits",
+                  "SOURCE_MISMATCH:total_credits"
+                ],
+                "passed": false,
+                "metrics": {
+                  "provider": "fixture",
+                  "usage": {},
+                  "latency_ms": 0
+                }
+              },
+              {
+                "label": "B",
+                "draft": {
+                  "rule_set_id": "synthetic-v1",
+                  "scope": "project_rules_only",
+                  "overall_status": "not_met",
+                  "earned_credits": 3,
+                  "items": [
+                    {
+                      "check_id": "total_credits",
+                      "actual_value": 3,
+                      "remaining_value": 130,
+                      "status": "not_met",
+                      "source_ids": [
+                        "synthetic-v1:total_credits"
+                      ],
+                      "action": "review_requirement"
+                    },
+                    {
+                      "check_id": "lecture_general",
+                      "actual_value": null,
+                      "remaining_value": null,
+                      "status": "needs_confirmation",
+                      "source_ids": [
+                        "synthetic-v1:lecture_general"
+                      ],
+                      "action": "provide_evidence"
+                    },
+                    {
+                      "check_id": "lecture_professional",
+                      "actual_value": 10,
+                      "remaining_value": 0,
+                      "status": "met",
+                      "source_ids": [
+                        "synthetic-v1:lecture_professional"
+                      ],
+                      "action": "keep_record"
+                    }
+                  ]
+                },
+                "errors": [],
+                "passed": true,
+                "metrics": {
+                  "provider": "fixture",
+                  "usage": {},
+                  "latency_ms": 0
+                }
+              }
+            ],
+            "model_calls": 2,
+            "tool_calls": 1,
+            "tool": "graduation_progress",
+            "status": "verified",
+            "stop_reason": "RUBRIC_PASS",
+            "explanation": [
+              {
+                "check_id": "total_credits",
+                "name": "總學分",
+                "text": "未達標：已採計 3／要求 133，尚缺 130（學分）。",
+                "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                "source_ids": [
+                  "synthetic-v1:total_credits"
+                ]
+              },
+              {
+                "check_id": "lecture_general",
+                "name": "一般講座",
+                "text": "待確認：資料未知，不能當作零或已達標。",
+                "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                "source_ids": [
+                  "synthetic-v1:lecture_general"
+                ]
+              },
+              {
+                "check_id": "lecture_professional",
+                "name": "專業講座",
+                "text": "已達標：已採計 10／要求 10，尚缺 0（學分）。",
+                "next_step": "保留通過與認列紀錄。",
+                "source_ids": [
+                  "synthetic-v1:lecture_professional"
+                ]
+              }
+            ],
+            "scope_text": "符合本次啟用的專案規則不等於校方畢業認證；規劃中或修習中課程不算已取得學分。",
+            "latency_ms": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_boundary_revision_limit",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00040260000969283283,
+      "reason": null,
+      "records": [
+        {
+          "kind": "injected_boundary",
+          "expected": "stop after B, show authoritative facts",
+          "actual": {
+            "run_id": "0345bc44-517e-4c47-b34d-791feb6af959",
+            "evaluated_at": "2026-10-21T11:17:10.944979+08:00",
+            "rubric": "graduation-explanation-v1",
+            "evidence_sha256": "c1e79b0d2e9dcde250970727f84353ce4e74976c4e6cd3bd8ab683cf4a46e4ca",
+            "evidence": {
+              "rule_set_id": "synthetic-v1",
+              "overall_status": "not_met",
+              "earned_credits": 3,
+              "scope": "project_rules_only",
+              "checks": [
+                {
+                  "check_id": "total_credits",
+                  "name": "總學分",
+                  "actual_value": 3,
+                  "remaining_value": 130,
+                  "required_value": 133,
+                  "unit": "credits",
+                  "status": "not_met"
+                },
+                {
+                  "check_id": "lecture_general",
+                  "name": "一般講座",
+                  "actual_value": null,
+                  "remaining_value": null,
+                  "required_value": 12,
+                  "unit": "credits",
+                  "status": "needs_confirmation"
+                },
+                {
+                  "check_id": "lecture_professional",
+                  "name": "專業講座",
+                  "actual_value": 10,
+                  "remaining_value": 0,
+                  "required_value": 10,
+                  "unit": "credits",
+                  "status": "met"
+                }
+              ]
+            },
+            "attempts": [
+              {
+                "label": "A",
+                "draft": {
+                  "rule_set_id": "synthetic-v1",
+                  "scope": "project_rules_only",
+                  "overall_status": "not_met",
+                  "earned_credits": 999,
+                  "items": [
+                    {
+                      "check_id": "total_credits",
+                      "actual_value": 3,
+                      "remaining_value": 130,
+                      "status": "not_met",
+                      "source_ids": [
+                        "synthetic-v1:total_credits"
+                      ],
+                      "action": "review_requirement"
+                    },
+                    {
+                      "check_id": "lecture_general",
+                      "actual_value": null,
+                      "remaining_value": null,
+                      "status": "needs_confirmation",
+                      "source_ids": [
+                        "synthetic-v1:lecture_general"
+                      ],
+                      "action": "provide_evidence"
+                    },
+                    {
+                      "check_id": "lecture_professional",
+                      "actual_value": 10,
+                      "remaining_value": 0,
+                      "status": "met",
+                      "source_ids": [
+                        "synthetic-v1:lecture_professional"
+                      ],
+                      "action": "keep_record"
+                    }
+                  ]
+                },
+                "errors": [
+                  "FACT_MISMATCH:earned_credits"
+                ],
+                "passed": false,
+                "metrics": {
+                  "provider": "fixture",
+                  "usage": {},
+                  "latency_ms": 0
+                }
+              },
+              {
+                "label": "B",
+                "draft": {
+                  "rule_set_id": "synthetic-v1",
+                  "scope": "project_rules_only",
+                  "overall_status": "not_met",
+                  "earned_credits": 999,
+                  "items": [
+                    {
+                      "check_id": "total_credits",
+                      "actual_value": 3,
+                      "remaining_value": 130,
+                      "status": "not_met",
+                      "source_ids": [
+                        "synthetic-v1:total_credits"
+                      ],
+                      "action": "review_requirement"
+                    },
+                    {
+                      "check_id": "lecture_general",
+                      "actual_value": null,
+                      "remaining_value": null,
+                      "status": "needs_confirmation",
+                      "source_ids": [
+                        "synthetic-v1:lecture_general"
+                      ],
+                      "action": "provide_evidence"
+                    },
+                    {
+                      "check_id": "lecture_professional",
+                      "actual_value": 10,
+                      "remaining_value": 0,
+                      "status": "met",
+                      "source_ids": [
+                        "synthetic-v1:lecture_professional"
+                      ],
+                      "action": "keep_record"
+                    }
+                  ]
+                },
+                "errors": [
+                  "FACT_MISMATCH:earned_credits"
+                ],
+                "passed": false,
+                "metrics": {
+                  "provider": "fixture",
+                  "usage": {},
+                  "latency_ms": 0
+                }
+              }
+            ],
+            "model_calls": 2,
+            "tool_calls": 1,
+            "tool": "graduation_progress",
+            "status": "fallback",
+            "stop_reason": "REVISION_LIMIT",
+            "explanation": [
+              {
+                "check_id": "total_credits",
+                "name": "總學分",
+                "text": "未達標：已採計 3／要求 133，尚缺 130（學分）。",
+                "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                "source_ids": [
+                  "synthetic-v1:total_credits"
+                ]
+              },
+              {
+                "check_id": "lecture_general",
+                "name": "一般講座",
+                "text": "待確認：資料未知，不能當作零或已達標。",
+                "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                "source_ids": [
+                  "synthetic-v1:lecture_general"
+                ]
+              },
+              {
+                "check_id": "lecture_professional",
+                "name": "專業講座",
+                "text": "已達標：已採計 10／要求 10，尚缺 0（學分）。",
+                "next_step": "保留通過與認列紀錄。",
+                "source_ids": [
+                  "synthetic-v1:lecture_professional"
+                ]
+              }
+            ],
+            "scope_text": "符合本次啟用的專案規則不等於校方畢業認證；規劃中或修習中課程不算已取得學分。",
+            "latency_ms": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_failure_is_bounded",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00023849998251534998,
+      "reason": null,
+      "records": [
+        {
+          "kind": "injected_provider_failure",
+          "expected": "one call, fallback",
+          "actual": {
+            "run_id": "f3503f30-90fa-4732-bbf4-efc3db597c40",
+            "evaluated_at": "2026-10-21T11:17:10.944979+08:00",
+            "rubric": "graduation-explanation-v1",
+            "evidence_sha256": "c1e79b0d2e9dcde250970727f84353ce4e74976c4e6cd3bd8ab683cf4a46e4ca",
+            "evidence": {
+              "rule_set_id": "synthetic-v1",
+              "overall_status": "not_met",
+              "earned_credits": 3,
+              "scope": "project_rules_only",
+              "checks": [
+                {
+                  "check_id": "total_credits",
+                  "name": "總學分",
+                  "actual_value": 3,
+                  "remaining_value": 130,
+                  "required_value": 133,
+                  "unit": "credits",
+                  "status": "not_met"
+                },
+                {
+                  "check_id": "lecture_general",
+                  "name": "一般講座",
+                  "actual_value": null,
+                  "remaining_value": null,
+                  "required_value": 12,
+                  "unit": "credits",
+                  "status": "needs_confirmation"
+                },
+                {
+                  "check_id": "lecture_professional",
+                  "name": "專業講座",
+                  "actual_value": 10,
+                  "remaining_value": 0,
+                  "required_value": 10,
+                  "unit": "credits",
+                  "status": "met"
+                }
+              ]
+            },
+            "attempts": [],
+            "model_calls": 1,
+            "tool_calls": 1,
+            "tool": "graduation_progress",
+            "status": "fallback",
+            "stop_reason": "PROVIDER_UNAVAILABLE",
+            "explanation": [
+              {
+                "check_id": "total_credits",
+                "name": "總學分",
+                "text": "未達標：已採計 3／要求 133，尚缺 130（學分）。",
+                "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                "source_ids": [
+                  "synthetic-v1:total_credits"
+                ]
+              },
+              {
+                "check_id": "lecture_general",
+                "name": "一般講座",
+                "text": "待確認：資料未知，不能當作零或已達標。",
+                "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                "source_ids": [
+                  "synthetic-v1:lecture_general"
+                ]
+              },
+              {
+                "check_id": "lecture_professional",
+                "name": "專業講座",
+                "text": "已達標：已採計 10／要求 10，尚缺 0（學分）。",
+                "next_step": "保留通過與認列紀錄。",
+                "source_ids": [
+                  "synthetic-v1:lecture_professional"
+                ]
+              }
+            ],
+            "scope_text": "符合本次啟用的專案規則不等於校方畢業認證；規劃中或修習中課程不算已取得學分。",
+            "latency_ms": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_missing_rule_skips_provider",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.00016189998132176697,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_cannot_modify_authoritative_context",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0003601000062189996,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_http_read_only_and_same_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.41527090000454336,
+      "reason": null,
+      "records": [
+        {
+          "kind": "fixture_http_normal",
+          "expected": "200, original facts, no writes",
+          "actual": {
+            "progress": {
+              "checks": [
+                {
+                  "actual_value": 0,
+                  "check_id": "total_credits",
+                  "message": "尚缺 133 credits",
+                  "name": "總學分",
+                  "remaining_value": 133,
+                  "required_value": 133,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "general_core",
+                  "message": "尚缺 12 credits",
+                  "name": "general_core",
+                  "remaining_value": 12.0,
+                  "required_value": 12,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "general_domain",
+                  "message": "尚缺 12 credits",
+                  "name": "general_domain",
+                  "remaining_value": 12.0,
+                  "required_value": 12,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "college_required",
+                  "message": "尚缺 2 credits",
+                  "name": "college_required",
+                  "remaining_value": 2.0,
+                  "required_value": 2,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "department_required",
+                  "message": "尚缺 69 credits",
+                  "name": "department_required",
+                  "remaining_value": 69.0,
+                  "required_value": 69,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "department_elective",
+                  "message": "尚缺 12 credits",
+                  "name": "department_elective",
+                  "remaining_value": 12.0,
+                  "required_value": 12,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "free_elective",
+                  "message": "尚缺 20 credits",
+                  "name": "free_elective",
+                  "remaining_value": 20.0,
+                  "required_value": 20,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0.0,
+                  "check_id": "general_elective",
+                  "message": "尚缺 18 credits",
+                  "name": "通識選修",
+                  "remaining_value": 18.0,
+                  "required_value": 18,
+                  "status": "not_met",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": 0,
+                  "check_id": "general_domains",
+                  "message": "尚缺 3 domains",
+                  "name": "通識領域數",
+                  "remaining_value": 3,
+                  "required_value": 3,
+                  "status": "not_met",
+                  "unit": "domains"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "general_core_0",
+                  "message": "資料待確認",
+                  "name": "中文閱讀與書寫",
+                  "remaining_value": null,
+                  "required_value": 4,
+                  "status": "needs_confirmation",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "general_core_1",
+                  "message": "資料待確認",
+                  "name": "英文",
+                  "remaining_value": null,
+                  "required_value": 4,
+                  "status": "needs_confirmation",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "general_core_2",
+                  "message": "資料待確認",
+                  "name": "體育",
+                  "remaining_value": null,
+                  "required_value": 2,
+                  "status": "needs_confirmation",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "general_core_3",
+                  "message": "資料待確認",
+                  "name": "運算思維與AI賦能程式設計",
+                  "remaining_value": null,
+                  "required_value": 2,
+                  "status": "needs_confirmation",
+                  "unit": "credits"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "college_course_0",
+                  "message": "資料待確認",
+                  "name": "科技法律",
+                  "remaining_value": null,
+                  "required_value": 1,
+                  "status": "needs_confirmation",
+                  "unit": "courses"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "required_courses",
+                  "message": "資料待確認",
+                  "name": "指定必修",
+                  "remaining_value": null,
+                  "required_value": 25,
+                  "status": "needs_confirmation",
+                  "unit": "courses"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "programs",
+                  "message": "資料待確認",
+                  "name": "完成學程",
+                  "remaining_value": null,
+                  "required_value": 2,
+                  "status": "needs_confirmation",
+                  "unit": "programs"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "lecture_professional",
+                  "message": "資料待確認",
+                  "name": "專業講座",
+                  "remaining_value": null,
+                  "required_value": 10,
+                  "status": "needs_confirmation",
+                  "unit": "lectures"
+                },
+                {
+                  "actual_value": null,
+                  "check_id": "lecture_general",
+                  "message": "資料待確認",
+                  "name": "一般講座",
+                  "remaining_value": null,
+                  "required_value": 12,
+                  "status": "needs_confirmation",
+                  "unit": "lectures"
+                }
+              ],
+              "credit_allocation": [],
+              "data_errors": [
+                {
+                  "code": "REQUIRED_COURSES_UNMAPPED",
+                  "courses": [
+                    {
+                      "course_code": "NN1001",
+                      "credits": 3,
+                      "name": "微積分(一)",
+                      "recommended_term": "大一上"
+                    },
+                    {
+                      "course_code": "NN1014",
+                      "credits": 3,
+                      "name": "計算機概論",
+                      "recommended_term": "大一上"
+                    },
+                    {
+                      "course_code": "NN1204",
+                      "credits": 3,
+                      "name": "計算機程式設計(一)",
+                      "recommended_term": "大一上"
+                    },
+                    {
+                      "course_code": "NN1205",
+                      "credits": 2,
+                      "name": "計算機程式設計實習(一)",
+                      "recommended_term": "大一上"
+                    },
+                    {
+                      "course_code": "NN1009",
+                      "credits": 3,
+                      "name": "微積分(二)",
+                      "recommended_term": "大一下"
+                    },
+                    {
+                      "course_code": "NN1215",
+                      "credits": 3,
+                      "name": "電子電路學",
+                      "recommended_term": "大一下"
+                    },
+                    {
+                      "course_code": "NN1016",
+                      "credits": 3,
+                      "name": "線性代數",
+                      "recommended_term": "大一下"
+                    },
+                    {
+                      "course_code": "NN1206",
+                      "credits": 3,
+                      "name": "計算機程式設計(二)",
+                      "recommended_term": "大一下"
+                    },
+                    {
+                      "course_code": "NN1207",
+                      "credits": 2,
+                      "name": "計算機程式設計實習(二)",
+                      "recommended_term": "大一下"
+                    },
+                    {
+                      "course_code": "NN1013",
+                      "credits": 3,
+                      "name": "離散數學",
+                      "recommended_term": "大二上"
+                    },
+                    {
+                      "course_code": "NN1018",
+                      "credits": 3,
+                      "name": "資料結構",
+                      "recommended_term": "大二上"
+                    },
+                    {
+                      "course_code": "NN1199",
+                      "credits": 3,
+                      "name": "邏輯設計",
+                      "recommended_term": "大二上"
+                    },
+                    {
+                      "course_code": "NN1200",
+                      "credits": 2,
+                      "name": "邏輯設計實驗",
+                      "recommended_term": "大二上"
+                    },
+                    {
+                      "course_code": "NN1208",
+                      "credits": 3,
+                      "name": "機率",
+                      "recommended_term": "大二上"
+                    },
+                    {
+                      "course_code": "NN1023",
+                      "credits": 3,
+                      "name": "系統程式",
+                      "recommended_term": "大二下"
+                    },
+                    {
+                      "course_code": "NN1024",
+                      "credits": 3,
+                      "name": "計算機網路",
+                      "recommended_term": "大二下"
+                    },
+                    {
+                      "course_code": "NN1066",
+                      "credits": 3,
+                      "name": "數位系統",
+                      "recommended_term": "大二下"
+                    },
+                    {
+                      "course_code": "NN1067",
+                      "credits": 2,
+                      "name": "數位系統實驗",
+                      "recommended_term": "大二下"
+                    },
+                    {
+                      "course_code": "NN1037",
+                      "credits": 3,
+                      "name": "人工智慧",
+                      "recommended_term": "大二下"
+                    },
+                    {
+                      "course_code": "NN1031",
+                      "credits": 3,
+                      "name": "作業系統",
+                      "recommended_term": "大三上"
+                    },
+                    {
+                      "course_code": "NN1032",
+                      "credits": 3,
+                      "name": "演算法",
+                      "recommended_term": "大三上"
+                    },
+                    {
+                      "course_code": "NN1030",
+                      "credits": 3,
+                      "name": "資料庫系統",
+                      "recommended_term": "大三上"
+                    },
+                    {
+                      "course_code": "NN1033",
+                      "credits": 3,
+                      "name": "計算機組織",
+                      "recommended_term": "大三上"
+                    },
+                    {
+                      "course_code": "NN1053",
+                      "credits": 2,
+                      "name": "畢業專題實作(一)",
+                      "recommended_term": "大三下"
+                    },
+                    {
+                      "course_code": "NN1062",
+                      "credits": 2,
+                      "name": "畢業專題實作(二)",
+                      "recommended_term": "大四上"
+                    }
+                  ]
+                }
+              ],
+              "earned_credits": 0,
+              "evaluated_at": "2026-10-21T11:17:11.495586+08:00",
+              "lecture_progress": {
+                "general_count": null,
+                "professional_count": null,
+                "updated_at": null,
+                "user_id": "user-demo-001"
+              },
+              "missing_required_courses": [],
+              "overall_status": "not_met",
+              "program_progress": [
+                {
+                  "course_ids": [],
+                  "data_status": "needs_confirmation",
+                  "list_year": 114,
+                  "minimum_passed_courses": 3,
+                  "name": "雲端網路",
+                  "passed_courses": 0,
+                  "program_id": "cloud_network",
+                  "rule_set_id": "nutn-csie-115-mvp-v1",
+                  "sources": [
+                    {
+                      "filename": "資工系115大學部課程架構表.pdf",
+                      "id": "curriculum_115",
+                      "type": "provided_pdf",
+                      "usage": "學分要求、必修清單、專業講座及學程門檻"
+                    },
+                    {
+                      "filename": "114 學年度大學部課程規劃地圖.pdf",
+                      "id": "program_map_114",
+                      "type": "provided_pdf",
+                      "usage": "三個學程的採計課程清單"
+                    },
+                    {
+                      "id": "user_decisions",
+                      "type": "conversation",
+                      "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                    }
+                  ],
+                  "status": "needs_confirmation",
+                  "unmapped_course_names": [
+                    "物聯網",
+                    "無線通訊網路",
+                    "雲端計算",
+                    "網路通訊協定",
+                    "安全程式設計",
+                    "區塊鏈原理與應用",
+                    "平行計算",
+                    "多媒體系統",
+                    "網路程式設計",
+                    "網路實務應用",
+                    "資訊安全"
+                  ]
+                },
+                {
+                  "course_ids": [],
+                  "data_status": "needs_confirmation",
+                  "list_year": 114,
+                  "minimum_passed_courses": 3,
+                  "name": "智慧計算",
+                  "passed_courses": 0,
+                  "program_id": "intelligent_computing",
+                  "rule_set_id": "nutn-csie-115-mvp-v1",
+                  "sources": [
+                    {
+                      "filename": "資工系115大學部課程架構表.pdf",
+                      "id": "curriculum_115",
+                      "type": "provided_pdf",
+                      "usage": "學分要求、必修清單、專業講座及學程門檻"
+                    },
+                    {
+                      "filename": "114 學年度大學部課程規劃地圖.pdf",
+                      "id": "program_map_114",
+                      "type": "provided_pdf",
+                      "usage": "三個學程的採計課程清單"
+                    },
+                    {
+                      "id": "user_decisions",
+                      "type": "conversation",
+                      "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                    }
+                  ],
+                  "status": "needs_confirmation",
+                  "unmapped_course_names": [
+                    "人工智慧",
+                    "機器學習",
+                    "軟式計算",
+                    "計算理論",
+                    "深度學習",
+                    "資訊擷取",
+                    "圖形識別",
+                    "計算機圖學",
+                    "資料探勘",
+                    "智慧型機器人"
+                  ]
+                },
+                {
+                  "course_ids": [],
+                  "data_status": "needs_confirmation",
+                  "list_year": 114,
+                  "minimum_passed_courses": 3,
+                  "name": "應用資訊",
+                  "passed_courses": 0,
+                  "program_id": "applied_information",
+                  "rule_set_id": "nutn-csie-115-mvp-v1",
+                  "sources": [
+                    {
+                      "filename": "資工系115大學部課程架構表.pdf",
+                      "id": "curriculum_115",
+                      "type": "provided_pdf",
+                      "usage": "學分要求、必修清單、專業講座及學程門檻"
+                    },
+                    {
+                      "filename": "114 學年度大學部課程規劃地圖.pdf",
+                      "id": "program_map_114",
+                      "type": "provided_pdf",
+                      "usage": "三個學程的採計課程清單"
+                    },
+                    {
+                      "id": "user_decisions",
+                      "type": "conversation",
+                      "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                    }
+                  ],
+                  "status": "needs_confirmation",
+                  "unmapped_course_names": [
+                    "生物資訊學",
+                    "電腦對局",
+                    "軟體工程",
+                    "影像處理",
+                    "訊號與系統",
+                    "數位訊號處理",
+                    "電子自動化設計",
+                    "計算機結構",
+                    "嵌入式系統",
+                    "量子計算"
+                  ]
+                }
+              ],
+              "rule_set_id": "nutn-csie-115-mvp-v1",
+              "user_id": "user-demo-001",
+              "verification_scope": "依提供文件及使用者決策整理的第一版規則，非校方正式畢業資格認證"
+            },
+            "workflow": {
+              "attempts": [
+                {
+                  "draft": {
+                    "earned_credits": 0,
+                    "items": [
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0,
+                        "check_id": "total_credits",
+                        "remaining_value": 133,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:total_credits"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "general_core",
+                        "remaining_value": 12.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_core"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "general_domain",
+                        "remaining_value": 12.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_domain"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "college_required",
+                        "remaining_value": 2.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:college_required"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "department_required",
+                        "remaining_value": 69.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:department_required"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "department_elective",
+                        "remaining_value": 12.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:department_elective"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "free_elective",
+                        "remaining_value": 20.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:free_elective"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0.0,
+                        "check_id": "general_elective",
+                        "remaining_value": 18.0,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_elective"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "review_requirement",
+                        "actual_value": 0,
+                        "check_id": "general_domains",
+                        "remaining_value": 3,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_domains"
+                        ],
+                        "status": "not_met"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "general_core_0",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_core_0"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "general_core_1",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_core_1"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "general_core_2",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_core_2"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "general_core_3",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:general_core_3"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "college_course_0",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:college_course_0"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "required_courses",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:required_courses"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "programs",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:programs"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "lecture_professional",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:lecture_professional"
+                        ],
+                        "status": "needs_confirmation"
+                      },
+                      {
+                        "action": "provide_evidence",
+                        "actual_value": null,
+                        "check_id": "lecture_general",
+                        "remaining_value": null,
+                        "source_ids": [
+                          "nutn-csie-115-mvp-v1:lecture_general"
+                        ],
+                        "status": "needs_confirmation"
+                      }
+                    ],
+                    "overall_status": "not_met",
+                    "rule_set_id": "nutn-csie-115-mvp-v1",
+                    "scope": "project_rules_only"
+                  },
+                  "errors": [],
+                  "label": "A",
+                  "metrics": {
+                    "latency_ms": 0,
+                    "provider": "fixture",
+                    "usage": {}
+                  },
+                  "passed": true
+                }
+              ],
+              "evaluated_at": "2026-10-21T11:17:11.496586+08:00",
+              "evidence": {
+                "checks": [
+                  {
+                    "actual_value": 0,
+                    "check_id": "total_credits",
+                    "name": "總學分",
+                    "remaining_value": 133,
+                    "required_value": 133,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "general_core",
+                    "name": "general_core",
+                    "remaining_value": 12.0,
+                    "required_value": 12,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "general_domain",
+                    "name": "general_domain",
+                    "remaining_value": 12.0,
+                    "required_value": 12,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "college_required",
+                    "name": "college_required",
+                    "remaining_value": 2.0,
+                    "required_value": 2,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "department_required",
+                    "name": "department_required",
+                    "remaining_value": 69.0,
+                    "required_value": 69,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "department_elective",
+                    "name": "department_elective",
+                    "remaining_value": 12.0,
+                    "required_value": 12,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "free_elective",
+                    "name": "free_elective",
+                    "remaining_value": 20.0,
+                    "required_value": 20,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0.0,
+                    "check_id": "general_elective",
+                    "name": "通識選修",
+                    "remaining_value": 18.0,
+                    "required_value": 18,
+                    "status": "not_met",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": 0,
+                    "check_id": "general_domains",
+                    "name": "通識領域數",
+                    "remaining_value": 3,
+                    "required_value": 3,
+                    "status": "not_met",
+                    "unit": "domains"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "general_core_0",
+                    "name": "中文閱讀與書寫",
+                    "remaining_value": null,
+                    "required_value": 4,
+                    "status": "needs_confirmation",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "general_core_1",
+                    "name": "英文",
+                    "remaining_value": null,
+                    "required_value": 4,
+                    "status": "needs_confirmation",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "general_core_2",
+                    "name": "體育",
+                    "remaining_value": null,
+                    "required_value": 2,
+                    "status": "needs_confirmation",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "general_core_3",
+                    "name": "運算思維與AI賦能程式設計",
+                    "remaining_value": null,
+                    "required_value": 2,
+                    "status": "needs_confirmation",
+                    "unit": "credits"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "college_course_0",
+                    "name": "科技法律",
+                    "remaining_value": null,
+                    "required_value": 1,
+                    "status": "needs_confirmation",
+                    "unit": "courses"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "required_courses",
+                    "name": "指定必修",
+                    "remaining_value": null,
+                    "required_value": 25,
+                    "status": "needs_confirmation",
+                    "unit": "courses"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "programs",
+                    "name": "完成學程",
+                    "remaining_value": null,
+                    "required_value": 2,
+                    "status": "needs_confirmation",
+                    "unit": "programs"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "lecture_professional",
+                    "name": "專業講座",
+                    "remaining_value": null,
+                    "required_value": 10,
+                    "status": "needs_confirmation",
+                    "unit": "lectures"
+                  },
+                  {
+                    "actual_value": null,
+                    "check_id": "lecture_general",
+                    "name": "一般講座",
+                    "remaining_value": null,
+                    "required_value": 12,
+                    "status": "needs_confirmation",
+                    "unit": "lectures"
+                  }
+                ],
+                "earned_credits": 0,
+                "overall_status": "not_met",
+                "rule_set_id": "nutn-csie-115-mvp-v1",
+                "scope": "project_rules_only"
+              },
+              "evidence_sha256": "79895c1cda8c36a51e5ac3f9ab74cd9f82ffce51704588179d9793f2b3c5c13d",
+              "explanation": [
+                {
+                  "check_id": "total_credits",
+                  "name": "總學分",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:total_credits"
+                  ],
+                  "text": "未達標：已採計 0／要求 133，尚缺 133（學分）。"
+                },
+                {
+                  "check_id": "general_core",
+                  "name": "通識核心",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_core"
+                  ],
+                  "text": "未達標：已採計 0／要求 12，尚缺 12（學分）。"
+                },
+                {
+                  "check_id": "general_domain",
+                  "name": "通識領域學分",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_domain"
+                  ],
+                  "text": "未達標：已採計 0／要求 12，尚缺 12（學分）。"
+                },
+                {
+                  "check_id": "college_required",
+                  "name": "院核心",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:college_required"
+                  ],
+                  "text": "未達標：已採計 0／要求 2，尚缺 2（學分）。"
+                },
+                {
+                  "check_id": "department_required",
+                  "name": "專業必修學分",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:department_required"
+                  ],
+                  "text": "未達標：已採計 0／要求 69，尚缺 69（學分）。"
+                },
+                {
+                  "check_id": "department_elective",
+                  "name": "專業選修",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:department_elective"
+                  ],
+                  "text": "未達標：已採計 0／要求 12，尚缺 12（學分）。"
+                },
+                {
+                  "check_id": "free_elective",
+                  "name": "自由選修",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:free_elective"
+                  ],
+                  "text": "未達標：已採計 0／要求 20，尚缺 20（學分）。"
+                },
+                {
+                  "check_id": "general_elective",
+                  "name": "通識選修",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_elective"
+                  ],
+                  "text": "未達標：已採計 0／要求 18，尚缺 18（學分）。"
+                },
+                {
+                  "check_id": "general_domains",
+                  "name": "通識領域數",
+                  "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_domains"
+                  ],
+                  "text": "未達標：已採計 0／要求 3，尚缺 3（個領域）。"
+                },
+                {
+                  "check_id": "general_core_0",
+                  "name": "中文閱讀與書寫",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_core_0"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "general_core_1",
+                  "name": "英文",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_core_1"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "general_core_2",
+                  "name": "體育",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_core_2"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "general_core_3",
+                  "name": "運算思維與AI賦能程式設計",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:general_core_3"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "college_course_0",
+                  "name": "科技法律",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:college_course_0"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "required_courses",
+                  "name": "指定必修",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:required_courses"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "programs",
+                  "name": "完成學程",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:programs"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "lecture_professional",
+                  "name": "專業講座",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:lecture_professional"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                },
+                {
+                  "check_id": "lecture_general",
+                  "name": "一般講座",
+                  "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                  "source_ids": [
+                    "nutn-csie-115-mvp-v1:lecture_general"
+                  ],
+                  "text": "待確認：資料未知，不能當作零或已達標。"
+                }
+              ],
+              "latency_ms": 0,
+              "model_calls": 1,
+              "rubric": "graduation-explanation-v1",
+              "run_id": "79894765-13c1-4288-87db-ad2e96a83456",
+              "scope_text": "符合本次啟用的專案規則不等於校方畢業認證；規劃中或修習中課程不算已取得學分。",
+              "status": "verified",
+              "stop_reason": "RUBRIC_PASS",
+              "tool": "graduation_progress",
+              "tool_calls": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[?user_id=other-kwargs0]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.015306000015698373,
+      "reason": null,
+      "records": [
+        {
+          "kind": "invalid_input",
+          "expected": "422, provider zero calls, no writes",
+          "actual": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "user_id",
+                  "reason": "不允許的欄位"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[-kwargs1]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.01909810001961887,
+      "reason": null,
+      "records": [
+        {
+          "kind": "invalid_input",
+          "expected": "422, provider zero calls, no writes",
+          "actual": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "此操作不接受內容；使用目前使用者的資料"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_invalid_input_zero_downstream[-kwargs2]",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.017689200001768768,
+      "reason": null,
+      "records": [
+        {
+          "kind": "invalid_input",
+          "expected": "422, provider zero calls, no writes",
+          "actual": {
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "fields": [
+                {
+                  "field": "body",
+                  "reason": "此操作不接受內容；使用目前使用者的資料"
+                }
+              ],
+              "message": "輸入資料不合法"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_database_error_zero_downstream",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.014893499988829717,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_source_projection_excludes_identity",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0001720000000204891,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_missing_config_zero_requests",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0002759000053629279,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_request_and_thought_filter",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0007619999814778566,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_provider_timeout_is_sanitized",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0003499999875202775,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_http_provider_failure_keeps_progress",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.023477200011257082,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_cross_site_cannot_trigger_model",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.0010048000258393586,
+      "reason": null,
+      "records": []
+    },
+    {
+      "id": "tests/test_graduation_explanations.py::test_explicit_dev_proxy_origin",
+      "phase": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.014368100004503503,
+      "reason": null,
+      "records": []
+    }
+  ],
+  "started_at": "2026-10-21T11:17:10.487768+08:00",
+  "base_commit": "6067862d7f0bebc031985dadc96241d291c90833",
+  "branch": "codex/week06-graduation-explanations",
+  "version_note": "Uncommitted working tree; source hashes identify tested content, not HEAD alone.",
+  "source_sha256": {
+    "backend\\app\\__init__.py": "7767be8ca82738b276222320e9ec53144fc515dbcf6506d6b28f1265d939d54d",
+    "backend\\app\\catalog.py": "ca02991dbeaf1734bdfa7d2c17488ed2cf80d332766438db4aa69d794fadd8b6",
+    "backend\\app\\catalog_schemas.py": "9f15554542afe4ff6facb759f19069f509f2e030cd2bff1ac644eb322d380a1c",
+    "backend\\app\\catalog_seed.py": "5e962e5008a392ba85234be129f3702922ec3a6546f20160b60caa2b9aa4773d",
+    "backend\\app\\data\\nutn_csie_115_graduation_rules_v1.json": "46d2f42a1da8babee675a0aaa51ca6096cdaa810aed73d581e031af193ad0aec",
+    "backend\\app\\db.py": "8eb27fdfaa308e531f1a13c2a8ba28cb7d7045f7268e43b4b4675633f1530277",
+    "backend\\app\\graduation_explanation_api.py": "103545d56efeda84844e39aa00a4323b9c8c1b3106f3d8b6141f055192b43289",
+    "backend\\app\\graduation_explanation_core.py": "61f8fe1d5f52c4c3f956c795fa42b7a9ec377738685f45e9aa79ea34dffc68fa",
+    "backend\\app\\graduation_gemini.py": "776b450aad863615183f38f45964f8fd45eaa6e1dbc6a10e2276501f4485867d",
+    "backend\\app\\graduation_workflow.py": "87310ea08f85391b04896e715de5c7f28bd676b8708d28d3db7a674266c6bc98",
+    "backend\\app\\planner.py": "bf28768a03f8682396b6b5f2b0145023e05d78bff48dd6f6e87ee5dda4d073a6",
+    "backend\\app\\planner_checks.py": "2831bdab218589781c36e93bae3463245cbaa615d0269eb5005bc14146de915e",
+    "backend\\app\\planner_core.py": "a3bf15cdbba9c0c7fae317e583e7dceaae614dd25d001dd4ee34b34fbd2c6fd4",
+    "backend\\app\\planner_graduation.py": "cca8a0e4d8da2608acc53e737b6fafade16d850b3bc6261cdb2bcfe546c8d4dd",
+    "backend\\app\\planner_logic.py": "390609dd9db91f1d806196ea0e6f7dc9c2733b76c82a0396b0f080662d26c672",
+    "backend\\app\\planner_openapi.py": "f1951d1b9039cfa090db259768b1f5bf20f6b215aff37e1f4322ba18ee1d39c8",
+    "backend\\app\\planner_schedule.py": "320b0d5b34e190779f3f7d834c2d6b2ce29d13b81a8549df5ed0b40009c2beca",
+    "backend\\app\\profile.py": "7b0e47436c8cdcc4dfc7f5c8b08c56249b0e2a250c80ee5095e723fa8d574362",
+    "backend\\tests\\conftest.py": "363ecd667a832368ea21367061415a7a75703f8c2a80003ac9b8b984391292e2",
+    "backend\\tests\\test_app.py": "508e741b266b67e9d41ec6764a762bd9a86ba9b0030c7cf85a69aefc05f4dd68",
+    "backend\\tests\\test_catalog.py": "e605b9d4d2292bb060d76f118ae9d1d0761cb03a4772bd78cc57807fb4e08105",
+    "backend\\tests\\test_graduation_explanations.py": "0105dedb45ee6ac905adc01ce1a71c554eb09f42c4d8501918d874814625cf86",
+    "backend\\tests\\test_me.py": "acf4f164a6da7a0f4260c09eb441beae88dafefe0982dec663bcb82c5be5ecfc",
+    "backend\\tests\\test_planner.py": "03fc66980e65368877702fa72fd0e00bad8148160d248719a76f2877e9b7740b",
+    "backend\\tests\\test_task_enhancements.py": "cf6b36432ce491b329e0249aadf3fe63546144f1753820f7346d65763eb244ad",
+    "scripts\\init-backend-db.sh": "349ff1459629a725c109fe086bd06a4c21bbc991af30dbb0a9341c3fa2c24caa",
+    "scripts\\run-backend.sh": "6cc392dedff8f70eaf99c09c0137f36e74542b8543bbab93164ad17658624802",
+    "scripts\\setup-backend.sh": "52708e0f1e37258b0256fa97a8bbb6907e7f13a7b3b8413b00bc48dfefb9edf6",
+    "scripts\\test-backend.sh": "ddbb40248d48dcbcaf800950e7b17345b0972458c926f826dede20f4ae807da1",
+    "backend\\requirements-dev.lock.txt": "1b0cafc981dfc32934f3c8724172e80d3f3678823437f0058d64f065ae52d016",
+    "backend\\pytest.ini": "e06dfed9dc87725c836b6289dfbaa9f795cdf7d9552bd7219f0b9535c5f500f9"
+  },
+  "source_fingerprint": "b3e5bd9d59a232612af1c2d268da0bf96d8d8f58746c966b8b64aae3d51358df",
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "packages": {
+    "Flask": "3.1.3",
+    "flask-smorest": "0.47.0",
+    "marshmallow": "4.3.1",
+    "pytest": "9.1.1"
+  },
+  "command": "./scripts/test-backend.sh -c backend/pytest.ini backend/tests/test_graduation_explanations.py -q --evidence docs/week06/evidence/offline.json",
+  "finished_at": "2026-10-21T11:17:12.258783+08:00",
+  "exit_code": 0
+}

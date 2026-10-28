@@ -1,0 +1,144 @@
+{
+  "baseline": "13be93782ef44e08886f86afffedd7f8fc72333d",
+  "candidate_source_commit": "6067862d7f0bebc031985dadc96241d291c90833",
+  "method": "git merge-tree --write-tree (no remote modifications)",
+  "branches": [
+    {
+      "branch": "origin/codex/frontend-week03-gate",
+      "sha": "0128b36daef168f0035187dc17b1ba8f17768273",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "ba58c67d19a7a414e2c987577abbb77e3f8fb2db",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "d25353d53bc8b519c78c85a85429f0090201a83c",
+        "messages": [],
+        "stderr": ""
+      }
+    },
+    {
+      "branch": "origin/codex/week05-graduation-langgraph",
+      "sha": "13be93782ef44e08886f86afffedd7f8fc72333d",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "a514c34d86e03241dad88fe00c2bbd1093ef2ff8",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "7b422b21003de32352a9678c819a107816f5a0d2",
+        "messages": [],
+        "stderr": ""
+      }
+    },
+    {
+      "branch": "origin/develop",
+      "sha": "efca82d4cfb00da9d7c9012fa2fa21d92719214f",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "9b092cfb7ff2c7697cefaebe804f27c0d19b41a6",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "e1e9522f319e33c6db134724b9284e19a30929f2",
+        "messages": [],
+        "stderr": ""
+      }
+    },
+    {
+      "branch": "origin/feature/agentic-week05-langgraph",
+      "sha": "e71192abdc329446fbd28414cda14c31d2f310c4",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "34d0a4391b49b2121118dddad1c06d7e15edc8d3",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "ec3764a3f49ab102b6027034f78066aafbdaac4c",
+        "messages": [],
+        "stderr": ""
+      }
+    },
+    {
+      "branch": "origin/feature/agentic-weeks02-04",
+      "sha": "e4afb77a29eade0ae6bd74369109b471ad2ef64e",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "2c0664d9fa1534565d179368241cc74598601b74",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "961f0692864aa7d383c0eeba167b2fc7fe8a5f62",
+        "messages": [],
+        "stderr": ""
+      }
+    },
+    {
+      "branch": "origin/feature/c-study-scheduler",
+      "sha": "2b727b135b2fe217db9ec2cebc14db976c50b9f4",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "a514c34d86e03241dad88fe00c2bbd1093ef2ff8",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "7b422b21003de32352a9678c819a107816f5a0d2",
+        "messages": [],
+        "stderr": ""
+      }
+    },
+    {
+      "branch": "origin/main",
+      "sha": "c06b69f50d4ee66cdc38cf43e1843057c0728f3c",
+      "before": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "a514c34d86e03241dad88fe00c2bbd1093ef2ff8",
+        "messages": [],
+        "stderr": ""
+      },
+      "after": {
+        "clean": true,
+        "exit_code": 0,
+        "tree": "7b422b21003de32352a9678c819a107816f5a0d2",
+        "messages": [],
+        "stderr": ""
+      }
+    }
+  ],
+  "functional_integration": {
+    "branch": "origin/codex/frontend-week03-gate",
+    "checkout": "temporary detached worktree, merge --no-commit --no-ff",
+    "frontend_tests_passed": 15,
+    "frontend_build": "PASS",
+    "resolved_config": {
+      "agentMiddleware": true,
+      "graduationProxy": "http://127.0.0.1:5000"
+    },
+    "scope": "Pairwise all branches; functional integration tested with frontend agent branch. Not an assertion about all future branch changes."
+  }
+}
