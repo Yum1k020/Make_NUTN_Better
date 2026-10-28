@@ -16,3 +16,7 @@ backend/instance/
 week04/runtime/
 week05/runtime/
 week07/runtime/
+
+# Local frontend memory state
+frontend/data/study-memory.json
+frontend/data/study-memory.json.*.tmp

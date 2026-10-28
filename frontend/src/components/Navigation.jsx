@@ -6,6 +6,7 @@ export const pages = [
   { id: "study", label: "智慧學習", icon: "book" },
   { id: "courses", label: "修課規劃", icon: "list" },
   { id: "graduation", label: "畢業進度", icon: "graduation" },
+  { id: "evidence", label: "資料證據", icon: "check" },
 ];
 
 export function Sidebar({ activePage, onNavigate }) {
