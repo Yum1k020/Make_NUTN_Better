@@ -1,0 +1,26 @@
+[
+  {
+    "query_id": "normal",
+    "query": "115資工系畢業至少要幾學分？",
+    "gold_ids": ["grad-total-credits"],
+    "should_answer": true
+  },
+  {
+    "query_id": "paraphrase",
+    "query": "115學年度入學的資工大學部，第一版總學分門檻是多少？",
+    "gold_ids": ["grad-total-credits"],
+    "should_answer": true
+  },
+  {
+    "query_id": "no_answer",
+    "query": "明天資料庫系統在哪一間教室上課？",
+    "gold_ids": [],
+    "should_answer": false
+  },
+  {
+    "query_id": "multi_evidence",
+    "query": "第一版畢業總學分是多少？專業講座和一般講座各要幾場？",
+    "gold_ids": ["grad-total-credits", "grad-lecture-counts"],
+    "should_answer": true
+  }
+]

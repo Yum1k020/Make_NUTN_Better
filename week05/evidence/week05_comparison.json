@@ -1,0 +1,173 @@
+{
+  "framework": "LangGraph",
+  "replacement_boundary": "human approval pause/resume orchestration",
+  "model_calls": 0,
+  "same_input_fixture": "tests/fixtures/week04_plan.json",
+  "baseline": {
+    "preview": {
+      "plan_id": "plan-001",
+      "suggested_sessions": [
+        {
+          "plan_id": "plan-001",
+          "starts_at": "2026-10-08T09:00:00",
+          "ends_at": "2026-10-08T10:00:00",
+          "minutes": 60
+        },
+        {
+          "plan_id": "plan-001",
+          "starts_at": "2026-10-08T11:00:00",
+          "ends_at": "2026-10-08T12:00:00",
+          "minutes": 60
+        },
+        {
+          "plan_id": "plan-001",
+          "starts_at": "2026-10-08T12:00:00",
+          "ends_at": "2026-10-08T13:00:00",
+          "minutes": 60
+        }
+      ],
+      "scheduled_minutes": 180,
+      "remaining_minutes": 0,
+      "reason": "scheduled_in_available_windows",
+      "action": "preview_study_plan",
+      "mutated": false,
+      "source": "scheduler_v1"
+    },
+    "reject": {
+      "action": "save_study_plan",
+      "accepted": false,
+      "executed": false,
+      "status": "confirmation_required",
+      "request_id": "REQ-W05-BASE-REJECT",
+      "replayed": false
+    },
+    "confirm": {
+      "action": "save_study_plan",
+      "accepted": true,
+      "executed": true,
+      "status": "saved",
+      "plan_id": "plan-001",
+      "request_id": "REQ-W05-BASE-SAVE",
+      "saved_session_ids": [
+        "REQ-W05-BASE-SAVE-S001",
+        "REQ-W05-BASE-SAVE-S002",
+        "REQ-W05-BASE-SAVE-S003"
+      ],
+      "replayed": false
+    },
+    "saved_session_count": 3
+  },
+  "candidate": {
+    "pending": {
+      "request_id": "REQ-W05-CANDIDATE",
+      "preview": {
+        "plan_id": "plan-001",
+        "suggested_sessions": [
+          {
+            "plan_id": "plan-001",
+            "starts_at": "2026-10-08T09:00:00",
+            "ends_at": "2026-10-08T10:00:00",
+            "minutes": 60
+          },
+          {
+            "plan_id": "plan-001",
+            "starts_at": "2026-10-08T11:00:00",
+            "ends_at": "2026-10-08T12:00:00",
+            "minutes": 60
+          },
+          {
+            "plan_id": "plan-001",
+            "starts_at": "2026-10-08T12:00:00",
+            "ends_at": "2026-10-08T13:00:00",
+            "minutes": 60
+          }
+        ],
+        "scheduled_minutes": 180,
+        "remaining_minutes": 0,
+        "reason": "scheduled_in_available_windows",
+        "action": "preview_study_plan",
+        "mutated": false,
+        "source": "scheduler_v1"
+      },
+      "status": "awaiting_confirmation",
+      "interrupt": {
+        "action": "save_study_plan",
+        "question": "確認寫入這份複習排程？只有 YES 才執行。",
+        "request_id": "REQ-W05-CANDIDATE",
+        "plan_id": "plan-001",
+        "scheduled_minutes": 180,
+        "session_count": 3
+      }
+    },
+    "confirmed_after_runtime_rebuild": {
+      "confirmation": "YES",
+      "save_result": {
+        "action": "save_study_plan",
+        "accepted": true,
+        "executed": true,
+        "status": "saved",
+        "plan_id": "plan-001",
+        "request_id": "REQ-W05-CANDIDATE",
+        "saved_session_ids": [
+          "REQ-W05-CANDIDATE-S001",
+          "REQ-W05-CANDIDATE-S002",
+          "REQ-W05-CANDIDATE-S003"
+        ],
+        "replayed": false
+      },
+      "status": "saved"
+    },
+    "replayed": {
+      "confirmation": "YES",
+      "save_result": {
+        "action": "save_study_plan",
+        "accepted": true,
+        "executed": true,
+        "status": "saved",
+        "plan_id": "plan-001",
+        "request_id": "REQ-W05-CANDIDATE",
+        "saved_session_ids": [
+          "REQ-W05-CANDIDATE-S001",
+          "REQ-W05-CANDIDATE-S002",
+          "REQ-W05-CANDIDATE-S003"
+        ],
+        "replayed": true
+      },
+      "status": "saved"
+    },
+    "lowercase_yes": {
+      "confirmation": "yes",
+      "save_result": {
+        "action": "save_study_plan",
+        "accepted": false,
+        "executed": false,
+        "status": "confirmation_required",
+        "request_id": "REQ-W05-LOWERCASE",
+        "replayed": false
+      },
+      "status": "rejected"
+    },
+    "saved_session_count": 3
+  },
+  "checks": {
+    "same_preview": true,
+    "paused_before_write": true,
+    "cross_runtime_resume_saved": true,
+    "idempotent_replay": true,
+    "lowercase_yes_rejected": true,
+    "candidate_saved_exactly_three_sessions": true
+  },
+  "all_pass": true,
+  "ci": {
+    "run_id": 38504073925,
+    "job_id": 115657405988,
+    "commit": "10280619d102c6b24c1e802d514a0236fde89241",
+    "pytest": "19 passed, 1 xfailed",
+    "artifact_id": 11867635421
+  },
+  "notes": [
+    "LangGraph owns checkpointed pause/resume only.",
+    "Week 04 scheduler and save_study_plan keep business rules and idempotency.",
+    "No Gemini/API key is needed for this Week 05 replacement boundary."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "workflow": "prompt_chaining",
+  "case": "case_1_normal_main_flow",
+  "live_status": "LIVE_NOT_RUN",
+  "reason": "No private GEMINI_API_KEY is available to GitHub CI. Offline fixtures must not be reported as a real Gemini normal-flow run.",
+  "runner": "python -m week06.live_chaining",
+  "expected_success_path": [
+    "Gemini extraction",
+    "deterministic Gate",
+    "preview_study_plan tool",
+    "Gemini summary"
+  ]
+}

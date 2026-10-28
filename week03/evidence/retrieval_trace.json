@@ -1,0 +1,90 @@
+{
+  "source": "backend/app/data/nutn_csie_115_graduation_rules_v1.json",
+  "index_version": "week03-transparent-v1",
+  "retriever": "character_bigram_plus_domain_boost",
+  "traces": [
+    {
+      "query_id": "normal",
+      "query": "115資工系畢業至少要幾學分？",
+      "route": "graduation_rule_json",
+      "top_k": [
+        {"chunk_id": "grad-total-credits", "score": 0.3184},
+        {"chunk_id": "grad-program-count", "score": 0.037},
+        {"chunk_id": "grad-lecture-counts", "score": 0.0256}
+      ],
+      "gate": {
+        "can_answer": true,
+        "failure_code": null,
+        "selected_evidence": ["grad-total-credits"],
+        "citations": ["grad-total-credits"],
+        "coverage": {
+          "required": ["minimum_total_credits"],
+          "covered": ["minimum_total_credits"],
+          "missing": []
+        }
+      }
+    },
+    {
+      "query_id": "paraphrase",
+      "query": "115學年度入學的資工大學部，第一版總學分門檻是多少？",
+      "route": "graduation_rule_json",
+      "top_k": [
+        {"chunk_id": "grad-total-credits", "score": 0.6007},
+        {"chunk_id": "grad-lecture-counts", "score": 0.0612},
+        {"chunk_id": "grad-program-count", "score": 0.0526}
+      ],
+      "gate": {
+        "can_answer": true,
+        "failure_code": null,
+        "selected_evidence": ["grad-total-credits"],
+        "citations": ["grad-total-credits"],
+        "coverage": {
+          "required": ["minimum_total_credits"],
+          "covered": ["minimum_total_credits"],
+          "missing": []
+        }
+      }
+    },
+    {
+      "query_id": "no_answer",
+      "query": "明天資料庫系統在哪一間教室上課？",
+      "route": "graduation_rule_json",
+      "top_k": [],
+      "gate": {
+        "can_answer": false,
+        "failure_code": "INSUFFICIENT_EVIDENCE",
+        "selected_evidence": [],
+        "citations": [],
+        "coverage": {"required": [], "covered": []}
+      }
+    },
+    {
+      "query_id": "multi_evidence",
+      "query": "第一版畢業總學分是多少？專業講座和一般講座各要幾場？",
+      "route": "graduation_rule_json",
+      "top_k": [
+        {"chunk_id": "grad-lecture-counts", "score": 0.6428},
+        {"chunk_id": "grad-total-credits", "score": 0.4617}
+      ],
+      "gate": {
+        "can_answer": true,
+        "failure_code": null,
+        "selected_evidence": ["grad-lecture-counts", "grad-total-credits"],
+        "citations": ["grad-lecture-counts", "grad-total-credits"],
+        "coverage": {
+          "required": [
+            "minimum_total_credits",
+            "professional_lecture_minimum",
+            "general_lecture_minimum"
+          ],
+          "covered": [
+            "general_lecture_minimum",
+            "minimum_total_credits",
+            "professional_lecture_minimum"
+          ],
+          "missing": []
+        }
+      }
+    }
+  ]
+}
