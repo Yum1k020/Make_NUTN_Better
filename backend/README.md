@@ -21,6 +21,7 @@
 - pytest：開發測試
 - google-auth：只在後端透過 ADC 取得短期 access token
 - requests：從後端呼叫 OpenAI Responses API；瀏覽器不接觸 API key
+- LangGraph：畢業進度唯讀工作流；由 framework lock 一併安裝
 
 確切安裝版本見 `requirements-dev.lock.txt`；執行環境依賴見 `requirements.lock.txt`。`.in` 檔是直接依賴範圍，重建時使用 lock 檔，以免自動升級。
 
@@ -34,6 +35,8 @@
 ```
 
 第一次使用請先執行 `./scripts/setup-backend.sh` 安裝依賴。初始化可重複執行，不會覆寫個人資料。預設資料庫為 `backend/instance/profile.sqlite3`；可用 `ME_DATABASE=/absolute/path/profile.sqlite3` 指定其他檔案，初始化和啟動必須指定同一路徑。
+
+未指定 `PYTHON_BIN` 時，安裝腳本會優先使用上一層課程環境中已驗證的 Python 3.12，再尋找 `python3.12`。若發現既有 `.venv` 缺少 pip，腳本會停止並提示先將該半成品環境移開，不會在損壞環境中繼續安裝。
 
 更新至學生安排版本後，請再執行一次 `./scripts/init-backend-db.sh`：會保留既有 `/me` 資料、升級學期欄位、建立課程測試資料、安排資源表與版本化畢業草案。查詢 API 本身不會自動建表或寫入種子；未升級的資料庫會回傳 500。日期、課程代碼、先修與校區均為展示資料，詳見課程查詢規格。
 
