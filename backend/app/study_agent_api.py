@@ -1,4 +1,4 @@
-"""Backend Gemini/ADC tool loop for the main study-planning demo."""
+"""Provider-selectable backend tool loop for the study-planning demo."""
 
 from __future__ import annotations
 
@@ -10,14 +10,16 @@ from typing import Any, Callable
 from flask import current_app, jsonify, request
 from flask_smorest import Blueprint
 
-from .study_agent_vertex import TOOL_NAME, VertexGeminiADCClient, VertexProviderError
+from .study_agent_contract import TOOL_NAME, StudyAgentProviderError
+from .study_agent_openai import DEFAULT_OPENAI_MODEL, OpenAIResponsesClient
+from .study_agent_vertex import VertexGeminiADCClient
 
 
 routes = Blueprint(
     "study-agent",
     __name__,
     url_prefix="/api/v1/study-agent",
-    description="使用 Google Cloud ADC 呼叫 Gemini 的唯讀學習規劃工具流程",
+    description="使用後端模型供應者呼叫唯讀學習規劃工具的流程",
 )
 
 PERIODS = {
@@ -307,26 +309,26 @@ def _validate_explanation(value: Any, remaining: int) -> dict[str, Any]:
         "citations",
         "refused",
     }:
-        raise ValueError("Gemini structured output 欄位不完整。")
+        raise ValueError("模型 structured output 欄位不完整。")
     summary = value["summary"]
     warnings = value["warnings"]
     citations = value["citations"]
     if not isinstance(summary, str) or not summary.strip() or len(summary) > 600:
-        raise ValueError("Gemini summary 不合法。")
+        raise ValueError("模型 summary 不合法。")
     if (
         not isinstance(warnings, list)
         or len(warnings) > 3
         or any(not isinstance(item, str) or not item.strip() for item in warnings)
     ):
-        raise ValueError("Gemini warnings 不合法。")
+        raise ValueError("模型 warnings 不合法。")
     if (
         not isinstance(citations, list)
         or not citations
         or any(item not in SOURCE_IDS for item in citations)
     ):
-        raise ValueError("Gemini citations 不合法。")
+        raise ValueError("模型 citations 不合法。")
     if value["refused"] is not False:
-        raise ValueError("Gemini 拒絕已驗證的唯讀排程。")
+        raise ValueError("模型拒絕已驗證的唯讀排程。")
     if remaining == 0:
         warnings = []
     elif not warnings:
@@ -347,15 +349,15 @@ class StudyAgentService:
     def __init__(
         self,
         *,
-        provider_factory: Callable[[], Any] = VertexGeminiADCClient,
+        provider_factory: Callable[[], Any] | None = None,
         tool: Callable[[dict[str, Any]], dict[str, Any]] = get_validated_study_plan,
     ) -> None:
-        self.provider_factory = provider_factory
+        self.provider_factory = provider_factory or _create_provider
         self.tool = tool
 
     def run(self, payload: Any) -> dict[str, Any]:
         workflow = {
-            "name": "study-plan-gemini-function-calling",
+            "name": "study-plan-function-calling",
             "version": "midterm-v1",
             "status": "running",
             "stopReason": None,
@@ -385,26 +387,31 @@ class StudyAgentService:
         )
 
         provider = self.provider_factory()
+        provider_name = getattr(provider, "provider_name", "Google Cloud Vertex AI")
+        authentication = getattr(
+            provider, "authentication", "Application Default Credentials"
+        )
+        framework = getattr(provider, "framework", "Google Cloud Vertex AI / ADC")
         function_call, history, selection_meta = provider.choose_tool(normalized)
         if function_call.get("name") != TOOL_NAME:
             workflow["stages"].append(
-                _stage("model-tool-call", "Gemini 工具選擇", "rejected", toolCalls=1)
+                _stage("model-tool-call", "模型工具選擇", "rejected", toolCalls=1)
             )
             workflow.update(status="stopped", stopReason="UNEXPECTED_TOOL")
             raise StudyAgentError(
                 "UNEXPECTED_TOOL",
-                "Gemini 選擇了未允許的工具。",
+                "模型選擇了未允許的工具。",
                 502,
                 workflow=workflow,
             )
         workflow["stages"].append(
             _stage(
                 "model-tool-call",
-                "Gemini 工具選擇",
+                "模型工具選擇",
                 "completed",
                 tool=TOOL_NAME,
-                provider="Google Cloud Vertex AI",
-                authentication="ADC",
+                provider=provider_name,
+                authentication=authentication,
                 model=provider.config.model,
             )
         )
@@ -428,7 +435,7 @@ class StudyAgentService:
             workflow.update(status="stopped", stopReason="TOOL_ARGUMENT_MISMATCH")
             raise StudyAgentError(
                 "TOOL_ARGUMENT_MISMATCH",
-                "Gemini 工具參數與使用者已驗證需求不一致。",
+                "模型工具參數與使用者已驗證需求不一致。",
                 409,
                 workflow=workflow,
             )
@@ -460,7 +467,7 @@ class StudyAgentService:
         workflow["stages"].append(
             _stage(
                 "return-tool-result",
-                "工具結果回送 Gemini",
+                "工具結果回送模型",
                 "completed",
                 functionResponseCount=1,
                 citationCount=len(explanation["citations"]),
@@ -471,7 +478,7 @@ class StudyAgentService:
             "plan": plan,
             "agent": {
                 **explanation,
-                "framework": "Google Cloud Vertex AI / ADC",
+                "framework": framework,
                 "tool": TOOL_NAME,
                 "model": provider.config.model,
                 "usage": {
@@ -494,8 +501,39 @@ def _service() -> StudyAgentService:
     return factory() if factory else StudyAgentService()
 
 
+def _selected_provider() -> str:
+    provider = (os.getenv("STUDY_AGENT_PROVIDER") or "vertex").strip().lower()
+    if provider not in {"vertex", "openai"}:
+        raise StudyAgentProviderError("INVALID_STUDY_AGENT_PROVIDER")
+    return provider
+
+
+def _create_provider() -> Any:
+    if _selected_provider() == "openai":
+        return OpenAIResponsesClient()
+    return VertexGeminiADCClient()
+
+
 @routes.get("/health")
 def health():
+    try:
+        provider = _selected_provider()
+    except StudyAgentProviderError as error:
+        return {
+            "ok": False,
+            "code": error.code,
+            "liveChecked": False,
+        }, 503
+    if provider == "openai":
+        return {
+            "ok": True,
+            "provider": "OpenAI Responses API",
+            "authentication": "Server-side API key",
+            "keyConfigured": bool(os.getenv("OPENAI_API_KEY")),
+            "model": (os.getenv("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL).strip(),
+            "modelConfigured": True,
+            "liveChecked": False,
+        }
     return {
         "ok": True,
         "provider": "Google Cloud Vertex AI Gemini",
@@ -525,12 +563,12 @@ def run_study_agent():
             ),
             error.status,
         )
-    except VertexProviderError as error:
+    except StudyAgentProviderError as error:
         status = 503 if not error.attempted else 502
         return (
             jsonify(
                 {
-                    "error": "Gemini / ADC 尚未可用，原本規則排程仍可使用。",
+                    "error": "模型供應者尚未可用，原本規則排程仍可使用。",
                     "code": error.code,
                 }
             ),

@@ -97,7 +97,7 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
           <p className="subtle">框架負責工具協調與說明，排程仍由原規則計算。</p>
         </div>
         <span className="agent-framework-badge">
-          {result?.framework || "Google Cloud Gemini"}
+          {result?.framework || "後端 Agent"}
         </span>
       </div>
 
@@ -428,8 +428,8 @@ export default function StudyPlanner({
               </button>
               <p className="agent-disclosure">
                 按下後會將合成課名、日期、可用時段與私人行程送至 Flask
-                後端，再由 Google Cloud ADC 呼叫
-                Gemini；確定性排程仍由規則工具完成。
+                後端，再由後端設定的模型供應者選用工具；課堂示範預設使用 Google
+                Cloud ADC／Gemini，亦可切換 OpenAI。確定性排程仍由規則工具完成。
               </p>
             </form>
           </section>

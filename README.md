@@ -35,7 +35,7 @@
 
 目前有兩條受限 Agent 子流程：
 
-1. **智慧學習主示範：** 前端將需求送到 Flask 後端；後端先驗證 schema，再透過 Google Cloud Application Default Credentials 呼叫 Vertex AI Gemini。Gemini 必須產生 `get_validated_study_plan` function call，程式驗證參數與原需求一致後才執行確定性排程，最後把工具結果回送 Gemini 整理說明。
+1. **智慧學習主示範：** 前端將需求送到 Flask 後端；後端先驗證 schema，再透過 Google Cloud Application Default Credentials 呼叫 Vertex AI Gemini。Gemini 必須產生 `get_validated_study_plan` function call，程式驗證參數與原需求一致後才執行確定性排程，最後把工具結果回送 Gemini 整理說明。後端另保留 `STUDY_AGENT_PROVIDER=openai` 的 Responses API 介面供後續切換，但不取代課堂規定的 Gemini／ADC 主證據。
 2. **畢業缺項說明：** 一般程式先計算學分與缺項；Gemini 只取得去識別彙整，輸出會經固定規準評估，最多修正一次。說明具有 300 秒 TTL 與來源重驗證，失效時回退基本進度。
 
 模型不決定正式學分、衝突、權限或寫入結果。規則引擎、Gate、版本檢查、到期、撤回與冪等都由一般程式處理。provider 失敗時，畫面仍保留安全的規則結果。

@@ -20,6 +20,7 @@
 - swagger-ui-bundle：本機文件網頁資源，不依賴外部 CDN
 - pytest：開發測試
 - google-auth：只在後端透過 ADC 取得短期 access token
+- requests：從後端呼叫 OpenAI Responses API；瀏覽器不接觸 API key
 
 確切安裝版本見 `requirements-dev.lock.txt`；執行環境依賴見 `requirements.lock.txt`。`.in` 檔是直接依賴範圍，重建時使用 lock 檔，以免自動升級。
 
@@ -55,6 +56,23 @@ export GOOGLE_CLOUD_GEMINI_MODEL="gemini-2.5-flash"
 - 健康檢查：`GET /api/v1/study-agent/health`。此端點只回報設定提示，`liveChecked=false`，不會假裝已完成真實模型呼叫。
 - 主流程：`POST /api/v1/study-agent/run`。只接受固定規劃 schema；Gemini 工具參數若與使用者需求不一致，工具呼叫會在執行前停止。
 - 唯讀工具：`get_validated_study_plan`。寫入工具 `save_study_plan` 仍要求明確確認與 `request_id` 冪等，未放入主示範的自動工具清單。
+
+## 選用 OpenAI 後端介面
+
+課堂主流程仍以 `STUDY_AGENT_PROVIDER=vertex` 為預設，符合 Gemini／ADC 驗收要求。若後續要改用 OpenAI，將真實金鑰只放在根目錄、已被 Git 忽略的 `.env.local`：
+
+```sh
+OPENAI_API_KEY=你的金鑰
+OPENAI_MODEL=gpt-5-mini
+```
+
+啟動時指定供應者；`run-backend.sh` 會讀取本機 `.env.local`，但不會輸出其中內容：
+
+```sh
+STUDY_AGENT_PROVIDER=openai ./scripts/run-backend.sh
+```
+
+OpenAI 路徑使用 Responses API 的 strict function tool，仍依序執行「需求驗證 → 模型工具呼叫 → 參數一致性 Gate → 確定性工具 → 工具結果回送模型」。不得使用 `VITE_OPENAI_API_KEY`，因為 `VITE_*` 會被包入瀏覽器程式。`GET /api/v1/study-agent/health` 只回報是否已設定，不會回傳金鑰，也不會執行付費呼叫。
 
 Swagger UI 中可使用 `POST /api/dev/echo`，輸入 `{"message":"測試 Flask API"}` 後按 Try it out／Execute。合法輸入回傳200，空值、缺欄位或型別錯誤回傳422；不會寫入資料。此為環境測試介面，不是業務介面。
 
