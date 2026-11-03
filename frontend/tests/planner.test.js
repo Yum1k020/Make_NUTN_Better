@@ -225,5 +225,28 @@ test("frontend client sends only planning data and accepts structured output", a
 test("frontend comparison detects framework changes to the rule result", () => {
   const plan = buildValidatedStudyPlan(createStudyPlanRequest());
   assert.equal(studyPlansMatch(plan, structuredClone(plan)), true);
+  const reordered = {
+    remainingMinutes: plan.remainingMinutes,
+    scheduledMinutes: plan.scheduledMinutes,
+    sessions: plan.sessions.map((session) => ({
+      tone: session.tone,
+      location: session.location,
+      title: session.title,
+      id: session.id,
+      end: session.end,
+      start: session.start,
+      date: session.date,
+    })),
+  };
+  assert.equal(studyPlansMatch(plan, reordered), true);
   assert.equal(studyPlansMatch(plan, { ...plan, remainingMinutes: 30 }), false);
+  assert.equal(
+    studyPlansMatch(plan, {
+      ...plan,
+      sessions: plan.sessions.map((session, index) =>
+        index === 0 ? { ...session, start: "13:30" } : session,
+      ),
+    }),
+    false,
+  );
 });

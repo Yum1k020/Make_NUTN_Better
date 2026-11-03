@@ -46,6 +46,18 @@ function formatStageEvidence(stage) {
       ? `檢查 ${evidence.checkedSessionCount} 個時段・${evidence.issueCount} 項問題`
       : `${evidence.issueCount} 項問題・下游 ${evidence.downstreamCalls} 次`;
   }
+  if (stage.id === "model-tool-call") {
+    return `${evidence.provider}・${evidence.model}・tool ${evidence.tool}`;
+  }
+  if (stage.id === "validate-tool-args") {
+    return `${evidence.issueCount} 項問題・${evidence.confirmationRequired ? "需要人工確認" : "唯讀預覽免確認"}`;
+  }
+  if (stage.id === "execute-tool") {
+    return `${evidence.sessionCount} 個時段・已安排 ${evidence.scheduledMinutes} 分鐘・尚缺 ${evidence.remainingMinutes} 分鐘`;
+  }
+  if (stage.id === "return-tool-result") {
+    return `${evidence.functionResponseCount} 筆工具結果・${evidence.citationCount} 個來源`;
+  }
   return stage.status === "completed"
     ? `${evidence.provider}・${evidence.citationCount} 個來源・嘗試 ${evidence.attemptCount} 次`
     : `${evidence.errorSource}・嘗試 ${evidence.attemptCount} 次`;
@@ -81,8 +93,8 @@ function WorkflowTrace({ workflow }) {
         </p>
       )}
       <small className="workflow-run-id">
-        workflow：{workflow.name}・version：{workflow.version}・run ID：
-        {workflow.runId}
+        workflow：{workflow.name}・version：{workflow.version}
+        {workflow.runId ? `・run ID：${workflow.runId}` : ""}
       </small>
     </div>
   );

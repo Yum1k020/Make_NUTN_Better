@@ -6,7 +6,20 @@ export function getStudyAgentEndpoint(env = import.meta.env || {}) {
 
 export function studyPlansMatch(left, right) {
   if (!left || !right) return false;
-  return JSON.stringify(left) === JSON.stringify(right);
+  const canonicalize = (value) => {
+    if (Array.isArray(value)) return value.map(canonicalize);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.keys(value)
+          .sort()
+          .map((key) => [key, canonicalize(value[key])]),
+      );
+    }
+    return value;
+  };
+  return (
+    JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right))
+  );
 }
 
 export async function requestStudyAgentPlan({
