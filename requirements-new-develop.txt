@@ -1,0 +1,4 @@
+# Shared environment for merged Flask and Agentic suites.
+-r backend/requirements-dev.lock.txt
+-r requirements-agentic-ai.txt
+tzdata

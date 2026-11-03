@@ -77,7 +77,7 @@ Offline comparison：offline_all_pass=true。
 
 沒有 API key 時不宣稱 LIVE_PASS，也不要把 .env、API key、ADC JSON、token 或個資提交到 repo。
 
-前後比較見 COMPARISON.md，架構決策見 ADR.md，證據索引見 EVIDENCE_INDEX.md。
+排程前後比較見 AGENTIC-COMPARISON.md，架構決策見 ADR.md，證據索引見 EVIDENCE_INDEX.md；畢業功能比較另見 comparison.md。
 
 
 ---

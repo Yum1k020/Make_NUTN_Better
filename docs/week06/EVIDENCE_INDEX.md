@@ -9,7 +9,7 @@
 | 同案例 offline comparison | week06/evidence/offline_comparison.json | offline_all_pass=true |
 | Case 1 normal main flow | week06/evidence/W06-LIVE-*.json | LIVE_NOT_RUN |
 | ADR | docs/week06/ADR.md | 已完成 |
-| Before / After | docs/week06/COMPARISON.md | 已補實測結果 |
+| Before / After | docs/week06/AGENTIC-COMPARISON.md | 原分支實測結果，非 new-develop 重新驗證 |
 
 ## CI
 
