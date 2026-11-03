@@ -1,0 +1,13 @@
+{
+  "kind": "actual_browser_synthetic_fixture",
+  "origin": "http://127.0.0.1:5173",
+  "external_model_call": false,
+  "data": "synthetic only",
+  "observed_steps": [
+    "Opened graduation page using locally generated synthetic fixture data; unknown values remain unknown.",
+    "Mode banner: 合成測試模式：使用虛構資料與固定測試回應，不連線 Gemini，不傳送學業資料。",
+    "Clicked 產生合成測試說明; verified clauses visible; issued 2026/10/28 10:29:05; expires 10:34:05",
+    "Clicked 開始新的說明工作階段; clauses and timestamps removed; 工作階段已變更，舊說明已清除。"
+  ],
+  "note": "Initial standard-labelled generate action was rejected by automatic UI review; no model request was performed. After explicit fixture-only UI indication and confirmed synthetic backend, fixture action succeeded."
+}

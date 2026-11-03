@@ -360,6 +360,8 @@ def init_app(app, api):
     api.register_blueprint(routes)
     from .planner_openapi import register_docs
     register_docs(app, api)
+    from .graduation_explanation_api import register
+    register(app, api)
 
     @app.get("/maps/<string:filename>")
     def map_image(filename):

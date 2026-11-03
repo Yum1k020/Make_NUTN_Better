@@ -1,0 +1,530 @@
+[2026-10-14 11:26:05,651] INFO in planner: planner success
+[2026-10-14 11:26:05,660] INFO in planner: planner success
+[2026-10-14 11:26:05,665] INFO in planner: planner success
+<WORKSPACE>\work\venv\Lib\site-packages\langgraph\cache\base\__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+[2026-10-14 11:26:06,612] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:06,613] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:06,613] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:06,613] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:06,614] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:06,615] INFO in planner: planner success
+[2026-10-14 11:26:06,625] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:06,626] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:06,626] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:06,627] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:06,627] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:06,628] INFO in planner: planner success
+[2026-10-14 11:26:06,633] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:06,633] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:06,634] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:06,634] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:06,635] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:06,635] INFO in planner: planner success
+[2026-10-14 11:26:06,788] INFO in planner: planner success
+[2026-10-14 11:26:06,796] INFO in planner: planner success
+[2026-10-14 11:26:06,797] INFO in planner: planner success
+[2026-10-14 11:26:06,863] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:06,863] INFO in graduation_workflow: graduation workflow: unavailable
+[2026-10-14 11:26:06,864] INFO in planner: planner success
+[2026-10-14 11:26:06,874] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:06,874] INFO in graduation_workflow: graduation workflow: unavailable
+[2026-10-14 11:26:06,874] INFO in planner: planner success
+[2026-10-14 11:26:06,878] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:06,879] INFO in graduation_workflow: graduation workflow: unavailable
+[2026-10-14 11:26:06,879] INFO in planner: planner success
+[2026-10-14 11:26:07,064] INFO in planner: planner success
+[2026-10-14 11:26:07,080] INFO in planner: planner success
+[2026-10-14 11:26:07,097] INFO in planner: planner success
+[2026-10-14 11:26:07,136] INFO in planner: planner success
+[2026-10-14 11:26:07,145] INFO in planner: planner success
+[2026-10-14 11:26:07,148] INFO in planner: planner success
+[2026-10-14 11:26:07,195] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,196] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,197] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,197] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,198] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,198] INFO in planner: planner success
+[2026-10-14 11:26:07,209] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,210] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,210] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,210] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,211] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,211] INFO in planner: planner success
+[2026-10-14 11:26:07,216] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,217] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,218] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,218] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,218] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,219] INFO in planner: planner success
+[2026-10-14 11:26:07,381] INFO in planner: planner success
+[2026-10-14 11:26:07,413] INFO in planner: planner success
+[2026-10-14 11:26:07,423] INFO in planner: planner success
+[2026-10-14 11:26:07,428] INFO in planner: planner success
+[2026-10-14 11:26:07,474] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,474] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,475] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,476] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,476] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,477] INFO in planner: planner success
+[2026-10-14 11:26:07,488] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,489] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,490] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,490] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,491] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,492] INFO in planner: planner success
+[2026-10-14 11:26:07,497] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,498] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,499] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,499] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,500] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,500] INFO in planner: planner success
+[2026-10-14 11:26:07,669] INFO in planner: planner success
+[2026-10-14 11:26:07,701] INFO in planner: planner success
+[2026-10-14 11:26:07,710] INFO in planner: planner success
+[2026-10-14 11:26:07,715] INFO in planner: planner success
+[2026-10-14 11:26:07,761] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,762] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,763] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,764] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,764] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,765] INFO in planner: planner success
+[2026-10-14 11:26:07,775] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,776] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,777] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,778] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,778] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,779] INFO in planner: planner success
+[2026-10-14 11:26:07,784] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:07,785] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:07,786] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:07,786] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:07,787] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:07,787] INFO in planner: planner success
+[2026-10-14 11:26:07,948] INFO in planner: planner success
+[2026-10-14 11:26:07,983] INFO in planner: planner success
+[2026-10-14 11:26:08,034] INFO in planner: planner success
+[2026-10-14 11:26:08,207] INFO in planner: planner success
+[2026-10-14 11:26:08,238] INFO in planner: planner success
+[2026-10-14 11:26:08,245] INFO in planner: planner success
+[2026-10-14 11:26:08,402] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:08,404] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:08,406] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:08,406] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:08,407] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:08,408] INFO in planner: planner success
+[2026-10-14 11:26:08,455] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:08,458] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:08,461] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:08,462] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:08,465] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:08,466] INFO in planner: planner success
+[2026-10-14 11:26:08,482] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:08,483] INFO in graduation_workflow: graduation workflow: collect
+[2026-10-14 11:26:08,484] INFO in graduation_workflow: graduation workflow: allocate
+[2026-10-14 11:26:08,485] INFO in graduation_workflow: graduation workflow: evaluate
+[2026-10-14 11:26:08,486] INFO in graduation_workflow: graduation workflow: summarize
+[2026-10-14 11:26:08,487] INFO in planner: planner success
+[2026-10-14 11:26:08,890] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 378, in progress
+    return progress_legacy(db)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 117, in progress_legacy
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 41, in document
+    raise ValueError("Rule document checksum mismatch")
+ValueError: Rule document checksum mismatch
+[2026-10-14 11:26:08,893] INFO in planner: planner failure
+[2026-10-14 11:26:08,925] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 378, in progress
+    return progress_legacy(db)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 117, in progress_legacy
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 41, in document
+    raise ValueError("Rule document checksum mismatch")
+ValueError: Rule document checksum mismatch
+[2026-10-14 11:26:08,927] INFO in planner: planner failure
+[2026-10-14 11:26:08,938] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 346, in dashboard_route
+    return {"data": dashboard(transaction(), p["date"])}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_checks.py", line 82, in dashboard
+    graduation = progress(db)
+                 ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 378, in progress
+    return progress_legacy(db)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 117, in progress_legacy
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 41, in document
+    raise ValueError("Rule document checksum mismatch")
+ValueError: Rule document checksum mismatch
+[2026-10-14 11:26:08,944] INFO in planner: planner failure
+[2026-10-14 11:26:09,227] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:09,228] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 380, in progress
+    return progress_graph(db)
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 70, in progress_graph
+    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\main.py", line 2633, in stream
+    for _ in runner.tick(
+             ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 32, in load
+    return load_graduation_context(db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 239, in load_graduation_context
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 41, in document
+    raise ValueError("Rule document checksum mismatch")
+ValueError: Rule document checksum mismatch
+During task with name 'load_rules' and id 'b4970501-c9c0-fc73-c98b-2290f2659ff1'
+[2026-10-14 11:26:09,236] INFO in planner: planner failure
+[2026-10-14 11:26:09,276] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:09,276] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 380, in progress
+    return progress_graph(db)
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 70, in progress_graph
+    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\main.py", line 2633, in stream
+    for _ in runner.tick(
+             ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 32, in load
+    return load_graduation_context(db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 239, in load_graduation_context
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 41, in document
+    raise ValueError("Rule document checksum mismatch")
+ValueError: Rule document checksum mismatch
+During task with name 'load_rules' and id '22e6052c-bda9-9e52-9c08-51758d513cd6'
+[2026-10-14 11:26:09,281] INFO in planner: planner failure
+[2026-10-14 11:26:09,314] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:09,315] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 346, in dashboard_route
+    return {"data": dashboard(transaction(), p["date"])}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_checks.py", line 82, in dashboard
+    graduation = progress(db)
+                 ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 380, in progress
+    return progress_graph(db)
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 70, in progress_graph
+    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\main.py", line 2633, in stream
+    for _ in runner.tick(
+             ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 32, in load
+    return load_graduation_context(db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 239, in load_graduation_context
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 41, in document
+    raise ValueError("Rule document checksum mismatch")
+ValueError: Rule document checksum mismatch
+During task with name 'load_rules' and id '4f4f1afc-9a3c-16a8-1645-f3e3c14d1415'
+[2026-10-14 11:26:09,324] INFO in planner: planner failure
+[2026-10-14 11:26:09,701] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 378, in progress
+    return progress_legacy(db)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 117, in progress_legacy
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 37, in document
+    row = db.execute("SELECT * FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: graduation_rule_documents
+[2026-10-14 11:26:09,703] INFO in planner: planner failure
+[2026-10-14 11:26:09,731] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 378, in progress
+    return progress_legacy(db)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 117, in progress_legacy
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 37, in document
+    row = db.execute("SELECT * FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: graduation_rule_documents
+[2026-10-14 11:26:09,733] INFO in planner: planner failure
+[2026-10-14 11:26:09,737] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 346, in dashboard_route
+    return {"data": dashboard(transaction(), p["date"])}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_checks.py", line 82, in dashboard
+    graduation = progress(db)
+                 ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 378, in progress
+    return progress_legacy(db)
+           ^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 117, in progress_legacy
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 37, in document
+    row = db.execute("SELECT * FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: graduation_rule_documents
+[2026-10-14 11:26:09,739] INFO in planner: planner failure
+[2026-10-14 11:26:09,884] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:09,884] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 380, in progress
+    return progress_graph(db)
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 70, in progress_graph
+    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\main.py", line 2633, in stream
+    for _ in runner.tick(
+             ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 32, in load
+    return load_graduation_context(db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 239, in load_graduation_context
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 37, in document
+    row = db.execute("SELECT * FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: graduation_rule_documents
+During task with name 'load_rules' and id '70916add-6487-04df-f9d5-838030c8077c'
+[2026-10-14 11:26:09,888] INFO in planner: planner failure
+[2026-10-14 11:26:09,926] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:09,926] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 339, in progress_route
+    return {"data": progress(transaction())}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 380, in progress
+    return progress_graph(db)
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 70, in progress_graph
+    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\main.py", line 2633, in stream
+    for _ in runner.tick(
+             ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 32, in load
+    return load_graduation_context(db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 239, in load_graduation_context
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 37, in document
+    row = db.execute("SELECT * FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: graduation_rule_documents
+During task with name 'load_rules' and id '95a9c254-7a4b-f9e3-2ae7-8aac7ffd9a2c'
+[2026-10-14 11:26:09,930] INFO in planner: planner failure
+[2026-10-14 11:26:09,943] INFO in graduation_workflow: graduation workflow: load_rules
+[2026-10-14 11:26:09,943] ERROR in planner: Planner operation failed
+Traceback (most recent call last):
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 40, in wrapped
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner.py", line 346, in dashboard_route
+    return {"data": dashboard(transaction(), p["date"])}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_checks.py", line 82, in dashboard
+    graduation = progress(db)
+                 ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 380, in progress
+    return progress_graph(db)
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 70, in progress_graph
+    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\main.py", line 2633, in stream
+    for _ in runner.tick(
+             ^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_runner.py", line 167, in tick
+    run_with_retry(
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\pregel\_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\graduation_workflow.py", line 32, in load
+    return load_graduation_context(db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 239, in load_graduation_context
+    rule = rules(db, rule_id) if rule_id else None
+           ^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 51, in rules
+    d = document(db, rule_id)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>\work\repo\backend\app\planner_graduation.py", line 37, in document
+    row = db.execute("SELECT * FROM graduation_rule_documents WHERE rule_set_id=?", (rule_id,)).fetchone()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: graduation_rule_documents
+During task with name 'load_rules' and id '62300aac-24a4-edb5-ecb0-921b1f9f28e6'
+[2026-10-14 11:26:09,948] INFO in planner: planner failure
+8/8 graduation A/B cases PASS; OFFLINE_NO_LLM

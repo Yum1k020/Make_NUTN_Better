@@ -1,0 +1,654 @@
+diff --git a/FRAMEWORK_HOMEWORK.md b/FRAMEWORK_HOMEWORK.md
+new file mode 100644
+index 0000000..46f4cd5
+--- /dev/null
++++ b/FRAMEWORK_HOMEWORK.md
+@@ -0,0 +1,85 @@
++# Week 05｜畢業規劃：局部換成 LangGraph
++
++將既有「畢業進度／缺項計算」的編排交给 LangGraph StateGraph；保留原來的學分、必修、學程與講座規則。既有入口是 **GET /api/v1/graduation-progress** 與 **GET /api/v1/dashboard** 的畢業摘要。
++
++基準版本：`c06b69f50d4ee66cdc38cf43e1843057c0728f3c`。預設 `legacy`；設定 `GRADUATION_ENGINE=langgraph` 可驗收候選。本次沒有修改複習時段產生功能。
++
++## 作業交付導覽
++
++- [一頁決策](docs/week05-graduation/decision.md)／[PDF](docs/week05-graduation/decision.pdf)
++- [前後測試摘要](docs/week05-graduation/acceptance.md)
++- [完整證據與環境](docs/week05-graduation/evidence/)
++- [程式差異](docs/week05-graduation/framework.patch)
++- 原版：Git 基準 commit，以及 `planner_graduation.py::progress_legacy`；候選：`graduation_workflow.py::progress_graph`。
++
++## 盤點：保留／替換／轉接
++
++|責任|原位置|本次處理|
++|---|---|---|
++|入口與安全保留|planner.py::progress_route、planner_checks.py::dashboard|沿用原 API、使用者歸屬、唯讀 SQLite 交易、回應格式及錯誤處理|
++|流程替換|planner_graduation.py::progress|原本手寫讀規則、分支、彙整、計算、摘要；現在選擇 legacy 或 graph|
++|原版保留|planner_graduation.py::progress_legacy|原函式本體原樣保存；可獨立核對與回退|
++|框架編排|graduation_workflow.py::progress_graph|實際使用 StateGraph、add_node、add_conditional_edges、compile、stream|
++|業務保留|document、rules、mappings、programs、lectures、make_check|規則版本與 checksum、分類、必修對照、學程及講座門檻仍由應用維護|
++|步驟轉接|load_graduation_context、collect_graduation_credits、allocate_graduation_credits、evaluate_graduation_requirements、finish_graduation_progress|從原 progress 抽出業務步驟；GraduationState 串起資料，不更改判定公式|
++
++```text
++原 API／dashboard → progress 選擇 runner
++legacy: 原 progress 本體
++langgraph: START → load_rules ─有規則→ collect → allocate → evaluate → summarize → END
++                            └缺規則→ unavailable → END
++規則 checksum 錯誤／資料庫錯誤：原 HTTP 邊界回 500，不偽造達標。
++```
++
++盤點確認需自行維護的是步驟順序、缺規則分支與中間資料傳遞；未證明有大量重複 Agent 迴圈。學分演算法不交给框架。為保留可独立對照的原版，抽出的業務步驟與 legacy 有刻意重複，必須計入維護成本。
++
++保留安全與資料規則：只有 finished 且 passed 的課程納入已得學分；修習中／計畫修課不冒充已取得；系選修溢額轉自由選修，不重複採計；分類／課程對照缺漏維持 needs_confirmation；缺規則學分為 null；保留非校方正式認證的 verification_scope。沿用既有狀態優先序：任何 not_met 先決定整體 not_met，個別未知檢查仍標示待確認。
++
++## Windows 重跑與啟動
++
++從專案根目錄（看得到 backend/）執行，Python 3.12。每台裝置使用自己的環境與 SQLite。
++
++```powershell
++py -3.12 -m venv .venv
++.\.venv\Scripts\python.exe -m pip install -r backend/requirements-framework.lock.txt
++$env:PYTHONUTF8 = '1'
++$env:PYTHONIOENCODING = 'utf-8'
++$env:LANGSMITH_TRACING = 'false'
++cd backend
++..\.venv\Scripts\python.exe compare_framework.py --output ../graduation-evidence-rerun.json
++$env:GRADUATION_ENGINE = 'langgraph'
++..\.venv\Scripts\python.exe -m flask --app app:create_app init-db
++..\.venv\Scripts\python.exe -m flask --app app:create_app run --host 127.0.0.1 --port 5000
++```
++
++開 http://127.0.0.1:5000/docs。先以 PATCH `/api/v1/me` 設定 `{"department_id":"dept-nutn-csie","admission_year":115,"current_semester_id":"semester-115-1"}`，再 GET `/api/v1/graduation-progress`。無修課資料的缺項回應也是正常結果；133 學分全達標用的是測試腳本中的合成資料，不是學生真實紀錄。
++
++回退：停止服務，把 `$env:GRADUATION_ENGINE = 'legacy'` 後重啟。資料庫不需遷移或刪除。拼錯 engine 會在啟動時明確失敗。legacy 不會匯入 LangGraph。
++
++## macOS／Linux
++
++```sh
++python3.12 -m venv .venv
++.venv/bin/python -m pip install -r backend/requirements-framework.lock.txt
++cd backend
++export PYTHONUTF8=1
++LANGSMITH_TRACING=false ../.venv/bin/python compare_framework.py --output ../graduation-evidence-rerun.json
++../.venv/bin/python -m flask --app app:create_app init-db
++GRADUATION_ENGINE=langgraph LANGSMITH_TRACING=false ../.venv/bin/python -m flask --app app:create_app run --host 127.0.0.1 --port 5000
++```
++
++以 `GRADUATION_ENGINE=legacy` 重啟回退。本次實測為 Windows；上面兩平台未實機驗證。
++
++## 回歸測試與證據
++
++在 backend/ 執行 `python -m pytest -k 'not real_http' --evidence ../regression-rerun.json`，分別設定 GRADUATION_ENGINE=legacy、langgraph。使用所建立的虛擬環境 Python；原證據 hook 需要 Git checkout。獨立 compare_framework.py 不需要 Git。
++
++八組 A/B 用完全相同的 SQLite 複本；兩版預期相同，僅排除回應中的 evaluated_at 比較，原時間仍完整保存在證據。每組都核對資料庫雜湊不變、重送不改資料、dashboard 摘要一致，以及真實框架 logger 的節點路徑。
++
++## 完成程度與課程要求
++
++局部框架替換、原入口整合、離線 A/B 與回退已完成。前端仍是既有本機示範原型，本次沒有接回前端。沒有 LLM 接頭，模型請求為 0，模型 live 與自然語言語意驗收仍待完成；不把離線成功寫成 LIVE_PASS。沒有 checkpoint、持久化恢復或寫入授權新增能力。
++
++依教授講義投影片 61、63、67～70（PDF 實體 59、61、65～68 頁）提供程式差異、測試證據、一頁決策。若課程要求模型 live，下一步須先界定畢業規劃的模型說明任務、共用接頭、授權額度、來源充分性與語意驗收，再實測。本包沒有將模型連線或正式畢業資格認證假裝完成。
++
++框架參考：[LangGraph 官方 Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)。本次固定 LangGraph 1.0.3，完整相依版本見 lock 檔。
+diff --git a/backend/app/__init__.py b/backend/app/__init__.py
+index 2bef64e..2bee1ba 100644
+--- a/backend/app/__init__.py
++++ b/backend/app/__init__.py
+@@ -22,6 +22,7 @@ def create_app(test_config=None):
+     app = Flask(__name__)
+     app.json.ensure_ascii = False
+     app.config.from_mapping(
++        GRADUATION_ENGINE=os.environ.get("GRADUATION_ENGINE", "legacy"),
+         API_TITLE="Make NUTN Better API",
+         API_VERSION="0.1.0",
+         OPENAPI_VERSION="3.0.3",
+@@ -35,6 +36,9 @@ def create_app(test_config=None):
+     if test_config:
+         app.config.update(test_config)
+ 
++    if app.config["GRADUATION_ENGINE"] not in {"legacy", "langgraph"}:
++        raise ValueError("GRADUATION_ENGINE must be legacy or langgraph")
++
+     # Serve documentation assets locally: no CDN or network needed after install.
+     app.register_blueprint(FlaskBlueprint(
+         "swagger_assets", __name__, static_folder=swagger_ui_path,
+diff --git a/backend/app/graduation_workflow.py b/backend/app/graduation_workflow.py
+new file mode 100644
+index 0000000..2d2b99a
+--- /dev/null
++++ b/backend/app/graduation_workflow.py
+@@ -0,0 +1,76 @@
++"""Read-only graduation planning orchestration; business rules stay in the app."""
++
++from typing import TypedDict
++from flask import current_app
++from langgraph.graph import START, END, StateGraph
++from .planner_graduation import (
++    load_graduation_context, collect_graduation_credits,
++    allocate_graduation_credits, evaluate_graduation_requirements,
++    finish_graduation_progress,
++)
++
++
++class GraduationState(TypedDict, total=False):
++    result: dict
++    rule: dict | None
++    document: dict
++    rule_id: str
++    passed: set[str]
++    unknown: bool
++    groups: dict
++    earned: float
++    totals: dict
++
++
++def progress_graph(db):
++    def event(name):
++        current_app.logger.info("graduation workflow: %s", name,
++                                extra={"workflow_node": name})
++
++    def load(state):
++        event("load_rules")
++        return load_graduation_context(db)
++
++    def route(state):
++        return "collect" if state["rule"] is not None else "unavailable"
++
++    def unavailable(state):
++        event("unavailable")
++        return {"result": state["result"]}
++
++    def collect(state):
++        event("collect")
++        return collect_graduation_credits(db, state)
++
++    def allocate(state):
++        event("allocate")
++        return allocate_graduation_credits(state)
++
++    def evaluate(state):
++        event("evaluate")
++        return evaluate_graduation_requirements(db, state)
++
++    def summarize(state):
++        event("summarize")
++        return {"result": finish_graduation_progress(state)}
++
++    graph = StateGraph(GraduationState)
++    for name, node in (("load_rules", load), ("unavailable", unavailable),
++                       ("collect", collect), ("allocate", allocate),
++                       ("evaluate", evaluate), ("summarize", summarize)):
++        graph.add_node(name, node)
++    graph.add_edge(START, "load_rules")
++    graph.add_conditional_edges("load_rules", route,
++                                {"collect": "collect", "unavailable": "unavailable"})
++    for a, b in (("collect", "allocate"), ("allocate", "evaluate"),
++                 ("evaluate", "summarize"), ("summarize", END), ("unavailable", END)):
++        graph.add_edge(a, b)
++    # Synchronous execution keeps the existing request-scoped SQLite transaction.
++    result = None
++    for update in graph.compile().stream({}, config={"recursion_limit": 8}, stream_mode="updates"):
++        for node in ("summarize", "unavailable"):
++            if node in update:
++                result = update[node]["result"]
++    if result is None:
++        raise ValueError("Graduation workflow did not produce a result")
++    return result
+diff --git a/backend/app/planner_graduation.py b/backend/app/planner_graduation.py
+index a99f2dc..2ec9168 100644
+--- a/backend/app/planner_graduation.py
++++ b/backend/app/planner_graduation.py
+@@ -104,7 +104,7 @@ def make_check(key, name, required, actual, unit="credits", reason=None):
+             "message": reason or ("資料待確認" if actual is None else "已達第一版門檻" if remaining == 0 else f"尚缺 {remaining:g} {unit}")}
+ 
+ 
+-def progress(db):
++def progress_legacy(db):
+     profile = db.execute("SELECT * FROM user_profiles WHERE user_id=?", (DEMO_USER_ID,)).fetchone()
+     if profile is None:
+         raise ValueError("Missing current user")
+@@ -226,6 +226,160 @@ def progress(db):
+     return result
+ 
+ 
++def load_graduation_context(db):
++    profile = db.execute("SELECT * FROM user_profiles WHERE user_id=?", (DEMO_USER_ID,)).fetchone()
++    if profile is None:
++        raise ValueError("Missing current user")
++    rule_id = profile["rule_set_id"]
++    result = {"user_id": DEMO_USER_ID, "rule_set_id": rule_id, "evaluated_at": timestamp(),
++              "overall_status": "needs_confirmation", "checks": [], "credit_allocation": [],
++              "missing_required_courses": [], "program_progress": [], "lecture_progress": lectures(db),
++              "data_errors": [], "verification_scope": "第一版設定，非校方正式認證"}
++    try:
++        rule = rules(db, rule_id) if rule_id else None
++    except Problem:
++        rule = None
++    if rule is None:
++        result["data_errors"] = [{"code": "RULE_UNAVAILABLE", "message": "尚無適用且有完整文件的畢業規則"}]
++        result["earned_credits"] = None
++        return {"result": result, "rule": None}
++    d = document(db, rule_id)
++    result["verification_scope"] = rule["verification_scope"]
++    return {"result": result, "rule": rule, "document": d, "rule_id": rule_id}
++
++
++def collect_graduation_credits(db, state):
++    result, rule_id = state["result"], state["rule_id"]
++    passed, seen, earned, groups = set(), set(), 0, defaultdict(float)
++    unknown = False
++    for enrollment in records(db, "enrollments"):
++        if enrollment["enrollment_status"] != "finished" or enrollment["passed"] is not True:
++            continue
++        cid = enrollment["course_id"]
++        if cid in seen:
++            result["data_errors"].append({"code": "DUPLICATE_COURSE", "course_id": cid})
++            unknown = True
++            continue
++        seen.add(cid)
++        passed.add(cid)
++        credits = enrollment["course_snapshot"]["credits"]
++        if type(credits) not in (int, float) or credits < 0:
++            raise ValueError("Invalid credit snapshot")
++        earned += credits
++        row = db.execute("SELECT credit_category FROM course_classifications WHERE course_id=? AND rule_set_id=?", (cid, rule_id)).fetchone()
++        category = row[0] if row else None
++        if category not in ("general_core", "general_domain", "general_diverse", "college_required", "department_required", "department_elective", "free_elective"):
++            unknown = True
++            result["data_errors"].append({"code": "CLASSIFICATION_UNKNOWN", "course_id": cid})
++        else:
++            groups[category] += credits
++        result["credit_allocation"].append({"enrollment_id": enrollment["enrollment_id"], "course_id": cid,
++                                            "credits": credits, "category": category, "allocations": []})
++    return {"result": result, "passed": passed, "unknown": unknown, "groups": groups, "earned": earned}
++
++
++def allocate_graduation_credits(state):
++    result, d, groups, earned = state["result"], state["document"], state["groups"], state["earned"]
++    # Allocate each earned credit once; professional elective overflow transfers to free elective.
++    elective_left = d["credit_requirements"]["department_elective"]["minimum_credits"]
++    diverse_left = d["credit_requirements"]["general_education"]["elective"]["diverse_courses"]["maximum_counted_credits"]
++    totals = defaultdict(float)
++    for row in result["credit_allocation"]:
++        category, credits = row["category"], row["credits"]
++        parts = []
++        if category == "department_elective":
++            count = min(elective_left, credits)
++            elective_left -= count
++            parts = [(category, count), ("free_elective", credits - count)]
++        elif category == "general_diverse":
++            count = min(diverse_left, credits)
++            diverse_left -= count
++            parts = [(category, count)]
++        elif category is not None and category in groups:
++            parts = [(category, credits)]
++        for cat, amount in parts:
++            if amount:
++                row["allocations"].append({"category": cat, "credits": amount})
++                totals[cat] += amount
++    result["earned_credits"] = earned
++    return {"result": result, "totals": totals}
++
++
++def evaluate_graduation_requirements(db, state):
++    result, rule, d = state["result"], state["rule"], state["document"]
++    rule_id, passed, unknown = state["rule_id"], state["passed"], state["unknown"]
++    earned, totals = state["earned"], state["totals"]
++    checks = [make_check("total_credits", "總學分", rule["total_credits_required"], earned)]
++    cr = d["credit_requirements"]
++    for key, needed in (("general_core", cr["general_education"]["core"]["required_credits"]),
++                        ("general_domain", cr["general_education"]["elective"]["domain_courses"]["minimum_credits"]),
++                        ("college_required", cr["college_core"]["required_credits"]),
++                        ("department_required", cr["department_required"]["required_credits"]),
++                        ("department_elective", cr["department_elective"]["minimum_credits"]),
++                        ("free_elective", cr["free_elective"]["minimum_credits"])):
++        checks.append(make_check(key, key, needed, None if unknown else totals[key]))
++    checks.append(make_check("general_elective", "通識選修", cr["general_education"]["elective"]["minimum_credits"],
++                             None if unknown else totals["general_domain"] + totals["general_diverse"]))
++    domains, missing_domain = set(), unknown
++    for allocation in result["credit_allocation"]:
++        if allocation["category"] == "general_domain":
++            row = db.execute("SELECT domain FROM graduation_course_domains WHERE rule_set_id=? AND course_id=?",
++                             (rule_id, allocation["course_id"])).fetchone()
++            if row is None or row[0] not in cr["general_education"]["elective"]["domain_courses"]["domains"]:
++                missing_domain = True
++                result["data_errors"].append({"code": "GENERAL_DOMAIN_UNKNOWN", "course_id": allocation["course_id"]})
++            else:
++                domains.add(row[0])
++    checks.append(make_check("general_domains", "通識領域數", cr["general_education"]["elective"]["domain_courses"]["minimum_distinct_domains"],
++                             None if missing_domain else len(domains), "domains"))
++    mapped = mappings(db, rule_id)
++    for i, requirement in enumerate(cr["general_education"]["core"]["requirements"]):
++        cid = mapped.get(f"general_core:{i}")
++        amount = next((e["credits"] for e in result["credit_allocation"] if e["course_id"] == cid), 0) if cid else None
++        checks.append(make_check(f"general_core_{i}", requirement["name"], requirement["required_credits"], amount))
++    for i, course in enumerate(cr["college_core"]["required_courses"]):
++        cid = mapped.get(f"college:{i}")
++        checks.append(make_check(f"college_course_{i}", course["name"], 1, int(cid in passed) if cid else None, "courses"))
++    result["missing_required_courses"] = [cid for cid in rule["required_course_ids"] if cid not in passed]
++    unresolved = rule["unmapped_required_courses"]
++    if unresolved:
++        result["data_errors"].append({"code": "REQUIRED_COURSES_UNMAPPED", "courses": unresolved})
++    checks.append(make_check("required_courses", "指定必修", len(cr["department_required"]["courses"]),
++                             None if unresolved else len(rule["required_course_ids"]) - len(result["missing_required_courses"]), "courses"))
++    complete_programs, unresolved_programs = 0, False
++    for p in programs(db, rule_id):
++        actual = len(set(p["course_ids"]) & passed)
++        status = "met" if actual >= p["minimum_passed_courses"] else "needs_confirmation" if p["data_status"] != "complete" else "not_met"
++        complete_programs += status == "met"
++        unresolved_programs |= status == "needs_confirmation"
++        result["program_progress"].append({**p, "passed_courses": actual, "status": status})
++    needed_programs = d["program_requirements"]["minimum_completed_programs"]
++    checks.append(make_check("programs", "完成學程", needed_programs,
++                             None if unresolved_programs and complete_programs < needed_programs else complete_programs, "programs"))
++    for key in ("professional", "general"):
++        checks.append(make_check("lecture_" + key, d["lecture_requirements"][key]["name"],
++                                 d["lecture_requirements"][key]["minimum_count"], result["lecture_progress"][key + "_count"], "lectures"))
++    result["checks"] = checks
++    return {"result": result}
++
++
++def finish_graduation_progress(state):
++    result = state["result"]
++    checks = result["checks"]
++    statuses = {c["status"] for c in checks}
++    result["overall_status"] = "not_met" if "not_met" in statuses else "needs_confirmation" if "needs_confirmation" in statuses else "met"
++    return result
++
++
++def progress(db):
++    """Preserve both original graduation API callers and allow explicit rollback."""
++    from flask import current_app
++    if current_app.config["GRADUATION_ENGINE"] == "legacy":
++        return progress_legacy(db)
++    from .graduation_workflow import progress_graph
++    return progress_graph(db)
++
++
+ MAPS = [
+     {"map_id": "fucheng-campus", "campus_id": "fucheng", "campus_name": "府城校區", "view_name": "校區總覽",
+      "image_url": "/maps/fucheng-campus.png", "alt_text": "臺南大學府城校區平面圖，顯示建築、出入口與設施", "sort_order": 1},
+diff --git a/backend/compare_framework.py b/backend/compare_framework.py
+new file mode 100644
+index 0000000..f7ab1a2
+--- /dev/null
++++ b/backend/compare_framework.py
+@@ -0,0 +1,208 @@
++"""Reproducible same-data graduation A/B comparison through original APIs."""
++import argparse
++from contextlib import closing
++from copy import deepcopy
++from datetime import datetime
++from hashlib import sha256
++from importlib.metadata import version
++import json
++import logging
++from pathlib import Path
++import platform
++import shutil
++import sqlite3
++import tempfile
++from time import perf_counter
++from zoneinfo import ZoneInfo
++from app import create_app
++from app.db import get_db, init_db
++from app.planner_core import course_snapshot, dump, timestamp
++from app.planner_graduation import document
++
++RULE, SEM = 'nutn-csie-115-mvp-v1', 'semester-115-1'
++BASE = '/api/v1'
++
++
++def digest(path):
++    with closing(sqlite3.connect(path)) as db:
++        return sha256('\n'.join(db.iterdump()).encode()).hexdigest()
++
++
++def normalized(body):
++    body = deepcopy(body)
++    if 'data' in body:
++        body['data'].pop('evaluated_at', None)
++    return body
++
++
++def fully_mapped(app):
++    """Synthetic 133-credit fixture; zero-credit program items are test-only."""
++    with app.app_context():
++        db = get_db()
++        d = document(db, RULE)
++        counter = 0
++        def passed(name, credits, category, key=None, domain=None):
++            nonlocal counter
++            counter += 1
++            cid = 'test-confirmed-' + str(counter)
++            db.execute('INSERT INTO courses VALUES (?,?,?,?,?,?,?,?)',
++                       (cid, None, name, credits, 'dept-nutn-csie', 'unknown', None, None))
++            db.execute('INSERT INTO course_classifications VALUES (?,?,?)', (cid, RULE, category))
++            if key:
++                db.execute('INSERT INTO graduation_course_mappings VALUES (?,?,?)', (RULE, key, cid))
++            if domain:
++                db.execute('INSERT INTO graduation_course_domains VALUES (?,?,?)', (RULE, cid, domain))
++            payload = dict(course_id=cid, semester_id=SEM, offering_id=None, enrollment_status='finished',
++                           passed=True, grade=None, course_snapshot=course_snapshot(db, cid))
++            now = timestamp()
++            db.execute('INSERT INTO planner_resources VALUES (?,?,?,?,?,?)',
++                       ('enrollments', 'test-record-'+str(counter), 'user-demo-001', dump(payload), now, now))
++        cr = d['credit_requirements']
++        for c in cr['department_required']['courses']:
++            passed(c['name'], c['credits'], 'department_required', 'required:'+c['course_code'])
++        for i,c in enumerate(cr['general_education']['core']['requirements']):
++            passed(c['name'], c['required_credits'], 'general_core', f'general_core:{i}')
++        passed('科技法律', 2, 'college_required', 'college:0')
++        for domain in ('文史哲藝術','社會脈動','生命科學'):
++            passed('合成領域課 '+domain, 4, 'general_domain', domain=domain)
++        passed('合成多元課', 6, 'general_diverse')
++        passed('合成系選修', 12, 'department_elective')
++        passed('合成自由選修', 20, 'free_elective')
++        for p in d['program_requirements']['programs']:
++            for i,name in enumerate(p['courses'][:3]):
++                passed(name+'（零學分合成項目）', 0, 'free_elective', f"program:{p['id']}:{i}")
++        db.commit()
++
++
++def setup(folder, case):
++    path=folder/(case+'.sqlite3')
++    app=create_app(dict(TESTING=True,DATABASE=str(path),GRADUATION_ENGINE='legacy'))
++    with app.app_context():
++        init_db()
++    client=app.test_client()
++    events=[]
++    def call(method,endpoint,payload,status):
++        r=client.open(BASE+endpoint,method=method,json=payload)
++        assert r.status_code==status,r.json
++        events.append(dict(method=method,path=BASE+endpoint,input=payload,actual_body=r.json))
++    if case!='missing_rule':
++        call('PATCH','/me',dict(department_id='dept-nutn-csie',admission_year=115,current_semester_id=SEM),200)
++    if case in ('full_met','lecture_gap'):
++        fully_mapped(app)
++        events.append({'fixture':'fully_mapped(): synthetic 133 credits and explicit mappings, zero-credit program items test-only'})
++        call('PUT','/lecture-progress',dict(professional_count=10,general_count=11 if case=='lecture_gap' else 12),200)
++    if case in ('partial','overflow','unknown_classification'):
++        credits=24 if case=='overflow' else 3
++        with closing(sqlite3.connect(path)) as db:
++            db.execute("UPDATE courses SET credits=? WHERE course_id='course-demo-001'",(credits,))
++            if case!='unknown_classification':
++                db.execute('INSERT INTO course_classifications VALUES (?,?,?)',('course-demo-001',RULE,'department_elective'))
++            db.commit()
++        events.append(dict(fixture='course-demo-001',credits=credits,classification=None if case=='unknown_classification' else 'department_elective'))
++        call('POST','/enrollments',dict(course_id='course-demo-001',semester_id=SEM,enrollment_status='finished',passed=True,grade=80),201)
++        call('POST','/enrollments',dict(course_id='course-demo-002',semester_id=SEM,enrollment_status='in_progress'),201)
++        call('POST','/planned-courses',dict(course_id='course-demo-003',target_semester_id=SEM),201)
++    if case in ('checksum_error','storage_error'):
++        sql="UPDATE graduation_rule_documents SET digest='tampered'" if case=='checksum_error' else 'DROP TABLE graduation_rule_documents'
++        with closing(sqlite3.connect(path)) as db:
++            db.execute(sql)
++            db.commit()
++        events.append(dict(injected_failure_sql=sql))
++    return path,events
++
++
++def verify(case,response):
++    status=500 if case in ('checksum_error','storage_error') else 200
++    assert response.status_code==status,response.json
++    if status==500:
++        assert response.json['error']['code']=='INTERNAL_ERROR'
++        return dict(http_status=500,error='INTERNAL_ERROR')
++    d=response.json['data']
++    if case=='missing_rule':
++        assert d['earned_credits'] is None and d['overall_status']=='needs_confirmation'
++        assert d['data_errors'][0]['code']=='RULE_UNAVAILABLE'
++        return dict(http_status=200,earned_credits=None,overall_status='needs_confirmation')
++    earned=133 if case in ('full_met','lecture_gap') else 24 if case=='overflow' else 3
++    assert d['earned_credits']==earned
++    checks={c['check_id']:c for c in d['checks']}
++    assert checks['total_credits']['remaining_value']==max(0,133-earned)
++    assert d['overall_status']==('met' if case=='full_met' else 'not_met')
++    if case=='full_met':
++        assert all(c['status']=='met' for c in d['checks']) and d['missing_required_courses']==[]
++    if case=='lecture_gap':
++        assert checks['lecture_general']['remaining_value']==1
++    if case=='overflow':
++        assert d['credit_allocation'][0]['allocations']==[dict(category='department_elective',credits=12),dict(category='free_elective',credits=12)]
++    if case=='unknown_classification':
++        assert any(e['code']=='CLASSIFICATION_UNKNOWN' for e in d['data_errors'])
++        assert checks['department_elective']['status']=='needs_confirmation'
++    assert all(sum(p['credits'] for p in row['allocations'])<=row['credits'] for row in d['credit_allocation'])
++    return dict(http_status=200,earned_credits=earned,overall_status='met' if case=='full_met' else 'not_met',no_double_allocation=True)
++
++
++def run_case(folder,case):
++    source,events=setup(folder,case)
++    runs=[]
++    for engine in ('legacy','langgraph'):
++        target=folder/(case+'-'+engine+'.sqlite3')
++        shutil.copy2(source,target)
++        app=create_app(dict(TESTING=True,DATABASE=str(target),GRADUATION_ENGINE=engine))
++        client=app.test_client()
++        nodes=[]
++        class Capture(logging.Handler):
++            def emit(self,record):
++                if hasattr(record,'workflow_node'):
++                    nodes.append(record.workflow_node)
++        handler=Capture()
++        app.logger.addHandler(handler)
++        app.logger.setLevel(logging.INFO)
++        before=digest(target)
++        start=perf_counter()
++        response=client.get(BASE+'/graduation-progress')
++        elapsed=perf_counter()-start
++        app.logger.removeHandler(handler)
++        expected=verify(case,response)
++        assert digest(target)==before
++        wanted=['load_rules'] if response.status_code==500 else ['load_rules','unavailable'] if case=='missing_rule' else ['load_rules','collect','allocate','evaluate','summarize']
++        assert nodes==(wanted if engine=='langgraph' else []),nodes
++        replay=client.get(BASE+'/graduation-progress')
++        assert replay.status_code==response.status_code and normalized(replay.json)==normalized(response.json)
++        dashboard=client.get(BASE+'/dashboard?date=2026-10-05')
++        assert dashboard.status_code==response.status_code
++        if response.status_code==200:
++            g=dashboard.json['data']['graduation_summary']
++            assert g['earned_credits']==response.json['data']['earned_credits']
++            assert g['overall_status']==response.json['data']['overall_status']
++        assert digest(target)==before
++        runs.append(dict(engine=engine,request=dict(method='GET',path=BASE+'/graduation-progress'),expected=expected,
++            actual_status=response.status_code,actual_body=response.json,database_before_sha256=before,
++            database_after_sha256=digest(target),nodes=nodes,elapsed_seconds=elapsed,repeat_read_unchanged=True,
++            dashboard_body=dashboard.json,model_calls=0,outcome='PASS'))
++    assert normalized(runs[0]['actual_body'])==normalized(runs[1]['actual_body'])
++    assert runs[0]['dashboard_body']==runs[1]['dashboard_body']
++    return dict(case=case,setup=events,same_result_excluding_evaluated_at=True,runs=runs)
++
++
++def main():
++    parser=argparse.ArgumentParser()
++    parser.add_argument('--output',default='graduation-evidence.json')
++    args=parser.parse_args()
++    with tempfile.TemporaryDirectory() as tmp:
++        cases=[run_case(Path(tmp),c) for c in ('partial','missing_rule','overflow','lecture_gap','full_met',
++                                              'unknown_classification','checksum_error','storage_error')]
++    root=Path(__file__).resolve().parent
++    result=dict(generated_at=datetime.now(ZoneInfo('Asia/Taipei')).isoformat(),topic='graduation planning',
++        base_commit='c06b69f50d4ee66cdc38cf43e1843057c0728f3c',python=platform.python_version(),platform=platform.platform(),
++        framework_version=version('langgraph'),mode='OFFLINE_NO_LLM',live_status='NOT_IMPLEMENTED_NO_MODEL_ADAPTER',
++        model_calls=0,transport='Flask test client; real SQLite and real LangGraph',
++        comparison_normalization='Only evaluated_at excluded; raw timestamps preserved.',
++        source_sha256={str(p.relative_to(root)):sha256(p.read_bytes()).hexdigest() for p in sorted((root/'app').glob('*.py'))},
++        cases=cases,passed_cases=len(cases),failed_cases=0)
++    target=Path(args.output)
++    target.parent.mkdir(parents=True,exist_ok=True)
++    target.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
++    print(f'{len(cases)}/{len(cases)} graduation A/B cases PASS; OFFLINE_NO_LLM')
++
++
++if __name__=='__main__':
++    main()
+diff --git a/backend/requirements-framework.in b/backend/requirements-framework.in
+new file mode 100644
+index 0000000..a813659
+--- /dev/null
++++ b/backend/requirements-framework.in
+@@ -0,0 +1,3 @@
++-r requirements-dev.lock.txt
++langgraph==1.0.3
++tzdata
+diff --git a/backend/requirements-framework.lock.txt b/backend/requirements-framework.lock.txt
+new file mode 100644
+index 0000000..92f2ade
+--- /dev/null
++++ b/backend/requirements-framework.lock.txt
+@@ -0,0 +1,56 @@
++annotated-types==0.8.0
++anyio==4.15.1
++apispec==6.10.0
++blinker==1.9.0
++certifi==2026.7.22
++charset-normalizer==3.5.2
++click==8.5.0
++colorama==0.4.6
++distro==1.9.0
++Flask==3.1.3
++flask-smorest==0.47.0
++h11==0.16.0
++httpcore==1.0.9
++httpcore2==2.13.1
++httpx==0.28.1
++httpx2==2.13.1
++idna==3.20
++iniconfig==2.3.0
++itsdangerous==2.2.0
++Jinja2==3.1.6
++jsonpatch==1.35
++jsonpointer==3.2.1
++langchain-core==1.6.10
++langchain-protocol==0.0.19
++langgraph==1.0.3
++langgraph-checkpoint==3.0.1
++langgraph-prebuilt==1.0.13
++langgraph-sdk==0.2.15
++langsmith==0.14.8
++MarkupSafe==3.0.3
++marshmallow==4.3.1
++orjson==3.13.0
++ormsgpack==1.12.2
++packaging==26.3
++pluggy==1.6.0
++pydantic==2.14.1
++pydantic_core==2.50.1
++Pygments==2.21.0
++pytest==9.1.1
++PyYAML==6.0.3
++requests==2.34.2
++requests-toolbelt==1.0.0
++sniffio==1.3.1
++swagger_ui_bundle==1.1.0
++tenacity==9.2.1
++truststore==0.10.5
++typing-inspection==0.4.4
++typing_extensions==4.16.0
++tzdata==2026.5
++urllib3==2.8.0
++uuid_utils==0.17.1
++webargs==8.7.1
++websockets==17.2
++Werkzeug==3.1.8
++xxhash==4.0.1
++zstandard==0.25.0

@@ -104,7 +104,7 @@ def make_check(key, name, required, actual, unit="credits", reason=None):
             "message": reason or ("資料待確認" if actual is None else "已達第一版門檻" if remaining == 0 else f"尚缺 {remaining:g} {unit}")}
 
 
-def progress(db):
+def progress_legacy(db):
     profile = db.execute("SELECT * FROM user_profiles WHERE user_id=?", (DEMO_USER_ID,)).fetchone()
     if profile is None:
         raise ValueError("Missing current user")
@@ -224,6 +224,160 @@ def progress(db):
     statuses = {c["status"] for c in checks}
     result["overall_status"] = "not_met" if "not_met" in statuses else "needs_confirmation" if "needs_confirmation" in statuses else "met"
     return result
+
+
+def load_graduation_context(db):
+    profile = db.execute("SELECT * FROM user_profiles WHERE user_id=?", (DEMO_USER_ID,)).fetchone()
+    if profile is None:
+        raise ValueError("Missing current user")
+    rule_id = profile["rule_set_id"]
+    result = {"user_id": DEMO_USER_ID, "rule_set_id": rule_id, "evaluated_at": timestamp(),
+              "overall_status": "needs_confirmation", "checks": [], "credit_allocation": [],
+              "missing_required_courses": [], "program_progress": [], "lecture_progress": lectures(db),
+              "data_errors": [], "verification_scope": "第一版設定，非校方正式認證"}
+    try:
+        rule = rules(db, rule_id) if rule_id else None
+    except Problem:
+        rule = None
+    if rule is None:
+        result["data_errors"] = [{"code": "RULE_UNAVAILABLE", "message": "尚無適用且有完整文件的畢業規則"}]
+        result["earned_credits"] = None
+        return {"result": result, "rule": None}
+    d = document(db, rule_id)
+    result["verification_scope"] = rule["verification_scope"]
+    return {"result": result, "rule": rule, "document": d, "rule_id": rule_id}
+
+
+def collect_graduation_credits(db, state):
+    result, rule_id = state["result"], state["rule_id"]
+    passed, seen, earned, groups = set(), set(), 0, defaultdict(float)
+    unknown = False
+    for enrollment in records(db, "enrollments"):
+        if enrollment["enrollment_status"] != "finished" or enrollment["passed"] is not True:
+            continue
+        cid = enrollment["course_id"]
+        if cid in seen:
+            result["data_errors"].append({"code": "DUPLICATE_COURSE", "course_id": cid})
+            unknown = True
+            continue
+        seen.add(cid)
+        passed.add(cid)
+        credits = enrollment["course_snapshot"]["credits"]
+        if type(credits) not in (int, float) or credits < 0:
+            raise ValueError("Invalid credit snapshot")
+        earned += credits
+        row = db.execute("SELECT credit_category FROM course_classifications WHERE course_id=? AND rule_set_id=?", (cid, rule_id)).fetchone()
+        category = row[0] if row else None
+        if category not in ("general_core", "general_domain", "general_diverse", "college_required", "department_required", "department_elective", "free_elective"):
+            unknown = True
+            result["data_errors"].append({"code": "CLASSIFICATION_UNKNOWN", "course_id": cid})
+        else:
+            groups[category] += credits
+        result["credit_allocation"].append({"enrollment_id": enrollment["enrollment_id"], "course_id": cid,
+                                            "credits": credits, "category": category, "allocations": []})
+    return {"result": result, "passed": passed, "unknown": unknown, "groups": groups, "earned": earned}
+
+
+def allocate_graduation_credits(state):
+    result, d, groups, earned = state["result"], state["document"], state["groups"], state["earned"]
+    # Allocate each earned credit once; professional elective overflow transfers to free elective.
+    elective_left = d["credit_requirements"]["department_elective"]["minimum_credits"]
+    diverse_left = d["credit_requirements"]["general_education"]["elective"]["diverse_courses"]["maximum_counted_credits"]
+    totals = defaultdict(float)
+    for row in result["credit_allocation"]:
+        category, credits = row["category"], row["credits"]
+        parts = []
+        if category == "department_elective":
+            count = min(elective_left, credits)
+            elective_left -= count
+            parts = [(category, count), ("free_elective", credits - count)]
+        elif category == "general_diverse":
+            count = min(diverse_left, credits)
+            diverse_left -= count
+            parts = [(category, count)]
+        elif category is not None and category in groups:
+            parts = [(category, credits)]
+        for cat, amount in parts:
+            if amount:
+                row["allocations"].append({"category": cat, "credits": amount})
+                totals[cat] += amount
+    result["earned_credits"] = earned
+    return {"result": result, "totals": totals}
+
+
+def evaluate_graduation_requirements(db, state):
+    result, rule, d = state["result"], state["rule"], state["document"]
+    rule_id, passed, unknown = state["rule_id"], state["passed"], state["unknown"]
+    earned, totals = state["earned"], state["totals"]
+    checks = [make_check("total_credits", "總學分", rule["total_credits_required"], earned)]
+    cr = d["credit_requirements"]
+    for key, needed in (("general_core", cr["general_education"]["core"]["required_credits"]),
+                        ("general_domain", cr["general_education"]["elective"]["domain_courses"]["minimum_credits"]),
+                        ("college_required", cr["college_core"]["required_credits"]),
+                        ("department_required", cr["department_required"]["required_credits"]),
+                        ("department_elective", cr["department_elective"]["minimum_credits"]),
+                        ("free_elective", cr["free_elective"]["minimum_credits"])):
+        checks.append(make_check(key, key, needed, None if unknown else totals[key]))
+    checks.append(make_check("general_elective", "通識選修", cr["general_education"]["elective"]["minimum_credits"],
+                             None if unknown else totals["general_domain"] + totals["general_diverse"]))
+    domains, missing_domain = set(), unknown
+    for allocation in result["credit_allocation"]:
+        if allocation["category"] == "general_domain":
+            row = db.execute("SELECT domain FROM graduation_course_domains WHERE rule_set_id=? AND course_id=?",
+                             (rule_id, allocation["course_id"])).fetchone()
+            if row is None or row[0] not in cr["general_education"]["elective"]["domain_courses"]["domains"]:
+                missing_domain = True
+                result["data_errors"].append({"code": "GENERAL_DOMAIN_UNKNOWN", "course_id": allocation["course_id"]})
+            else:
+                domains.add(row[0])
+    checks.append(make_check("general_domains", "通識領域數", cr["general_education"]["elective"]["domain_courses"]["minimum_distinct_domains"],
+                             None if missing_domain else len(domains), "domains"))
+    mapped = mappings(db, rule_id)
+    for i, requirement in enumerate(cr["general_education"]["core"]["requirements"]):
+        cid = mapped.get(f"general_core:{i}")
+        amount = next((e["credits"] for e in result["credit_allocation"] if e["course_id"] == cid), 0) if cid else None
+        checks.append(make_check(f"general_core_{i}", requirement["name"], requirement["required_credits"], amount))
+    for i, course in enumerate(cr["college_core"]["required_courses"]):
+        cid = mapped.get(f"college:{i}")
+        checks.append(make_check(f"college_course_{i}", course["name"], 1, int(cid in passed) if cid else None, "courses"))
+    result["missing_required_courses"] = [cid for cid in rule["required_course_ids"] if cid not in passed]
+    unresolved = rule["unmapped_required_courses"]
+    if unresolved:
+        result["data_errors"].append({"code": "REQUIRED_COURSES_UNMAPPED", "courses": unresolved})
+    checks.append(make_check("required_courses", "指定必修", len(cr["department_required"]["courses"]),
+                             None if unresolved else len(rule["required_course_ids"]) - len(result["missing_required_courses"]), "courses"))
+    complete_programs, unresolved_programs = 0, False
+    for p in programs(db, rule_id):
+        actual = len(set(p["course_ids"]) & passed)
+        status = "met" if actual >= p["minimum_passed_courses"] else "needs_confirmation" if p["data_status"] != "complete" else "not_met"
+        complete_programs += status == "met"
+        unresolved_programs |= status == "needs_confirmation"
+        result["program_progress"].append({**p, "passed_courses": actual, "status": status})
+    needed_programs = d["program_requirements"]["minimum_completed_programs"]
+    checks.append(make_check("programs", "完成學程", needed_programs,
+                             None if unresolved_programs and complete_programs < needed_programs else complete_programs, "programs"))
+    for key in ("professional", "general"):
+        checks.append(make_check("lecture_" + key, d["lecture_requirements"][key]["name"],
+                                 d["lecture_requirements"][key]["minimum_count"], result["lecture_progress"][key + "_count"], "lectures"))
+    result["checks"] = checks
+    return {"result": result}
+
+
+def finish_graduation_progress(state):
+    result = state["result"]
+    checks = result["checks"]
+    statuses = {c["status"] for c in checks}
+    result["overall_status"] = "not_met" if "not_met" in statuses else "needs_confirmation" if "needs_confirmation" in statuses else "met"
+    return result
+
+
+def progress(db):
+    """Preserve both original graduation API callers and allow explicit rollback."""
+    from flask import current_app
+    if current_app.config["GRADUATION_ENGINE"] == "legacy":
+        return progress_legacy(db)
+    from .graduation_workflow import progress_graph
+    return progress_graph(db)
 
 
 MAPS = [
