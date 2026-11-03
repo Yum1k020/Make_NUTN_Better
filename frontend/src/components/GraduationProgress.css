@@ -51,7 +51,55 @@
   opacity: 0.6;
   cursor: wait;
 }
+.graduation-rule-baseline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+  border: 1px solid #cbdcf3;
+  border-radius: 9px;
+  background: #f5f9ff;
+  overflow: hidden;
+}
+.graduation-rule-baseline > div {
+  padding: 14px 16px;
+  border-right: 1px solid #d8e5f6;
+}
+.graduation-rule-baseline > div:nth-child(4) {
+  border-right: 0;
+}
+.graduation-rule-baseline span,
+.graduation-rule-baseline strong {
+  display: block;
+}
+.graduation-rule-baseline span {
+  color: #60708b;
+  font-size: 10px;
+}
+.graduation-rule-baseline strong {
+  margin-top: 5px;
+  color: #173c74;
+  font-size: 20px;
+}
+.graduation-rule-baseline > p {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 16px;
+  color: #60708b;
+  border-top: 1px solid #d8e5f6;
+  font-size: 10px;
+  line-height: 1.55;
+}
 @media (max-width: 600px) {
+  .graduation-rule-baseline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .graduation-rule-baseline > div {
+    border-right: 0;
+    border-bottom: 1px solid #d8e5f6;
+  }
+  .graduation-rule-baseline > div:nth-child(odd) {
+    border-right: 1px solid #d8e5f6;
+  }
   .graduation-check {
     grid-template-columns: 1fr;
   }

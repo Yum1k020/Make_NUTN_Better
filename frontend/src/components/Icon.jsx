@@ -65,6 +65,12 @@ const paths = {
     </>
   ),
   check: <path d="m4 12 5 5L20 6" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m16.5 16.5 4 4" />
+    </>
+  ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   map: (
     <>

@@ -471,7 +471,7 @@ export default function Dashboard({
             <span className="summary-icon">
               <Icon name="graduation" size={21} />
             </span>
-            <h2>畢業進度</h2>
+            <h2>113 學年度畢業門檻示例</h2>
           </div>
           <strong>
             {graduationRule.earnedCredits} / {graduationRule.requiredCredits}{" "}
@@ -485,8 +485,10 @@ export default function Dashboard({
             />
           </div>
           <p>
-            尚缺 {graduationRule.requiredCredits - graduationRule.earnedCredits}{" "}
-            學分・缺少 1 門必修
+            合成資料：尚缺{" "}
+            {graduationRule.requiredCredits - graduationRule.earnedCredits}{" "}
+            學分・講座 {graduationRule.completedLectures}/
+            {graduationRule.requiredLectures}
           </p>
           <Icon name="right" size={18} className="summary-arrow" />
         </button>

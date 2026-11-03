@@ -56,7 +56,11 @@ def test_same_rule_id_changed_content_changes_source(setup_app, evidence):
     app,c,_ = setup_app
     old = get_context(c)
     with sqlite3.connect(app.config['DATABASE']) as db:
-        rule, text = db.execute('SELECT rule_set_id,document FROM graduation_rule_documents').fetchone()
+        rule = 'nutn-csie-115-mvp-v1'
+        text = db.execute(
+            'SELECT document FROM graduation_rule_documents WHERE rule_set_id=?',
+            (rule,),
+        ).fetchone()[0]
         d = json.loads(text)
         d['credit_requirements']['minimum_total_credits'] += 1
         encoded = dump(d)

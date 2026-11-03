@@ -23,7 +23,7 @@ export function Sidebar({ activePage, onNavigate }) {
         </span>
         <span>
           <strong>校園日程</strong>
-          <small>規劃今日，成就未來</small>
+          <small>113 學年度學生規劃系統</small>
         </span>
       </button>
       <nav aria-label="主要功能" className="side-nav">
@@ -41,7 +41,7 @@ export function Sidebar({ activePage, onNavigate }) {
         ))}
       </nav>
       <p className="sidebar-note">
-        學生個人安排系統
+        資料基準：113 學年度
         <br />
         本機示範版
       </p>

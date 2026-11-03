@@ -74,7 +74,10 @@ def api(catalog_app, evidence):
 
 def test_S01_all_semesters_sorted(api):
     rows = api("semesters")["data"]
-    assert [r["semester_id"] for r in rows] == ["semester-115-1", "semester-115-2", "semester-114-2"]
+    assert [r["semester_id"] for r in rows] == [
+        "semester-115-1", "semester-115-2", "semester-114-2",
+        "semester-113-1", "semester-113-2",
+    ]
     assert rows[0] == {"semester_id": SEMESTER, "academic_year": 115, "term": "1",
                        "starts_on": "2026-09-01", "ends_on": "2027-01-31", "timezone": "Asia/Taipei"}
 

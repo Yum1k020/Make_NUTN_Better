@@ -12,6 +12,10 @@ import {
   GraduationMemory,
   VALIDITY_MESSAGES,
 } from "../lib/graduationMemory.js";
+import {
+  curriculumMeta113,
+  graduationRequirements113,
+} from "../data/curriculum113.js";
 
 export default function GraduationProgress({ onNavigate }) {
   const [progress, setProgress] = useState(null);
@@ -107,7 +111,10 @@ export default function GraduationProgress({ onNavigate }) {
     <div className="graduation-live">
       <header className="page-header">
         <div>
-          <h1>畢業進度</h1>
+          <div className="title-line">
+            <h1>113 學年度畢業進度</h1>
+            <span className="academic-year-badge">113 學年度</span>
+          </div>
           <p>
             依目前使用者紀錄與啟用規則，逐項確認已完成、未完成與待確認事項。
           </p>
@@ -120,6 +127,27 @@ export default function GraduationProgress({ onNavigate }) {
           重新整理
         </button>
       </header>
+      <section className="graduation-rule-baseline">
+        <div>
+          <span>最低總學分</span>
+          <strong>{graduationRequirements113.minimumTotalCredits}</strong>
+        </div>
+        <div>
+          <span>系專業必選修</span>
+          <strong>{graduationRequirements113.minimumDepartmentCredits}</strong>
+        </div>
+        <div>
+          <span>學術講座</span>
+          <strong>{graduationRequirements113.requiredLectureCount} 場</strong>
+        </div>
+        <div>
+          <span>領域學程證書</span>
+          <strong>
+            {graduationRequirements113.minimumCompletedPrograms} 個
+          </strong>
+        </div>
+        <p>{curriculumMeta113.verificationNote}</p>
+      </section>
       <button
         className="text-link"
         disabled={busy || loading}
@@ -135,6 +163,13 @@ export default function GraduationProgress({ onNavigate }) {
       )}
       {progress && (
         <>
+          {!progress.rule_set_id?.includes("-113-") && (
+            <p role="alert" className="graduation-notice">
+              後端目前載入的「{progress.rule_set_id || "未選定"}」不是 113
+              學年度規則，因此下方即時計算不可當作 113
+              畢業審核結果。請先把示範身分切換到 113 規則。
+            </p>
+          )}
           <section className="graduation-hero">
             <div>
               <h2>{GRADUATION_STATUS[progress.overall_status]}</h2>

@@ -21,3 +21,6 @@ week07/runtime/
 # Local frontend memory state
 frontend/data/study-memory.json
 frontend/data/study-memory.json.*.tmp
+
+# Local extracts of instructor-provided lecture slides; keep the source manifest only.
+docs/sources/course-lectures/lecture*.md

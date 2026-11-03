@@ -31,6 +31,8 @@ def init_catalog(db):
     ):
         db.execute(statement)
     for semester in (
+        ("semester-113-1", 113, "1", "2024-09-01", "2025-01-31", "Asia/Taipei"),
+        ("semester-113-2", 113, "2", "2025-02-01", "2025-06-30", "Asia/Taipei"),
         ("semester-114-2", 114, "2", "2026-02-01", "2026-06-30", "Asia/Taipei"),
         ("semester-115-1", 115, "1", "2026-09-01", "2027-01-31", "Asia/Taipei"),
         ("semester-115-2", 115, "2", "2027-02-01", "2027-06-30", "Asia/Taipei"),

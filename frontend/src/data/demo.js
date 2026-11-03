@@ -302,9 +302,10 @@ export const initialTasks = [
 ];
 
 export const graduationRule = {
-  requiredCredits: 128,
+  academicYear: 113,
+  requiredCredits: 134,
   earnedCredits: 100,
-  requiredLectures: 6,
+  requiredLectures: 10,
   completedLectures: 4,
   missingRequiredCourses: ["資料庫系統"],
 };

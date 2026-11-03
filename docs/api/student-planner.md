@@ -35,7 +35,13 @@
 
 ## 規則資料與已知限制
 
-內建 `backend/app/data/nutn_csie_115_graduation_rules_v1.json` 是團隊第一版草案，133 學分、三學程擇二、專業講座 10／通識講座 12，非校方正式認證。規則内容雜湊固定，同版本内容被改動時初始化拒絕覆寫。
+內建 `backend/app/data/nutn_csie_113_graduation_rules_v1.json` 是依使用者提供文件整理的 113 學年度展示規則，最低 134 學分、三學程至少完成二個、相關學術講座 10 場；`backend/app/data/nutn_csie_115_graduation_rules_v1.json` 則保留原有 115 測試草案供回歸驗證。兩者都不是校方正式資格認證；規則內容雜湊固定，同版本內容被改動時初始化拒絕覆寫。
+
+113 展示身分可執行 `./scripts/select-demo-profile-113.sh`，或 PATCH `/me`：
+
+```json
+{"department_id":"dept-nutn-csie","admission_year":113,"current_semester_id":"semester-113-1"}
+```
 
 為保留原 `/me` 測試資料，新增 `dept-nutn-csie`／115 對應 `nutn-csie-115-mvp-v1`。原 `dept-csie` 的合成規則不會自動套用 133 學分。可 PATCH `/me`：
 

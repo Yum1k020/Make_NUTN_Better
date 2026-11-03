@@ -21,6 +21,7 @@ from app.db import get_db, init_db
 PREFIX = "/api/v1/"
 COURSE, SEM = "course-demo-001", "semester-115-1"
 RULE = "nutn-csie-115-mvp-v1"
+RULE_113 = "nutn-csie-113-source-v1"
 
 
 def dt(time, date="2026-10-05"):
@@ -370,6 +371,32 @@ def test_GR01_GR02_PR01_PR02_rules(api):
     ps = api("GET", "programs?rule_set_id=" + RULE)
     assert len(ps) == 3 and all(p["minimum_passed_courses"] == 3 and p["data_status"] == "needs_confirmation" for p in ps)
     api("GET", "programs", status=422, phase="L2")
+
+
+def test_GR113_source_rules_and_profile_selection(api):
+    rule = api("GET", "graduation-rules/" + RULE_113)
+    requirements = rule["credit_requirements"]
+    assert rule["admission_year"] == 113
+    assert rule["total_credits_required"] == 134
+    assert requirements["general_education"]["minimum_total_credits"] == 28
+    assert requirements["college_core"]["required_credits"] == 4
+    assert requirements["department_required"]["required_credits"] == 70
+    assert len(requirements["department_required"]["courses"]) == 25
+    assert sum(course["credits"] for course in requirements["department_required"]["courses"]) == 70
+    programs = api("GET", "programs?rule_set_id=" + RULE_113)
+    assert [program["name"] for program in programs] == ["雲端網路", "智慧計算", "應用資訊"]
+    assert all(program["minimum_passed_courses"] == 3 for program in programs)
+
+    profile = api("PATCH", "me", {
+        "department_id": "dept-nutn-csie",
+        "admission_year": 113,
+        "current_semester_id": "semester-113-1",
+    })
+    assert profile["rule_set_id"] == RULE_113
+    checks = {item["check_id"]: item for item in api("GET", "graduation-progress")["checks"]}
+    assert checks["total_credits"]["required_value"] == 134
+    assert checks["lecture_professional"]["required_value"] == 10
+    assert "lecture_general" not in checks
 
 
 def test_LP01_LP02_LP03_lectures(api):

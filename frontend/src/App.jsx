@@ -115,7 +115,7 @@ export default function App() {
           onClick={() => setActivePage("dashboard")}
         >
           <Icon name="calendar" size={25} />
-          <span>校園日程</span>
+          <span>校園日程・113</span>
         </button>
         <div className="mobile-top-actions">
           <button

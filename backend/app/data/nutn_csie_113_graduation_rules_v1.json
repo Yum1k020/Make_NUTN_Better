@@ -1,0 +1,167 @@
+{
+  "schema_version": "1.0.0",
+  "rule_set_id": "nutn-csie-113-source-v1",
+  "title": "國立臺南大學資訊工程學系113學年度大學部課程規劃：展示用畢業審核規則",
+  "language": "zh-TW",
+  "scope": {
+    "institution": "國立臺南大學",
+    "department": "資訊工程學系",
+    "degree": "大學部",
+    "admission_academic_year_roc": 113,
+    "program_catalog_academic_year_roc": 113,
+    "purpose": "課堂展示系統",
+    "authority": "依使用者提供的113學年度課程規劃表與課程地圖整理，供課堂展示；正式畢業資格仍以校方審核為準"
+  },
+  "sources": [
+    {
+      "id": "curriculum_plan_113",
+      "type": "provided_pdf",
+      "filename": "113 學年度大學部課程規劃表.pdf",
+      "sha256": "81ffbd05f92aa34f2ec6382f1b48e9f3ef4fdd8a23fdf526ab1ac155e6dab003",
+      "usage": "畢業學分、必選修、講座與專業領域學程門檻"
+    },
+    {
+      "id": "curriculum_map_113",
+      "type": "provided_pdf",
+      "filename": "113 學年度大學部課程規劃地圖.pdf",
+      "sha256": "fec8072aed8289131298ece772a4a5edb790f04d64a6b6c1c37f61e868d152a7",
+      "usage": "三個專業領域學程的採計課程清單"
+    }
+  ],
+  "credit_requirements": {
+    "minimum_total_credits": 134,
+    "general_education": {
+      "minimum_total_credits": 28,
+      "core": {
+        "required_credits": 10,
+        "requirements": [
+          { "name": "中文閱讀與書寫", "required_credits": 4 },
+          { "name": "英文", "required_credits": 4 },
+          { "name": "體育", "required_credits": 2 }
+        ]
+      },
+      "elective": {
+        "minimum_credits": 18,
+        "domain_courses": {
+          "minimum_credits": 12,
+          "minimum_distinct_domains": 3,
+          "domains": ["文史哲藝術", "社會脈動", "生命科學", "科技探索"],
+          "domain_completion_definition": "四大領域至少修習三個領域"
+        },
+        "diverse_courses": {
+          "maximum_counted_credits": 6,
+          "minimum_required_credits": 0
+        }
+      }
+    },
+    "college_core": {
+      "required_credits": 4,
+      "required_courses": [
+        { "name": "科技法律", "credits": 2 },
+        { "name": "運算思維與程式設計", "credits": 2 }
+      ]
+    },
+    "department_required": {
+      "required_credits": 70,
+      "require_all_courses_passed": true,
+      "courses": [
+        { "course_code": "NN1001", "name": "微積分(一)", "credits": 3, "recommended_term": "大一上" },
+        { "course_code": "NN1014", "name": "計算機概論", "credits": 3, "recommended_term": "大一上" },
+        { "course_code": "NN1204", "name": "計算機程式設計(一)", "credits": 3, "recommended_term": "大一上" },
+        { "course_code": "NN1205", "name": "計算機程式設計實習(一)", "credits": 2, "recommended_term": "大一上" },
+        { "course_code": "NN1009", "name": "微積分(二)", "credits": 3, "recommended_term": "大一下" },
+        { "course_code": "NN1002", "name": "普通物理學", "credits": 3, "recommended_term": "大一下" },
+        { "course_code": "NN1106", "name": "普通物理學實驗", "credits": 2, "recommended_term": "大一下" },
+        { "course_code": "NN1013", "name": "離散數學", "credits": 3, "recommended_term": "大一下" },
+        { "course_code": "NN1206", "name": "計算機程式設計(二)", "credits": 3, "recommended_term": "大一下" },
+        { "course_code": "NN1207", "name": "計算機程式設計實習(二)", "credits": 2, "recommended_term": "大一下" },
+        { "course_code": "NN1016", "name": "線性代數", "credits": 3, "recommended_term": "大二上" },
+        { "course_code": "NN1018", "name": "資料結構", "credits": 3, "recommended_term": "大二上" },
+        { "course_code": "NN1199", "name": "邏輯設計", "credits": 3, "recommended_term": "大二上" },
+        { "course_code": "NN1200", "name": "邏輯設計實驗", "credits": 3, "recommended_term": "大二上" },
+        { "course_code": "NN1208", "name": "機率", "credits": 3, "recommended_term": "大二下" },
+        { "course_code": "NN1023", "name": "系統程式", "credits": 3, "recommended_term": "大二下" },
+        { "course_code": "NN1024", "name": "計算機網路", "credits": 3, "recommended_term": "大二下" },
+        { "course_code": "NN1066", "name": "數位系統", "credits": 3, "recommended_term": "大二下" },
+        { "course_code": "NN1067", "name": "數位系統實驗", "credits": 3, "recommended_term": "大二下" },
+        { "course_code": "NN1031", "name": "作業系統", "credits": 3, "recommended_term": "大三上" },
+        { "course_code": "NN1032", "name": "演算法", "credits": 3, "recommended_term": "大三上" },
+        { "course_code": "NN1030", "name": "資料庫系統", "credits": 3, "recommended_term": "大三上" },
+        { "course_code": "NN1033", "name": "計算機組織", "credits": 3, "recommended_term": "大三上" },
+        { "course_code": "NN1053", "name": "畢業專題實作(一)", "credits": 2, "recommended_term": "大三下" },
+        { "course_code": "NN1062", "name": "畢業專題實作(二)", "credits": 2, "recommended_term": "大四上" }
+      ]
+    },
+    "department_elective": { "minimum_credits": 12 },
+    "free_elective": {
+      "minimum_credits": 20,
+      "eligible_sources": ["本系專業選修超過12學分的部分", "符合自由選修規定的本系、外系或外校專業課程"],
+      "excluded_sources": ["通識課程"]
+    },
+    "subtotals": {
+      "department_required_and_elective_minimum": 82,
+      "including_college_core_minimum": 86,
+      "note": "小計不是額外學分，不可再次加入總學分。"
+    }
+  },
+  "credit_allocation": {
+    "classification_order": ["通識核心、領域或多元課程", "院核心指定必修", "系專業指定必修", "其他本系專業選修", "其他符合條件的自由選修"],
+    "no_duplicate_total_credits": true,
+    "no_duplicate_credit_allocation": true,
+    "program_course_count_can_overlap_credit_requirement": true,
+    "general_education_overflow_to_free": "不自動轉列"
+  },
+  "program_requirements": {
+    "minimum_completed_programs": 2,
+    "programs": [
+      {
+        "id": "cloud_network",
+        "name": "雲端網路",
+        "courses": ["物聯網", "平行計算", "無線通訊網路", "多媒體系統", "雲端計算", "網路程式設計", "網路通訊協定", "網路實務應用", "安全程式設計", "資訊安全", "區塊鏈原理與應用"],
+        "minimum_distinct_passed_courses": 3
+      },
+      {
+        "id": "intelligent_computing",
+        "name": "智慧計算",
+        "courses": ["人工智慧", "資訊擷取", "機器學習", "圖形識別", "軟式計算", "計算機圖學", "計算理論", "資料探勘", "深度學習", "智慧型機器人"],
+        "minimum_distinct_passed_courses": 3
+      },
+      {
+        "id": "applied_information",
+        "name": "應用資訊",
+        "courses": ["生物資訊學", "數位訊號處理", "電腦對局", "電子自動化設計", "軟體工程", "計算機結構", "影像處理", "嵌入式系統", "訊號與系統", "量子計算"],
+        "minimum_distinct_passed_courses": 3
+      }
+    ],
+    "completion_basis": "各學程通過三門規劃課程可取得修習證明；本系學生至少取得兩個學程證書始准予畢業。",
+    "catalog_selection": "採用113學年度大學部課程規劃地圖。",
+    "course_matching": "以課程地圖課名映射正式課程識別碼；未提供代碼的課名不推測。"
+  },
+  "lecture_requirements": {
+    "professional": {
+      "name": "相關學術講座",
+      "minimum_count": 10,
+      "source_ids": ["curriculum_plan_113"]
+    },
+    "input_mode": "由使用者手動提供已完成場次，須為非負整數。",
+    "review_reflection_or_certification": false,
+    "note": "來源文件要求聆聽10場講座並撰寫心得報告；目前系統只檢查場次，心得內容需人工確認。"
+  },
+  "passing_and_duplicates": {
+    "numeric_grade_optional": true,
+    "numeric_passing_threshold": 60,
+    "count_only_passed": true,
+    "planned_or_in_progress_counts_as_earned": false,
+    "unique_course_counting": true,
+    "duplicate_input_handling": "同一課程的重複紀錄先提示整理，不相加學分或學程門數。"
+  },
+  "excluded_from_v1": [
+    "抵免與免修",
+    "替代課程",
+    "重修流程與歷次成績選擇",
+    "講座心得內容審核",
+    "學程證書申請與文件審核",
+    "其他校級畢業門檻",
+    "正式畢業資格認證"
+  ]
+}

@@ -8,7 +8,10 @@ from pathlib import Path
 from .db import DEMO_USER_ID
 from .planner_core import Problem, dump, records, reference, timestamp
 
-RULE_FILE = Path(__file__).parent / "data" / "nutn_csie_115_graduation_rules_v1.json"
+RULE_FILES = (
+    Path(__file__).parent / "data" / "nutn_csie_113_graduation_rules_v1.json",
+    Path(__file__).parent / "data" / "nutn_csie_115_graduation_rules_v1.json",
+)
 
 
 def init_graduation(db):
@@ -21,15 +24,26 @@ def init_graduation(db):
         rule_set_id TEXT REFERENCES graduation_rule_documents(rule_set_id),
         course_id TEXT REFERENCES courses(course_id), domain TEXT NOT NULL,
         PRIMARY KEY(rule_set_id,course_id))""")
-    document = json.loads(RULE_FILE.read_text())
     db.execute("INSERT OR IGNORE INTO departments VALUES ('dept-nutn-csie')")
-    db.execute("INSERT OR IGNORE INTO rule_sets VALUES (?, 'dept-nutn-csie', 115)", (document["rule_set_id"],))
-    encoded = dump(document)
-    digest = sha256(encoded.encode()).hexdigest()
-    old = db.execute("SELECT digest FROM graduation_rule_documents WHERE rule_set_id=?", (document["rule_set_id"],)).fetchone()
-    if old and old["digest"] != digest:
-        raise ValueError("Rule content changed without a new rule version")
-    db.execute("INSERT OR IGNORE INTO graduation_rule_documents VALUES (?,?,?)", (document["rule_set_id"], encoded, digest))
+    for rule_file in RULE_FILES:
+        document = json.loads(rule_file.read_text())
+        year = document["scope"]["admission_academic_year_roc"]
+        db.execute(
+            "INSERT OR IGNORE INTO rule_sets VALUES (?, 'dept-nutn-csie', ?)",
+            (document["rule_set_id"], year),
+        )
+        encoded = dump(document)
+        digest = sha256(encoded.encode()).hexdigest()
+        old = db.execute(
+            "SELECT digest FROM graduation_rule_documents WHERE rule_set_id=?",
+            (document["rule_set_id"],),
+        ).fetchone()
+        if old and old["digest"] != digest:
+            raise ValueError("Rule content changed without a new rule version")
+        db.execute(
+            "INSERT OR IGNORE INTO graduation_rule_documents VALUES (?,?,?)",
+            (document["rule_set_id"], encoded, digest),
+        )
     db.executemany("INSERT OR IGNORE INTO campuses VALUES (?)", [("fucheng",), ("rongyu",)])
 
 
@@ -217,9 +231,11 @@ def progress_legacy(db):
     needed_programs = d["program_requirements"]["minimum_completed_programs"]
     checks.append(make_check("programs", "完成學程", needed_programs,
                              None if unresolved_programs and complete_programs < needed_programs else complete_programs, "programs"))
-    for key in ("professional", "general"):
-        checks.append(make_check("lecture_" + key, d["lecture_requirements"][key]["name"],
-                                 d["lecture_requirements"][key]["minimum_count"], result["lecture_progress"][key + "_count"], "lectures"))
+    for key, requirement in d["lecture_requirements"].items():
+        if not isinstance(requirement, dict) or "minimum_count" not in requirement:
+            continue
+        checks.append(make_check("lecture_" + key, requirement["name"],
+                                 requirement["minimum_count"], result["lecture_progress"].get(key + "_count"), "lectures"))
     result["checks"] = checks
     statuses = {c["status"] for c in checks}
     result["overall_status"] = "not_met" if "not_met" in statuses else "needs_confirmation" if "needs_confirmation" in statuses else "met"
@@ -356,9 +372,11 @@ def evaluate_graduation_requirements(db, state):
     needed_programs = d["program_requirements"]["minimum_completed_programs"]
     checks.append(make_check("programs", "完成學程", needed_programs,
                              None if unresolved_programs and complete_programs < needed_programs else complete_programs, "programs"))
-    for key in ("professional", "general"):
-        checks.append(make_check("lecture_" + key, d["lecture_requirements"][key]["name"],
-                                 d["lecture_requirements"][key]["minimum_count"], result["lecture_progress"][key + "_count"], "lectures"))
+    for key, requirement in d["lecture_requirements"].items():
+        if not isinstance(requirement, dict) or "minimum_count" not in requirement:
+            continue
+        checks.append(make_check("lecture_" + key, requirement["name"],
+                                 requirement["minimum_count"], result["lecture_progress"].get(key + "_count"), "lectures"))
     result["checks"] = checks
     return {"result": result}
 

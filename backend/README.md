@@ -133,7 +133,9 @@ PYTHON_BIN=/absolute/path/to/python3.12 ./scripts/setup-backend.sh
 
 新增描述、優先級、無截止日期待辦、limit/offset 分頁及 `/api/v1/health` 資料庫檢查，詳見 [契約與舊版差異](../docs/api/task-api-enhancements.md)。此分支沿用 Flask，不需要安裝 FastAPI 或變更 SQLite 表結構。
 
-## 畢業規則整合狀態（2026-10-03）
+## 畢業規則整合狀態
 
-根目錄的新 [整合規則](../nutn_csie_115_graduation_rules.json) 與 [決策紀錄](../docs/decisions/CHANGE_DECISIONS.md) 是目標規格。後端目前仍使用 `app/data/nutn_csie_115_graduation_rules_v1.json`，尚未實作共同認列範圍、證書推定狀態或可停用的60分政策。不要直接替換該快照；後續需完成程式與資料遷移。
+113 學年度網站展示規則位於 `app/data/nutn_csie_113_graduation_rules_v1.json`，ID 為 `nutn-csie-113-source-v1`。它依使用者提供的 113 學年度課程規劃表與課程地圖整理，最低 134 學分；執行 `../scripts/select-demo-profile-113.sh` 可將本機固定測試身分切換到這份規則。來源、雜湊與限制見 [`../docs/sources/113-academic-year/`](../docs/sources/113-academic-year/README.md)。
+
+根目錄的 [115 整合規則](../nutn_csie_115_graduation_rules.json) 與 [決策紀錄](../docs/decisions/CHANGE_DECISIONS.md) 是另一個年度的目標規格。後端保留 `app/data/nutn_csie_115_graduation_rules_v1.json` 供既有回歸測試，尚未實作共同認列範圍、證書推定狀態或可停用的 60 分政策；不得把 115 快照與 113 規則混用。
 

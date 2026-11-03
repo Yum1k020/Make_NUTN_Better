@@ -8,7 +8,7 @@ export const proposalBrief = {
     "系統只根據可引用的課表、待辦、複習計畫與畢業規則回答，資料不足時必須拒答並說明缺少哪個來源。",
   dataScope: [
     "本機示範課表、待辦、私人行程與複習建議",
-    "README 驗收條件中的畢業規則",
+    "113 學年度大學部課程規劃表與課程規劃地圖",
     "未串接的真實教務、停課公告、個人正式成績不列入回答依據",
   ],
   refusalConditions: [
@@ -40,13 +40,13 @@ export const sourceCards = [
     status: "allowed",
   },
   {
-    id: "graduation-rule-readme",
-    name: "README 畢業條件測試規則",
-    authority: "來自專案 README 的驗收條件，用於 UI 原型驗證",
-    permission: "公開於團隊 repo，可供本機 fixture 使用",
-    freshness: "固定測試規則；正式資格仍需校方最新公告確認",
+    id: "curriculum-plan-113",
+    name: "113 學年度資工系課程規劃資料",
+    authority: "來自使用者提供的 113 學年度課程規劃表與課程地圖",
+    permission: "供本課程專題整理與本機展示",
+    freshness: "標示為 113 學年度；正式資格仍需校方審核確認",
     pii: "不含真實學生修課紀錄",
-    revocation: "若 README 規則更新，需重新產生比較 JSON",
+    revocation: "來源文件更新時，需重新轉換、核對與產生比較 JSON",
     status: "allowed",
   },
   {
@@ -100,10 +100,11 @@ export const evidenceDocuments = [
   },
   {
     id: "graduation-gap",
-    sourceId: "graduation-rule-readme",
-    title: "畢業缺項",
-    quote: "需 128 學分；已取得 100 學分；缺資料庫系統；講座完成 4/6。",
-    facts: ["尚缺 28 學分", "缺資料庫系統", "尚缺 2 場講座"],
+    sourceId: "curriculum-plan-113",
+    title: "113 學年度畢業條件與合成進度",
+    quote:
+      "113 學年度最低需 134 學分及 10 場相關學術講座；合成測試進度為 100 學分、4 場講座。",
+    facts: ["尚缺 34 學分", "缺資料庫系統", "尚缺 6 場講座"],
   },
 ];
 
