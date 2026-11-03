@@ -8,10 +8,46 @@ from pathlib import Path
 from .db import DEMO_USER_ID
 from .planner_core import Problem, dump, records, reference, timestamp
 
+DATA_DIR = Path(__file__).parent / "data"
+PROJECT_ROOT = Path(__file__).parents[2]
+INTEGRATED_RULE_ID = "nutn-csie-115-integrated-v2"
+LEGACY_RULE_ID = "nutn-csie-115-mvp-v1"
 RULE_FILES = (
-    Path(__file__).parent / "data" / "nutn_csie_113_graduation_rules_v1.json",
-    Path(__file__).parent / "data" / "nutn_csie_115_graduation_rules_v1.json",
+    (DATA_DIR / "nutn_csie_113_graduation_rules_v1.json", "dept-nutn-csie"),
+    (DATA_DIR / "nutn_csie_115_graduation_rules_v1.json", "dept-nutn-csie-legacy"),
+    (PROJECT_ROOT / "nutn_csie_115_graduation_rules.json", "dept-nutn-csie"),
 )
+
+
+def planning_courses(document):
+    """Expose stable backend IDs for the versioned planning catalog."""
+    required = document["credit_requirements"]["department_required"]["courses"]
+    electives = document.get("course_catalog", {}).get("department_electives", [])
+    result = []
+    for category, label, courses in (
+        ("department_required", "專業必修", required),
+        ("department_elective", "專業選修", electives),
+    ):
+        result.extend({
+            "course_id": f"nutn-115-{course['course_code'].lower()}",
+            "course_code": course["course_code"],
+            "name": course["name"],
+            "credits": course["credits"],
+            "recommended_term": course.get("recommended_term"),
+            "credit_category": category,
+            "type": label,
+        } for course in courses)
+    return result
+
+
+def recognition_status(document, course_id):
+    policy = document.get("passing_and_recognition")
+    if not policy:
+        return "recognized"
+    scope = policy["common_recognition_scope"]["course_ids"]
+    if scope is None:
+        return "pending_confirmation"
+    return "recognized" if course_id in scope else "not_recognized"
 
 
 def init_graduation(db):
@@ -24,13 +60,20 @@ def init_graduation(db):
         rule_set_id TEXT REFERENCES graduation_rule_documents(rule_set_id),
         course_id TEXT REFERENCES courses(course_id), domain TEXT NOT NULL,
         PRIMARY KEY(rule_set_id,course_id))""")
-    db.execute("INSERT OR IGNORE INTO departments VALUES ('dept-nutn-csie')")
-    for rule_file in RULE_FILES:
+    db.executemany("INSERT OR IGNORE INTO departments VALUES (?)", [
+        ("dept-nutn-csie",), ("dept-nutn-csie-legacy",),
+    ])
+    # SQLite originally allowed only one rule for each department/year pair.
+    # Keep the old v1 document queryable under an explicit legacy department,
+    # then make integrated-v2 the active 115 rule without deleting history.
+    db.execute("""UPDATE rule_sets SET department_id='dept-nutn-csie-legacy'
+                  WHERE id=? AND department_id='dept-nutn-csie'""", (LEGACY_RULE_ID,))
+    for rule_file, department_id in RULE_FILES:
         document = json.loads(rule_file.read_text())
         year = document["scope"]["admission_academic_year_roc"]
         db.execute(
-            "INSERT OR IGNORE INTO rule_sets VALUES (?, 'dept-nutn-csie', ?)",
-            (document["rule_set_id"], year),
+            "INSERT OR IGNORE INTO rule_sets VALUES (?, ?, ?)",
+            (document["rule_set_id"], department_id, year),
         )
         encoded = dump(document)
         digest = sha256(encoded.encode()).hexdigest()
@@ -44,6 +87,9 @@ def init_graduation(db):
             "INSERT OR IGNORE INTO graduation_rule_documents VALUES (?,?,?)",
             (document["rule_set_id"], encoded, digest),
         )
+    db.execute("""UPDATE user_profiles SET rule_set_id=?
+                  WHERE department_id='dept-nutn-csie' AND admission_year=115
+                  AND rule_set_id=?""", (INTEGRATED_RULE_ID, LEGACY_RULE_ID))
     db.executemany("INSERT OR IGNORE INTO campuses VALUES (?)", [("fucheng",), ("rongyu",)])
 
 
@@ -69,14 +115,18 @@ def rules(db, rule_id):
     ids = [mapped["required:" + c["course_code"]] for c in required if "required:" + c["course_code"] in mapped]
     for course_id in ids:
         reference(db, "courses", "course_id", course_id, "course_id")
-    return {"rule_set_id": rule_id, "version": rule_id.rsplit("-", 1)[-1],
+    return {"rule_set_id": rule_id, "version": d.get("version", rule_id.rsplit("-", 1)[-1]),
             "department_id": ref["department_id"], "admission_year": ref["admission_year"],
             "sources": d["sources"], "total_credits_required": d["credit_requirements"]["minimum_total_credits"],
             "credit_requirements": d["credit_requirements"], "required_course_ids": ids,
             "unmapped_required_courses": [c for c in required if "required:" + c["course_code"] not in mapped],
             "general_education_requirements": d["credit_requirements"]["general_education"],
             "program_requirements": d["program_requirements"], "lecture_requirements": d["lecture_requirements"],
-            "excluded_conditions": d["excluded_from_v1"], "verification_scope": d["scope"]["authority"]}
+            "excluded_conditions": d.get("excluded_conditions", d.get("excluded_from_v1", [])),
+            "verification_scope": d["scope"]["authority"],
+            "planning_courses": planning_courses(d) if rule_id == INTEGRATED_RULE_ID else [],
+            "passing_and_recognition": d.get("passing_and_recognition"),
+            "backend_status": "active" if rule_id == INTEGRATED_RULE_ID else "legacy_compatible"}
 
 
 def programs(db, rule_id):
@@ -139,6 +189,7 @@ def progress_legacy(db):
     result["verification_scope"] = rule["verification_scope"]
     passed, seen, earned, groups = set(), set(), 0, defaultdict(float)
     unknown = False
+    pending_recognition = False
     for enrollment in records(db, "enrollments"):
         if enrollment["enrollment_status"] != "finished" or enrollment["passed"] is not True:
             continue
@@ -148,10 +199,23 @@ def progress_legacy(db):
             unknown = True
             continue
         seen.add(cid)
-        passed.add(cid)
         credits = enrollment["course_snapshot"]["credits"]
         if type(credits) not in (int, float) or credits < 0:
             raise ValueError("Invalid credit snapshot")
+        recognition = recognition_status(d, cid)
+        allocation = {"enrollment_id": enrollment["enrollment_id"], "course_id": cid,
+                      "credits": credits, "category": None, "recognition_status": recognition,
+                      "allocations": []}
+        result["credit_allocation"].append(allocation)
+        if recognition != "recognized":
+            pending_recognition |= recognition == "pending_confirmation"
+            unknown = True
+            result["data_errors"].append({
+                "code": "RECOGNITION_PENDING" if recognition == "pending_confirmation" else "COURSE_NOT_RECOGNIZED",
+                "course_id": cid,
+            })
+            continue
+        passed.add(cid)
         earned += credits
         row = db.execute("SELECT credit_category FROM course_classifications WHERE course_id=? AND rule_set_id=?", (cid, rule_id)).fetchone()
         category = row[0] if row else None
@@ -160,8 +224,7 @@ def progress_legacy(db):
             result["data_errors"].append({"code": "CLASSIFICATION_UNKNOWN", "course_id": cid})
         else:
             groups[category] += credits
-        result["credit_allocation"].append({"enrollment_id": enrollment["enrollment_id"], "course_id": cid,
-                                            "credits": credits, "category": category, "allocations": []})
+        allocation["category"] = category
     # Allocate each earned credit once; professional elective overflow transfers to free elective.
     elective_left = d["credit_requirements"]["department_elective"]["minimum_credits"]
     diverse_left = d["credit_requirements"]["general_education"]["elective"]["diverse_courses"]["maximum_counted_credits"]
@@ -183,8 +246,8 @@ def progress_legacy(db):
             if amount:
                 row["allocations"].append({"category": cat, "credits": amount})
                 totals[cat] += amount
-    result["earned_credits"] = earned
-    checks = [make_check("total_credits", "總學分", rule["total_credits_required"], earned)]
+    result["earned_credits"] = None if pending_recognition else earned
+    checks = [make_check("total_credits", "總學分", rule["total_credits_required"], result["earned_credits"])]
     cr = d["credit_requirements"]
     for key, needed in (("general_core", cr["general_education"]["core"]["required_credits"]),
                         ("general_domain", cr["general_education"]["elective"]["domain_courses"]["minimum_credits"]),
@@ -268,6 +331,7 @@ def collect_graduation_credits(db, state):
     result, rule_id = state["result"], state["rule_id"]
     passed, seen, earned, groups = set(), set(), 0, defaultdict(float)
     unknown = False
+    pending_recognition = False
     for enrollment in records(db, "enrollments"):
         if enrollment["enrollment_status"] != "finished" or enrollment["passed"] is not True:
             continue
@@ -277,10 +341,23 @@ def collect_graduation_credits(db, state):
             unknown = True
             continue
         seen.add(cid)
-        passed.add(cid)
         credits = enrollment["course_snapshot"]["credits"]
         if type(credits) not in (int, float) or credits < 0:
             raise ValueError("Invalid credit snapshot")
+        recognition = recognition_status(state["document"], cid)
+        allocation = {"enrollment_id": enrollment["enrollment_id"], "course_id": cid,
+                      "credits": credits, "category": None, "recognition_status": recognition,
+                      "allocations": []}
+        result["credit_allocation"].append(allocation)
+        if recognition != "recognized":
+            pending_recognition |= recognition == "pending_confirmation"
+            unknown = True
+            result["data_errors"].append({
+                "code": "RECOGNITION_PENDING" if recognition == "pending_confirmation" else "COURSE_NOT_RECOGNIZED",
+                "course_id": cid,
+            })
+            continue
+        passed.add(cid)
         earned += credits
         row = db.execute("SELECT credit_category FROM course_classifications WHERE course_id=? AND rule_set_id=?", (cid, rule_id)).fetchone()
         category = row[0] if row else None
@@ -289,9 +366,9 @@ def collect_graduation_credits(db, state):
             result["data_errors"].append({"code": "CLASSIFICATION_UNKNOWN", "course_id": cid})
         else:
             groups[category] += credits
-        result["credit_allocation"].append({"enrollment_id": enrollment["enrollment_id"], "course_id": cid,
-                                            "credits": credits, "category": category, "allocations": []})
-    return {"result": result, "passed": passed, "unknown": unknown, "groups": groups, "earned": earned}
+        allocation["category"] = category
+    return {"result": result, "passed": passed, "unknown": unknown, "groups": groups,
+            "earned": earned, "pending_recognition": pending_recognition}
 
 
 def allocate_graduation_credits(state):
@@ -317,7 +394,7 @@ def allocate_graduation_credits(state):
             if amount:
                 row["allocations"].append({"category": cat, "credits": amount})
                 totals[cat] += amount
-    result["earned_credits"] = earned
+    result["earned_credits"] = None if state.get("pending_recognition") else earned
     return {"result": result, "totals": totals}
 
 
@@ -325,7 +402,7 @@ def evaluate_graduation_requirements(db, state):
     result, rule, d = state["result"], state["rule"], state["document"]
     rule_id, passed, unknown = state["rule_id"], state["passed"], state["unknown"]
     earned, totals = state["earned"], state["totals"]
-    checks = [make_check("total_credits", "總學分", rule["total_credits_required"], earned)]
+    checks = [make_check("total_credits", "總學分", rule["total_credits_required"], result["earned_credits"])]
     cr = d["credit_requirements"]
     for key, needed in (("general_core", cr["general_education"]["core"]["required_credits"]),
                         ("general_domain", cr["general_education"]["elective"]["domain_courses"]["minimum_credits"]),

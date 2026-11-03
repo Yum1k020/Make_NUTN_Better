@@ -42,7 +42,7 @@ EVENT_ALLOWED_FIELDS = EVENT_REQUIRED_FIELDS | {"location"}
 SOURCE_IDS = {
     "planner-rule",
     "weekly-classes-fixture",
-    "tasks-events-local",
+    "planner-backend-sqlite",
 }
 
 WEEKLY_CLASSES = [

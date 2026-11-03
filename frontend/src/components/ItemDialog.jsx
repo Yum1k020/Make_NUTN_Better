@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Icon from "./Icon.jsx";
 import { findEventConflict, minutes } from "../lib/planner.js";
-import { weeklyClasses } from "../data/demo.js";
 
 export default function ItemDialog({
   initial,
   initialKind = "task",
   selectedDate,
   personalEvents,
+  weeklyClasses,
   onClose,
   onSave,
   onDelete,
@@ -24,6 +24,7 @@ export default function ItemDialog({
     type: initial?.type || "待辦",
   });
   const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const conflict = useMemo(
     () =>
       kind === "event" &&
@@ -33,7 +34,7 @@ export default function ItemDialog({
       minutes(form.end) > minutes(form.start)
         ? findEventConflict(form, weeklyClasses, personalEvents, initial?.id)
         : null,
-    [kind, form, personalEvents, initial?.id],
+    [kind, form, personalEvents, weeklyClasses, initial?.id],
   );
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function ItemDialog({
     setError("");
   }
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault();
     if (!form.title.trim()) return setError("請輸入名稱。");
     if (!form.date) return setError("請選擇日期。");
@@ -57,14 +58,45 @@ export default function ItemDialog({
       return setError("結束時間需晚於開始時間。");
     if (conflict)
       return setError(`與「${conflict.title}」時間重疊，請調整時間。`);
-    onSave({
-      ...form,
-      title: form.title.trim(),
-      course: form.course.trim(),
-      location: form.location.trim(),
-      kind,
-      id: initial?.id || `${kind}-${Date.now()}`,
-    });
+    setIsSaving(true);
+    try {
+      await onSave({
+        ...form,
+        title: form.title.trim(),
+        course: form.course.trim(),
+        location: form.location.trim(),
+        kind,
+        id: initial?.id || `${kind}-${Date.now()}`,
+      });
+    } catch (saveError) {
+      setError(
+        saveError instanceof Error ? saveError.message : String(saveError),
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function remove() {
+    if (
+      typeof globalThis.confirm === "function" &&
+      !globalThis.confirm(`確定要刪除「${initial?.title || "這筆資料"}」嗎？`)
+    ) {
+      return;
+    }
+    setIsSaving(true);
+    setError("");
+    try {
+      await onDelete(initial);
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : String(deleteError),
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -220,7 +252,8 @@ export default function ItemDialog({
               <button
                 className="danger-button"
                 type="button"
-                onClick={() => onDelete(initial)}
+                onClick={remove}
+                disabled={isSaving}
               >
                 <Icon name="trash" size={17} />
                 刪除
@@ -231,11 +264,16 @@ export default function ItemDialog({
               className="secondary-button"
               type="button"
               onClick={onClose}
+              disabled={isSaving}
             >
               取消
             </button>
-            <button className="primary-button" type="submit">
-              儲存事項
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={isSaving}
+            >
+              {isSaving ? "儲存中" : "儲存事項"}
             </button>
           </div>
         </form>

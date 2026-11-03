@@ -8,7 +8,15 @@
 
 ## 實作範圍與 baseline
 
-沿用專案已決定的 Flask，並非原附件提及的 FastAPI。SQLite、固定使用者 `user-demo-001`，全部業務端點使用 `/api/v1`。既有 `/me`、學期及課程查詢保持相容；既有前端尚未串接。
+沿用專案已決定的 Flask，並非原附件提及的 FastAPI。SQLite、固定使用者 `user-demo-001`，全部業務端點使用 `/api/v1`。既有 `/me`、學期及課程查詢保持相容；React 已串接待辦、私人行程、讀書計畫、115 修課規劃、課表、課程、已修紀錄、畢業規則與已確認偏好。正式登入仍未完成。
+
+## 2026-11-03 前端後端持久化增補
+
+- React 啟動時並行讀取 `/tasks`、`/personal-events`、`/study-schedule` 與 `/planned-courses`。
+- `PUT /study-schedule` 在一個 SQLite 交易內刪除舊計畫、驗證新計畫與時段並整組保存；任何衝突會 rollback，舊計畫仍存在。
+- `/study-memory/preference` 已從 Vite JSON middleware 移至 Flask SQLite，保留確認、owner、版本、期限、撤回與冪等控制。
+- 舊版四組 `localStorage` 只在後端相對集合為空時遷移；成功後移除，避免雙主資料來源。
+- 115 整合規格的 60 筆規劃課程 ID 存於 `ui_courses` 參照表，不加入原本六筆合成 `/courses` 查詢結果，因此既有課程 API 契約維持相容。
 
 | 功能 | 實作 |
 | --- | --- |
@@ -35,19 +43,17 @@
 
 ## 規則資料與已知限制
 
-內建 `backend/app/data/nutn_csie_113_graduation_rules_v1.json` 是依使用者提供文件整理的 113 學年度展示規則，最低 134 學分、三學程至少完成二個、相關學術講座 10 場；`backend/app/data/nutn_csie_115_graduation_rules_v1.json` 則保留原有 115 測試草案供回歸驗證。兩者都不是校方正式資格認證；規則內容雜湊固定，同版本內容被改動時初始化拒絕覆寫。
+目前 115 啟用規則為根目錄 `nutn_csie_115_graduation_rules.json`，ID `nutn-csie-115-integrated-v2`，最低 133 學分。初始化會保存規則內容與雜湊，同版本內容被改動時拒絕覆寫。113 與舊 115 `mvp-v1` 文件仍保留供版本化查詢與回歸，不是目前 115 身分的啟用規格。
 
-113 展示身分可執行 `./scripts/select-demo-profile-113.sh`，或 PATCH `/me`：
-
-```json
-{"department_id":"dept-nutn-csie","admission_year":113,"current_semester_id":"semester-113-1"}
-```
-
-為保留原 `/me` 測試資料，新增 `dept-nutn-csie`／115 對應 `nutn-csie-115-mvp-v1`。原 `dept-csie` 的合成規則不會自動套用 133 學分。可 PATCH `/me`：
+115 展示身分可執行 `./scripts/select-demo-profile-115.sh`，或 PATCH `/me`：
 
 ```json
 {"department_id":"dept-nutn-csie","admission_year":115,"current_semester_id":"semester-115-1"}
 ```
+
+`dept-nutn-csie`／115 現在對應 `nutn-csie-115-integrated-v2`；舊 `mvp-v1` 移至 legacy 系所鍵以避免同系同屆唯一索引衝突。原 `dept-csie` 的合成規則不會自動套用 133 學分。
+
+整合版的 `passing_and_recognition.common_recognition_scope.course_ids` 目前是 `null`。這表示範圍尚未提供，不是空範圍；已通過課程會保存在 `/enrollments`，但 `/graduation-progress` 會回傳 `RECOGNITION_PENDING` 並把確認學分保持為未知。
 
 正式課程 ID 對照、學分分類與通識領域尚未完成。`graduation_course_mappings`、`graduation_course_domains` 保留人工確認的對照；不按同名猜測、不把未知當 0。未映射必修與學程回傳待確認，缺規則的學分總數為 null。B20 的 133 學分全達標案例使用**測試專用合成對照**，不表示真實學生已達畢業門檻。
 

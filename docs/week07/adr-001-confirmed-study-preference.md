@@ -1,6 +1,6 @@
 # ADR-001：採用已確認的每次複習分鐘數記憶
 
-- 狀態：Accepted
+- 狀態：Accepted，2026-11-03 修訂儲存實作
 - 日期：2026-10-28
 - 路線：A「保存一個已確認欄位」
 
@@ -23,7 +23,7 @@
 
 ## 儲存選擇
 
-Python 驗收 runner 與 React 網站原型都使用伺服器端 JSON 檔與原子檔案替換，因為本週只驗收單機原型的一個欄位。實際資料檔均由 Git 忽略。兩個入口使用同一欄位與生命週期契約，但不共用同一實體 JSON 檔。
+原 Week 07 作業版使用伺服器端 JSON 檔；2026-11-03 起，React 網站改由 Flask 的 `/api/v1/study-memory/preference` 寫入與個人安排相同的 SQLite。`study_preferences` 保存目前版本，`study_preference_operations` 保存 operation ID 指紋與可重播結果。Python 驗收 runner 仍保留作為歷史離線比較，不是網站 runtime。
 
 ## 替代方案
 
@@ -31,7 +31,7 @@ Python 驗收 runner 與 React 網站原型都使用伺服器端 JSON 檔與原�
 | --- | --- |
 | 只用瀏覽器 `localStorage` | 缺少受控後端 schema、版本衝突、跨 user 隔離與冪等寫入證據。 |
 | 保存完整規劃請求或對話摘要 | 擴大個資與暫時條件的保存範圍。 |
-| SQLite 或正式資料庫 | 對單一欄位課堂原型過重；多實例或正式部署時再採用。 |
+| SQLite | 已採用；可與待辦、行程、讀書計畫及規劃課程共用交易與備份邊界。 |
 | 向量資料庫 | 本題是精確欄位查詢，不需要語意相似度。 |
 
 ## 後果與代價
@@ -45,7 +45,7 @@ Python 驗收 runner 與 React 網站原型都使用伺服器端 JSON 檔與原�
 
 代價：
 
-- JSON 檔只適合單機，正式多實例部署需要資料庫交易。
+- SQLite 適合目前單機示範；正式多實例部署仍需集中式資料庫與遷移策略。
 - 示範 header 不是正式身分驗證，正式部署前不可直接沿用。
 - 撤回保留本機 operation 證據；完整刪除需要額外保留與備份政策。
 
@@ -53,7 +53,7 @@ Python 驗收 runner 與 React 網站原型都使用伺服器端 JSON 檔與原�
 
 - 不保存私人行程、考試日期、prompt、API key 或模型內部推理。
 - 網站記憶內容不傳給 OpenAI；Agent 仍只接收原規劃請求必要資料。
-- 損壞的記憶檔會停止讀取，不會默默重建並覆蓋原資料。
+- SQLite 錯誤會回傳 `MEMORY_SERVICE_FAILED` 並 rollback，不會用空值覆蓋舊資料。
 - 過期或撤回記憶不回填 UI；舊版本寫入會回報衝突。
 
 ## 驗收

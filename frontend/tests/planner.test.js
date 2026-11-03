@@ -152,7 +152,7 @@ test("framework tool preserves the original deterministic study plan", async () 
           citations: [
             "planner-rule",
             "weekly-classes-fixture",
-            "tasks-events-local",
+            "planner-backend-sqlite",
           ],
           refused: false,
         },

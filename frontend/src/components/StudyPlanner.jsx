@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import Icon from "./Icon.jsx";
 import StudyMemoryPanel from "./StudyMemoryPanel.jsx";
-import { DEMO_DATE, courses, weeklyClasses } from "../data/demo.js";
+import { DEMO_DATE } from "../data/demo.js";
 import {
   addDays,
   eventsOnDate,
@@ -160,9 +160,13 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
 export default function StudyPlanner({
   personalEvents,
   studySessions,
-  onUpdateSessions,
+  courses,
+  weeklyClasses,
+  onReplaceSchedule,
+  onUpdateSession,
+  onDeleteSession,
 }) {
-  const [courseId, setCourseId] = useState("data-structures");
+  const [courseId, setCourseId] = useState("");
   const [examDate, setExamDate] = useState("2026-09-24");
   const [hours, setHours] = useState(6);
   const [sessionHours, setSessionHours] = useState(2);
@@ -178,8 +182,19 @@ export default function StudyPlanner({
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
   const [editError, setEditError] = useState("");
+  const enrolledCourses = courses.filter((course) =>
+    ["inProgress", "completed"].includes(course.status),
+  );
+  const selectableCourses = enrolledCourses.length
+    ? enrolledCourses
+    : courses.slice(0, 10);
+  const activeCourseId = selectableCourses.some(
+    (course) => course.id === courseId,
+  )
+    ? courseId
+    : selectableCourses[0]?.id || "";
   const courseName =
-    courses.find((course) => course.id === courseId)?.name || "課程";
+    courses.find((course) => course.id === activeCourseId)?.name || "課程";
   const scheduledHours =
     studySessions.reduce(
       (sum, item) => sum + minutes(item.end) - minutes(item.start),
@@ -222,6 +237,8 @@ export default function StudyPlanner({
       return setPlanMessage("請輸入 0.5 至 100 小時的複習時數。");
     if (!allowedPeriods.length)
       return setPlanMessage("請至少選擇一個可安排時段。");
+    if (!activeCourseId)
+      return setPlanMessage("後端目前沒有可用課程，請先設定 115 示範身分。");
     if (examDate <= DEMO_DATE)
       return setPlanMessage("考試日期需晚於示範起始日 9 月 17 日。");
     const request = {
@@ -247,7 +264,6 @@ export default function StudyPlanner({
       weeklyClasses,
     });
 
-    onUpdateSessions(baseline.sessions);
     setPlanMessage(
       baseline.remainingMinutes > 0
         ? `可安排時間不足，尚缺 ${baseline.remainingMinutes / 60} 小時。請增加可安排時段或調整複習需求。`
@@ -258,6 +274,20 @@ export default function StudyPlanner({
     setAgentWorkflow(null);
     setAgentLoading(true);
     setEditingId(null);
+
+    try {
+      await onReplaceSchedule({
+        request: { ...request, courseId: activeCourseId },
+        sessions: baseline.sessions,
+      });
+    } catch (error) {
+      setAgentError(
+        `後端儲存失敗：${error instanceof Error ? error.message : String(error)}`,
+      );
+      setPlanMessage("學習計畫未寫入後端，請修正錯誤後再試一次。");
+      setAgentLoading(false);
+      return;
+    }
 
     try {
       const response = await requestStudyAgentPlan({
@@ -272,7 +302,6 @@ export default function StudyPlanner({
         throw new Error("框架回傳排程與原規則不一致。");
       }
 
-      onUpdateSessions(response.plan.sessions);
       setAgentResult({
         ...response.agent,
         comparison: response.comparison,
@@ -297,7 +326,7 @@ export default function StudyPlanner({
     setEditError("");
   }
 
-  function saveEdit(session) {
+  async function saveEdit(session) {
     if (!draft?.date || minutes(draft.end) <= minutes(draft.start))
       return setEditError("請輸入有效的日期與時間。");
     if (draft.date < DEMO_DATE || draft.date >= examDate)
@@ -311,24 +340,36 @@ export default function StudyPlanner({
     const conflict = occupied.find((item) => overlaps(draft, item));
     if (conflict)
       return setEditError(`與「${conflict.title}」重疊，請調整時間。`);
-    onUpdateSessions(
-      studySessions.map((item) =>
-        item.id === session.id ? { ...item, ...draft } : item,
-      ),
-    );
-    setAgentResult(null);
-    setAgentError("");
-    setAgentWorkflow(null);
-    setEditingId(null);
-    setPlanMessage("已手動調整複習時段。");
+    try {
+      await onUpdateSession(session, draft);
+      setAgentResult(null);
+      setAgentError("");
+      setAgentWorkflow(null);
+      setEditingId(null);
+      setPlanMessage("已手動調整複習時段並同步到後端。");
+    } catch (error) {
+      setEditError(error instanceof Error ? error.message : String(error));
+    }
   }
 
-  function removeSession(sessionId) {
-    onUpdateSessions(studySessions.filter((item) => item.id !== sessionId));
-    setAgentResult(null);
-    setAgentError("");
-    setAgentWorkflow(null);
-    setPlanMessage("已移除複習時段；需要時可重新產生計畫。");
+  async function removeSession(session) {
+    if (
+      typeof globalThis.confirm === "function" &&
+      !globalThis.confirm(`確定要刪除「${session.title}」這個複習時段嗎？`)
+    ) {
+      return;
+    }
+    try {
+      await onDeleteSession(session);
+      setAgentResult(null);
+      setAgentError("");
+      setAgentWorkflow(null);
+      setPlanMessage("已從後端移除複習時段；需要時可重新產生計畫。");
+    } catch (error) {
+      setPlanMessage(
+        `無法刪除複習時段：${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
   }
 
   return (
@@ -361,18 +402,15 @@ export default function StudyPlanner({
                 <span>課程</span>
                 <select
                   id="study-course"
-                  value={courseId}
+                  value={activeCourseId}
                   onChange={(event) => setCourseId(event.target.value)}
+                  disabled={!selectableCourses.length}
                 >
-                  {courses
-                    .filter((course) =>
-                      ["inProgress", "completed"].includes(course.status),
-                    )
-                    .map((course) => (
-                      <option key={course.id} value={course.id}>
-                        {course.name}（{course.code}）
-                      </option>
-                    ))}
+                  {selectableCourses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.name}（{course.code}）
+                    </option>
+                  ))}
                 </select>
               </label>
               <label className="field">
@@ -638,7 +676,7 @@ export default function StudyPlanner({
                         <button
                           type="button"
                           className="icon-button"
-                          onClick={() => removeSession(session.id)}
+                          onClick={() => removeSession(session)}
                           aria-label={`移除第 ${index + 1} 個複習時段`}
                         >
                           <Icon name="trash" size={17} />

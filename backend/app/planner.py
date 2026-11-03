@@ -238,6 +238,49 @@ def interval_items(value, sessions=False, empty=False):
     return [shape(row, fields, fields.keys()) for row in value]
 
 
+def study_plan_input(value):
+    return shape(
+        value,
+        RESOURCE["study-plans"][1],
+        RESOURCE["study-plans"][2],
+        RESOURCE["study-plans"][3],
+    )
+
+
+@routes.route("/study-schedule", methods=["GET", "PUT"])
+@endpoint
+def study_schedule_route():
+    """Load or transactionally replace the single schedule used by the React UI."""
+    query({})
+    if request.method == "GET":
+        db = transaction()
+        plans = records(db, "study-plans")
+        if not plans:
+            return {"data": None}
+        plan = max(plans, key=lambda item: (item["updated_at"], item["plan_id"]))
+        return {"data": {"plan": output(db, "study-plans", plan), **session_result(db, plan)}}
+
+    payload = shape(
+        body(),
+        {
+            "plan": (study_plan_input, False),
+            "sessions": (lambda value: interval_items(value, True, True), False),
+        },
+        ["plan", "sessions"],
+    )
+    db = transaction(True)
+    # Remove the previous UI plan inside this transaction. Any later validation
+    # failure rolls back both the deletion and the attempted replacement.
+    for old in records(db, "study-plans"):
+        delete(db, "study-plans", old)
+    plan = save(db, "study-plans", payload["plan"])
+    result = replace_sessions(
+        db, plan, payload["sessions"], plan["plan_version"]
+    )
+    current = owned(db, "study-plans", plan["plan_id"])
+    return {"data": {"plan": output(db, "study-plans", current), **result}}
+
+
 @routes.post("/study-plans/<string:plan_id>/generate")
 @endpoint
 def generate_route(plan_id):

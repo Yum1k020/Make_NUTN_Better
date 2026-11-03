@@ -22,7 +22,8 @@ def pytest_addoption(parser):
 def pytest_sessionstart(session):
     paths = sorted(path for folder in ("backend/app", "backend/tests", "scripts")
                    for path in (ROOT / folder).rglob("*") if path.suffix in (".py", ".sh", ".json"))
-    paths += [ROOT / "backend/requirements-dev.lock.txt", ROOT / "backend/pytest.ini"]
+    paths += [ROOT / "backend/requirements-dev.lock.txt", ROOT / "backend/pytest.ini",
+              ROOT / "nutn_csie_115_graduation_rules.json"]
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in paths}
     REPORT.update({

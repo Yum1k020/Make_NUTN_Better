@@ -48,6 +48,9 @@ Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`do
 
 - 繳交用 PDF 與可編輯 PPTX：[`reports/midterm/`](reports/midterm/README.md)。
 - 完整報告、架構、示範腳本、測試結果與證據索引：[`docs/midterm/`](docs/midterm/README.md)。
+- 網站操作步驟：[`docs/midterm/USER_GUIDE.md`](docs/midterm/USER_GUIDE.md)。
+- 14 分鐘口頭講稿與問答：[`docs/midterm/PRESENTATION_SCRIPT.md`](docs/midterm/PRESENTATION_SCRIPT.md)。
+- GitHub 分支盤點與整合判定：[`docs/midterm/BRANCH_INTEGRATION.md`](docs/midterm/BRANCH_INTEGRATION.md)。
 - 主示範工具：`get_validated_study_plan`，唯讀預覽；模型參數必須通過後端驗證。
 - 寫入工具：`save_study_plan`，必須 `confirmed=true` 並以 `request_id` 防止重複寫入。
 - 真實 Gemini／ADC 證據：`docs/midterm/evidence/study-agent-live.json`。
@@ -74,13 +77,13 @@ Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`do
 
 ### 4. 畢業進度追蹤
 
-- **Given：** 後端已載入固定測試使用者、啟用中的 `nutn-csie-113-source-v1` 規則與合成修課紀錄。
+- **Given：** 後端已載入固定測試使用者、啟用中的 `nutn-csie-115-integrated-v2` 規則與合成修課紀錄。
 - **When：** 使用者查看畢業進度或明確要求產生缺項說明。
 - **Then：** 一般程式先顯示每項已取得、尚缺或待確認狀態；模型說明不得把未知當成零、把規劃中課程算成已取得，且來源更新或 300 秒到期後停止使用。
 
 ## 後端 API
 
-Flask＋SQLite 已提供使用者資料、課程查詢與學生安排 API baseline。啟動方式見 [後端 README](backend/README.md)，規格、限制與 252 通過／4 未執行的實測紀錄見 [學生安排 API](docs/api/student-planner.md)。目前固定測試使用者，尚未串接前端。
+Flask＋SQLite 已提供使用者資料、課程查詢、學生安排與已確認偏好 API。React 會從 `/api/v1` 讀寫待辦、私人行程、讀書時段、115 修課規劃、課表、課程、已修紀錄、畢業規則及 `study_session_minutes`；舊版四組 `localStorage` 只在第一次啟動時作為遷移來源，成功後即移除。啟動方式見 [後端 README](backend/README.md)，契約與限制見 [學生安排 API](docs/api/student-planner.md)。目前仍是固定測試使用者，尚未建立正式登入。
 
 ## 前端原型
 
@@ -93,13 +96,13 @@ Flask＋SQLite 已提供使用者資料、課程查詢與學生安排 API baseli
 ./scripts/run-backend.sh
 
 # 另一個終端
-./scripts/select-demo-profile-113.sh
+./scripts/select-demo-profile-115.sh
 cd frontend
 npm install
 npm run dev
 ```
 
-網站課程規劃與畢業門檻以「113 學年度」清楚標示。113 原始文件的 Markdown 抽取、雜湊與使用界線見 [`docs/sources/113-academic-year/`](docs/sources/113-academic-year/README.md)。其中課程大綱文件年代較早，只補充課程內容，不作為 113 畢業規定。
+網站課程規劃與畢業門檻以「115 學年度」清楚標示，執行規則為 [`nutn-csie-115-integrated-v2`](nutn_csie_115_graduation_rules.json)。共同認列範圍仍為 `null`，所以已通過課程會保存為已修紀錄，但在認列前不會冒充已取得畢業學分。
 
 本機 ADC 設定使用 `gcloud auth application-default login`；專案只讀取 `GOOGLE_CLOUD_PROJECT`、`GOOGLE_CLOUD_LOCATION` 與 `GOOGLE_CLOUD_GEMINI_MODEL`，不得提交 ADC JSON。
 
@@ -137,7 +140,7 @@ npm run dev
 
 ## 本機後端開發環境
 
-Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重建與完整移除方式請見 [後端說明](backend/README.md)。已提供固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`；[API 規格與實測證據](docs/api/me.md) 記錄契約、限制與測試結果。前端尚未串接後端。
+Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重建與完整移除方式請見 [後端說明](backend/README.md)。已提供固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`；[API 規格與實測證據](docs/api/me.md) 記錄契約、限制與測試結果。前端個人安排已串接同一個 Flask／SQLite 後端；正式登入與多使用者隔離仍未完成。
 
 另提供 `GET /api/v1/semesters`、`GET /api/v1/courses`、`GET /api/v1/courses/{id}`、`GET /api/v1/course-offerings` 四支唯讀測試資料 API；查詢條件、資料庫升級方式及實測結果見 [課程查詢 API 文件](docs/api/catalog.md)。
 
@@ -146,7 +149,7 @@ Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重�
 - [113 學年度來源與整理界線](docs/sources/113-academic-year/README.md) 與後端展示規則 `backend/app/data/nutn_csie_113_graduation_rules_v1.json`。
 - [專案決策與變更紀錄](docs/decisions/CHANGE_DECISIONS.md)：逐項決定、新舊差異、影響分支與檔案，後續變更持續追加。
 - [115畢業規則整合說明](GRADUATION_PROGRESS_115.md) 與 [唯一整合JSON](nutn_csie_115_graduation_rules.json)。
-- 115 規則保留供既有回歸測試；目前網站展示資料基準為 113 學年度、最低 134 學分。合成修課紀錄仍不可當作真實學生畢業資格。
+- 115 整合規則是目前網站執行規格，最低 133 學分；舊 `nutn-csie-115-mvp-v1` 與 113 規則只保留為版本化歷史／回歸資料。合成修課紀錄仍不可當作真實學生畢業資格。
 
 ## Week 07：畢業說明記憶範圍（C 路線）
 

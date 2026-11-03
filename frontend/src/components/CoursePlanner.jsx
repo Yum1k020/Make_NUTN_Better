@@ -1,51 +1,44 @@
 import React, { useMemo, useState } from "react";
 import Icon from "./Icon.jsx";
-import {
-  curriculumMeta113,
-  graduationRequirements113,
-  legacySyllabusHighlights,
-  professionalElectives113,
-  programNamesForCourse113,
-  programs113,
-  requiredCourses113,
-  sourceDocuments113,
-} from "../data/curriculum113.js";
 
-const CATALOGS = {
-  required: { label: "專業必修", courses: requiredCourses113 },
-  elective: { label: "專業選修", courses: professionalElectives113 },
-};
-
-function RequirementOverview() {
-  const rules = graduationRequirements113;
+function RequirementOverview({ rule }) {
+  const requirements = rule?.credit_requirements;
+  if (!requirements) return null;
   return (
-    <section className="curriculum-overview" aria-label="113 學年度畢業門檻">
+    <section className="curriculum-overview" aria-label="115 學年度畢業門檻">
       <div>
         <span>最低畢業學分</span>
-        <strong>{rules.minimumTotalCredits}</strong>
+        <strong>{requirements.minimum_total_credits}</strong>
         <small>學分</small>
       </div>
       <div>
         <span>通識課程</span>
-        <strong>{rules.generalEducationCredits}</strong>
-        <small>核心 10＋領域／多元 18</small>
+        <strong>{requirements.general_education.minimum_total_credits}</strong>
+        <small>核心與選修分別檢核</small>
       </div>
       <div>
         <span>系專業必選修</span>
-        <strong>{rules.minimumDepartmentCredits}</strong>
-        <small>必修 70＋選修至少 12</small>
+        <strong>
+          {requirements.department_required.required_credits +
+            requirements.department_elective.minimum_credits}
+        </strong>
+        <small>
+          必修 {requirements.department_required.required_credits}＋選修至少{" "}
+          {requirements.department_elective.minimum_credits}
+        </small>
       </div>
       <div>
         <span>領域學程</span>
-        <strong>{rules.minimumCompletedPrograms}</strong>
-        <small>至少 2 個；每個通過 3 門</small>
+        <strong>{rule.program_requirements.minimum_completed_programs}</strong>
+        <small>至少完成的學程數</small>
       </div>
     </section>
   );
 }
 
 function ProgramCard({ program, plannedCourseNames }) {
-  const selectedCount = program.courses.filter((name) =>
+  const names = program.unmapped_course_names || [];
+  const selectedCount = names.filter((name) =>
     plannedCourseNames.has(name),
   ).length;
   return (
@@ -53,12 +46,15 @@ function ProgramCard({ program, plannedCourseNames }) {
       <div className="program-card-head">
         <div>
           <h3>{program.name}</h3>
-          <span>{program.requirement}</span>
+          <span>已通過且已認列 3 門</span>
         </div>
-        <strong>{Math.min(selectedCount, 3)} / 3</strong>
+        <strong>
+          {Math.min(selectedCount, program.minimum_passed_courses)} /{" "}
+          {program.minimum_passed_courses}
+        </strong>
       </div>
       <div className="program-course-tags">
-        {program.courses.map((name) => (
+        {names.map((name) => (
           <span
             className={plannedCourseNames.has(name) ? "selected" : ""}
             key={name}
@@ -67,74 +63,89 @@ function ProgramCard({ program, plannedCourseNames }) {
           </span>
         ))}
       </div>
+      <small>
+        {program.data_status === "complete" ? "對照完成" : "正式課程 ID 待確認"}
+      </small>
     </article>
   );
 }
 
-export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
-  const [catalog, setCatalog] = useState("required");
+export default function CoursePlanner({
+  plannedCourseIds,
+  onToggleCourse,
+  academic,
+}) {
+  const [catalog, setCatalog] = useState("department_required");
   const [query, setQuery] = useState("");
+  const courses = academic.courses || [];
+  const rule = academic.rule;
+  const programs = academic.programs || [];
+  const enrollments = academic.enrollments || [];
   const plannedIdSet = useMemo(
     () => new Set(plannedCourseIds),
     [plannedCourseIds],
   );
-  const allCourses = useMemo(
-    () => [...requiredCourses113, ...professionalElectives113],
-    [],
-  );
   const planned = useMemo(
-    () => allCourses.filter((course) => plannedIdSet.has(course.id)),
-    [allCourses, plannedIdSet],
+    () => courses.filter((course) => plannedIdSet.has(course.id)),
+    [courses, plannedIdSet],
   );
   const plannedCourseNames = useMemo(
     () => new Set(planned.map((course) => course.name)),
     [planned],
   );
   const normalizedQuery = query.trim().toLocaleLowerCase("zh-TW");
-  const visibleCourses = CATALOGS[catalog].courses.filter((course) =>
-    normalizedQuery
-      ? `${course.code} ${course.name} ${course.recommendedTerm}`
+  const visibleCourses = courses.filter(
+    (course) =>
+      course.category === catalog &&
+      (!normalizedQuery ||
+        `${course.code} ${course.name} ${course.recommendedTerm}`
           .toLocaleLowerCase("zh-TW")
-          .includes(normalizedQuery)
-      : true,
+          .includes(normalizedQuery)),
   );
   const plannedCredits = planned.reduce(
     (sum, course) => sum + course.credits,
     0,
   );
+  const requiredCount = courses.filter(
+    (course) => course.category === "department_required",
+  ).length;
+  const electiveCount = courses.filter(
+    (course) => course.category === "department_elective",
+  ).length;
 
   return (
     <>
       <header className="page-header curriculum-header">
         <div>
           <div className="title-line">
-            <h1>113 學年度修課規劃</h1>
-            <span className="academic-year-badge">資料基準：113 學年度</span>
+            <h1>115 學年度修課規劃</h1>
+            <span className="academic-year-badge">
+              {rule?.rule_set_id || "規則載入中"}
+            </span>
           </div>
-          <p>
-            {curriculumMeta113.institution} {curriculumMeta113.department}
-            {curriculumMeta113.degree}課程規劃；可搜尋課程並加入個人清單。
-          </p>
+          <p>課程資料、規劃清單與已修紀錄都由 Flask／SQLite 提供。</p>
         </div>
       </header>
 
       <div className="curriculum-source-banner">
         <Icon name="check" size={20} />
         <div>
-          <strong>已依兩份 113 學年度文件整理</strong>
-          <p>{curriculumMeta113.verificationNote}</p>
+          <strong>後端整合規格：{rule?.backend_status || "讀取中"}</strong>
+          <p>規劃課程不等於已取得或已認列學分。</p>
         </div>
       </div>
 
-      <RequirementOverview />
+      <RequirementOverview rule={rule} />
 
       <div className="feature-grid courses-grid curriculum-grid">
         <div className="feature-left">
           <section className="panel course-catalog-panel">
             <div className="course-catalog-heading">
               <div>
-                <h2>113 課程目錄</h2>
-                <span>必修 25 門；專業選修表列 35 門</span>
+                <h2>115 後端課程目錄</h2>
+                <span>
+                  必修 {requiredCount} 門；專業選修 {electiveCount} 門
+                </span>
               </div>
               <label className="course-search">
                 <span className="sr-only">搜尋課程名稱或代碼</span>
@@ -148,7 +159,10 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
               </label>
             </div>
             <div className="catalog-tabs" role="tablist" aria-label="課程類別">
-              {Object.entries(CATALOGS).map(([id, item]) => (
+              {[
+                ["department_required", "專業必修", requiredCount],
+                ["department_elective", "專業選修", electiveCount],
+              ].map(([id, label, count]) => (
                 <button
                   type="button"
                   role="tab"
@@ -157,14 +171,13 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
                   onClick={() => setCatalog(id)}
                   key={id}
                 >
-                  {item.label}
-                  <span>{item.courses.length}</span>
+                  {label}
+                  <span>{count}</span>
                 </button>
               ))}
             </div>
             <div className="course-list" role="tabpanel">
               {visibleCourses.map((course) => {
-                const programNames = programNamesForCourse113(course.name);
                 const selected = plannedIdSet.has(course.id);
                 return (
                   <article className="course-row" key={course.id}>
@@ -175,7 +188,7 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
                       <div>
                         <h3>{course.name}</h3>
                         <span
-                          className={`course-type ${catalog === "required" ? "required" : ""}`}
+                          className={`course-type ${catalog === "department_required" ? "required" : ""}`}
                         >
                           {course.type}
                         </span>
@@ -184,11 +197,7 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
                         {course.code}・{course.credits} 學分・
                         {course.recommendedTerm}
                       </p>
-                      <small>
-                        {programNames.length
-                          ? `可採計：${programNames.join("、")}學程`
-                          : "依 113 學年度課程規劃表列示"}
-                      </small>
+                      <small>來源：{rule?.rule_set_id}</small>
                     </div>
                     <button
                       type="button"
@@ -206,7 +215,7 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
                 );
               })}
               {!visibleCourses.length && (
-                <p className="empty-state">找不到符合條件的 113 課程。</p>
+                <p className="empty-state">後端沒有符合條件的 115 課程。</p>
               )}
             </div>
           </section>
@@ -214,39 +223,17 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
           <section className="panel program-panel">
             <div className="panel-heading">
               <div>
-                <h2>113 專業領域學程</h2>
-                <span className="subtle">
-                  每個學程通過 3 門；畢業至少取得 2 個學程證書
-                </span>
+                <h2>115 專業領域學程</h2>
+                <span className="subtle">課程完成與證書推定分開顯示</span>
               </div>
             </div>
             <div className="program-grid">
-              {programs113.map((program) => (
+              {programs.map((program) => (
                 <ProgramCard
                   program={program}
                   plannedCourseNames={plannedCourseNames}
-                  key={program.id}
+                  key={program.program_id}
                 />
-              ))}
-            </div>
-            <p className="helper-text program-helper">
-              課程地圖中的部分學程課名未列於本份專業選修表；實際選課前仍需確認當學期開課與認列方式。
-            </p>
-          </section>
-
-          <section className="panel syllabus-reference-panel">
-            <div className="panel-heading">
-              <div>
-                <h2>課程內容參考</h2>
-                <span className="subtle">舊版課程大綱；不是 113 畢業規定</span>
-              </div>
-            </div>
-            <div className="syllabus-highlight-grid">
-              {legacySyllabusHighlights.map((item) => (
-                <article key={item.course}>
-                  <strong>{item.course}</strong>
-                  <p>{item.topics}</p>
-                </article>
               ))}
             </div>
           </section>
@@ -255,8 +242,8 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
         <div className="feature-right curriculum-side">
           <section className="panel planned-panel">
             <div className="panel-heading">
-              <h2>我的 113 修課清單</h2>
-              <span className="subtle">規劃不等於已取得學分</span>
+              <h2>我的 115 修課清單</h2>
+              <span className="subtle">後端 SQLite</span>
             </div>
             {planned.length ? (
               <div className="planned-list">
@@ -280,9 +267,7 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
                 ))}
               </div>
             ) : (
-              <p className="empty-state">
-                尚未加入課程。從左側 113 課程目錄開始規劃。
-              </p>
+              <p className="empty-state">尚未加入課程。</p>
             )}
             <div className="panel-foot">
               <span>{planned.length} 門課</span>
@@ -292,44 +277,33 @@ export default function CoursePlanner({ plannedCourseIds, onToggleCourse }) {
 
           <section className="panel requirement-detail-panel">
             <div className="panel-heading">
-              <h2>畢業條件摘要</h2>
-              <span className="academic-year-mini">113</span>
+              <h2>後端已修紀錄</h2>
+              <span className="academic-year-mini">115</span>
             </div>
-            <dl className="requirement-list">
-              <div>
-                <dt>院核心必修</dt>
-                <dd>4 學分</dd>
-              </div>
-              <div>
-                <dt>自由選修</dt>
-                <dd>至少 20 學分</dd>
-              </div>
-              <div>
-                <dt>相關學術講座</dt>
-                <dd>10 場＋心得報告</dd>
-              </div>
-              <div>
-                <dt>通識領域</dt>
-                <dd>4 大領域至少修 3 領域</dd>
-              </div>
-            </dl>
+            {enrollments.length ? (
+              <ul className="requirement-list">
+                {enrollments.map((enrollment) => (
+                  <li key={enrollment.enrollment_id}>
+                    {enrollment.course_snapshot.name}・
+                    {enrollment.enrollment_status === "finished"
+                      ? "已完成"
+                      : "修習中"}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="empty-state">目前沒有後端已修紀錄。</p>
+            )}
           </section>
 
           <section className="panel source-panel">
             <div className="panel-heading">
-              <h2>資料來源與界線</h2>
+              <h2>資料界線</h2>
             </div>
-            <div className="source-document-list">
-              {sourceDocuments113.map((source) => (
-                <article key={source.title}>
-                  <div>
-                    <strong>{source.title}</strong>
-                    <span>{source.status}</span>
-                  </div>
-                  <p>{source.usage}</p>
-                </article>
-              ))}
-            </div>
+            <p>{rule?.verification_scope}</p>
+            <p>
+              共同認列範圍尚未提供時，已修課程會保留為待確認，不會自動算入畢業學分。
+            </p>
           </section>
         </div>
       </div>

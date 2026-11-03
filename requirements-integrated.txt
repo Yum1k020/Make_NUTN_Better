@@ -1,0 +1,4 @@
+# One Python 3.12 environment for the Flask application and Week 02-07 suites.
+# This combination passed the complete repository test suite on 2026-11-03.
+-r backend/requirements-dev.lock.txt
+-r requirements-agentic-ai.txt

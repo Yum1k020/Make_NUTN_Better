@@ -56,7 +56,7 @@ def test_same_rule_id_changed_content_changes_source(setup_app, evidence):
     app,c,_ = setup_app
     old = get_context(c)
     with sqlite3.connect(app.config['DATABASE']) as db:
-        rule = 'nutn-csie-115-mvp-v1'
+        rule = 'nutn-csie-115-integrated-v2'
         text = db.execute(
             'SELECT document FROM graduation_rule_documents WHERE rule_set_id=?',
             (rule,),

@@ -26,7 +26,7 @@ const agentOutputSchema = z
         z.enum([
           "planner-rule",
           "weekly-classes-fixture",
-          "tasks-events-local",
+          "planner-backend-sqlite",
         ]),
       )
       .min(1)
@@ -63,7 +63,7 @@ const getValidatedStudyPlan = tool({
         sources: [
           "planner-rule",
           "weekly-classes-fixture",
-          "tasks-events-local",
+          "planner-backend-sqlite",
         ],
       },
     };

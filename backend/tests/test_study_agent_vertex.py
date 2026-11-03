@@ -64,7 +64,7 @@ class FakeProvider:
                 "citations": [
                     "planner-rule",
                     "weekly-classes-fixture",
-                    "tasks-events-local",
+                    "planner-backend-sqlite",
                 ],
                 "refused": False,
             },

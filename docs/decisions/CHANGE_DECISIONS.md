@@ -76,14 +76,14 @@ professional_count/general_count代表已通過場次，不是單純出席；nul
 舊版明定數字成績60以上通過；新版建議選用且預設不啟用。
 決定：保留threshold=60、enabled_by_default=false；不單憑分數推導通過。停用時明確passed狀態為依據，grade只保存；只有成績沒有通過結果時待確認，不能自動算通過。
 影響：JSON `/passing_and_recognition/optional_numeric_threshold`、DATA_GUIDE。
-後端現有 planner_logic.py 與 planner_core.py 仍有60分一致性檢查，未來遷移時需同步移除硬編碼／改政策控制，更新測試。
+2026-11-03 後端啟用 integrated-v2 時已移除 planner_logic.py 與 planner_core.py 的60分硬編碼推導，改以明確 `passed` 狀態為準，並更新測試。
 
 ## GR-009 通過與認列分開
 
 舊版依passed與分類判斷；新版增加recognition_status，通過不代表可採計。
 決定：採新版概念，只有已通過且已認列才計入已確認學分及學程門數。狀態：pending_confirmation / recognized / not_recognized。
 已認列仍不表示能任意歸到任何類別；需有效分類與學程對照。特殊抵免、重修等不在本次實作範圍。
-影響：JSON `/passing_and_recognition`；未來修課資源欄位、規則判定、API/OpenAPI、UI與測試。當前Flask尚未支援獨立認列狀態。
+影響：JSON `/passing_and_recognition`；修課資源欄位、規則判定、API/OpenAPI、UI與測試。2026-11-03 Flask 已依共同認列範圍回傳 `recognized`、`not_recognized` 或 `pending_confirmation`，但尚未加入逐筆人工覆寫認列狀態的介面。
 
 ## GR-010 一份共同認列範圍，範圍外不認列
 
@@ -157,3 +157,11 @@ Node/npm檢查與可乾淨移除的安裝方式曾討論，但本次不安裝，
 JSON解析與政策斷言通過；必修25門共69學分逐筆等於兩版來源；35門專業選修逐筆等於新版；三學程11／10／10門逐筆等於舊版；共同認列範圍保持null；60分預設停用；無simulation/gpa設定；政策路徑與來源編號可解析；來源SHA-256吻合固定提交；更新文件的本機連結存在；git diff --check通過。後端相容快照與origin/main逐位元組一致，沒有程式或資料庫變更，因此未重跑後端測試，亦未宣稱新版規則已經後端驗收。
 
 發布方式：本筆紀錄與整合文件一併提交至 `docs/unified-graduation-rules` 並推送同名遠端分支；不合併main。提交識別以該分支Git歷史為準，避免在檔案內記錄自身提交雜湊造成循環。
+
+## GR-016 2026-11-03 後端啟用 integrated-v2
+
+使用者要求把 `nutn-csie-115-integrated-v2` 與課表、課程、已修紀錄、規劃及偏好統一接到 Flask／SQLite。後端現在把舊 `mvp-v1` 移到 legacy 系所鍵，115 入學的 `dept-nutn-csie` 對應整合版；60 分推導預設停用，必須有明確通過狀態。25 門必修與 35 門選修以穩定 ID 提供前端規劃，但不混入既有六筆合成課程 API。
+
+共同認列範圍仍為 `null`，所以已修紀錄會保存但不計入確認畢業學分，回傳 `RECOGNITION_PENDING`。這是規格要求的待確認狀態，不是失敗或零學分。舊 113 與 115 mvp 文件保留查詢與回歸相容；歷史證據不改寫。
+
+驗證結果：後端 330 個案例中 325 通過、5 個既有案例略過；前端 38/38 通過、正式建置與格式檢查通過。瀏覽器以臨時 SQLite 驗證 115 規則、25/35 門課程、課表、已修紀錄與規劃課程，新增規劃後重新整理仍存在。舊版讀書時段若與新課表衝突，保留原 `localStorage` 並顯示警示，不覆寫 SQLite、也不阻塞其他後端資料載入。狀態：已完成本機驗證；尚未提交或推送。

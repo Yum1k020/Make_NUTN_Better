@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Icon from "./Icon.jsx";
-import { graduationRule, weeklyClasses } from "../data/demo.js";
 import {
   addDays,
   eventsOnDate,
@@ -71,6 +70,7 @@ function WeekCalendar({
   dates,
   personalEvents,
   studySessions,
+  weeklyClasses,
   onSelectDate,
   onEditEvent,
   onOpenMap,
@@ -123,6 +123,7 @@ function DayTimeline({
   date,
   personalEvents,
   studySessions,
+  weeklyClasses,
   onEditEvent,
   onOpenMap,
   onNavigate,
@@ -206,6 +207,9 @@ export default function Dashboard({
   tasks,
   personalEvents,
   studySessions,
+  weeklyClasses,
+  graduationProgress,
+  academicYear,
   onToggleTask,
   onEditTask,
   onEditEvent,
@@ -330,6 +334,7 @@ export default function Dashboard({
                 dates={dates}
                 personalEvents={personalEvents}
                 studySessions={studySessions}
+                weeklyClasses={weeklyClasses}
                 onSelectDate={onSelectDate}
                 onEditEvent={onEditEvent}
                 onOpenMap={onOpenMap}
@@ -340,6 +345,7 @@ export default function Dashboard({
                 date={selectedDate}
                 personalEvents={personalEvents}
                 studySessions={studySessions}
+                weeklyClasses={weeklyClasses}
                 onEditEvent={onEditEvent}
                 onOpenMap={onOpenMap}
                 onNavigate={onNavigate}
@@ -351,6 +357,7 @@ export default function Dashboard({
               date={selectedDate}
               personalEvents={personalEvents}
               studySessions={studySessions}
+              weeklyClasses={weeklyClasses}
               onEditEvent={onEditEvent}
               onOpenMap={onOpenMap}
               onNavigate={onNavigate}
@@ -471,24 +478,39 @@ export default function Dashboard({
             <span className="summary-icon">
               <Icon name="graduation" size={21} />
             </span>
-            <h2>113 學年度畢業門檻示例</h2>
+            <h2>{academicYear} 學年度畢業進度</h2>
           </div>
           <strong>
-            {graduationRule.earnedCredits} / {graduationRule.requiredCredits}{" "}
+            {graduationProgress?.earned_credits ?? "待確認"} /{" "}
+            {graduationProgress?.checks?.find(
+              (check) => check.check_id === "total_credits",
+            )?.required_value ?? 133}{" "}
             <small>學分</small>
           </strong>
           <div className="progress-track">
             <span
               style={{
-                width: `${(graduationRule.earnedCredits / graduationRule.requiredCredits) * 100}%`,
+                width: `${Math.min(
+                  100,
+                  ((graduationProgress?.earned_credits || 0) /
+                    (graduationProgress?.checks?.find(
+                      (check) => check.check_id === "total_credits",
+                    )?.required_value || 133)) *
+                    100,
+                )}%`,
               }}
             />
           </div>
           <p>
-            合成資料：尚缺{" "}
-            {graduationRule.requiredCredits - graduationRule.earnedCredits}{" "}
-            學分・講座 {graduationRule.completedLectures}/
-            {graduationRule.requiredLectures}
+            {graduationProgress
+              ? `後端規則：${graduationProgress.rule_set_id}・${
+                  graduationProgress.overall_status === "met"
+                    ? "已達標"
+                    : graduationProgress.overall_status === "not_met"
+                      ? "未達標"
+                      : "待確認"
+                }`
+              : "正在從後端讀取畢業規則與已修紀錄"}
           </p>
           <Icon name="right" size={18} className="summary-arrow" />
         </button>

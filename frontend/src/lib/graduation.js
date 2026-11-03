@@ -16,6 +16,8 @@ export const DATA_MESSAGES = {
   REQUIRED_COURSES_UNMAPPED: "部分必修課程尚未完成課程對照。",
   GENERAL_DOMAIN_UNKNOWN: "部分通識課程的領域尚待確認。",
   DUPLICATE_COURSE: "發現重複課程紀錄，請確認採計方式。",
+  RECOGNITION_PENDING: "共同認列範圍尚未提供，已修課程暫不計入確認學分。",
+  COURSE_NOT_RECOGNIZED: "這門課不在目前認列範圍內，未計入畢業學分。",
   RULE_UNAVAILABLE: "尚無適用且完整的畢業規則。",
 };
 const apiBase = (import.meta.env?.VITE_GRADUATION_API_BASE || "").replace(

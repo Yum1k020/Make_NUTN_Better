@@ -8,101 +8,243 @@ import ItemDialog from "./components/ItemDialog.jsx";
 import CampusMapDialog from "./components/CampusMapDialog.jsx";
 import Icon from "./components/Icon.jsx";
 import { MobileNav, Sidebar } from "./components/Navigation.jsx";
+import { DEMO_DATE } from "./data/demo.js";
 import {
-  DEMO_DATE,
-  initialEvents,
-  initialTasks,
-  weeklyClasses,
-} from "./data/demo.js";
-import { planStudySessions } from "./lib/planner.js";
+  addPlannedCourse,
+  deletePersonalEvent,
+  deletePlannedCourse,
+  deleteStudySession,
+  deleteTask,
+  loadApplicationState,
+  migrateLegacyPlannerState,
+  replaceStudySchedule,
+  savePersonalEvent,
+  saveTask,
+  setTaskCompleted,
+  updateStudySession,
+} from "./lib/plannerApiClient.js";
 
-function loadStored(key, fallback) {
-  try {
-    const value = JSON.parse(localStorage.getItem(key));
-    return Array.isArray(value) ? value : fallback;
-  } catch {
-    return fallback;
+let plannerInitialization;
+
+function initializePlannerState() {
+  if (!plannerInitialization) {
+    plannerInitialization = loadApplicationState()
+      .then(async (state) => ({
+        ...state,
+        ...(await migrateLegacyPlannerState(state, {
+          targetSemesterId:
+            state.academic.profile.current_semester_id || "semester-115-1",
+        })),
+      }))
+      .catch((error) => {
+        plannerInitialization = undefined;
+        throw error;
+      });
   }
+  return plannerInitialization;
 }
-
-const initialStudyPlan = planStudySessions({
-  startDate: DEMO_DATE,
-  examDate: "2026-09-24",
-  hours: 6,
-  sessionHours: 2,
-  allowedPeriods: ["afternoon", "evening"],
-  courseName: "資料結構",
-  weeklyClasses,
-  personalEvents: initialEvents,
-}).sessions;
 
 export default function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [selectedDate, setSelectedDate] = useState(DEMO_DATE);
-  const [tasks, setTasks] = useState(() =>
-    loadStored("nutn-tasks-v2", initialTasks),
-  );
-  const [personalEvents, setPersonalEvents] = useState(() =>
-    loadStored("nutn-events-v1", initialEvents),
-  );
-  const [studySessions, setStudySessions] = useState(() =>
-    loadStored("nutn-study-v1", initialStudyPlan),
-  );
-  const [plannedCourseIds, setPlannedCourseIds] = useState(() =>
-    loadStored("nutn-courses-v1", []),
-  );
+  const [tasks, setTasks] = useState([]);
+  const [personalEvents, setPersonalEvents] = useState([]);
+  const [studyPlan, setStudyPlan] = useState(null);
+  const [studySessions, setStudySessions] = useState([]);
+  const [plannedCourses, setPlannedCourses] = useState([]);
+  const [academic, setAcademic] = useState({
+    profile: {},
+    rule: null,
+    programs: [],
+    enrollments: [],
+    timetableEntries: [],
+    courses: [],
+    weeklyClasses: [],
+    graduationProgress: null,
+  });
+  const [backendState, setBackendState] = useState({
+    status: "loading",
+    message: "正在從後端讀取個人安排。",
+  });
   const [dialog, setDialog] = useState(null);
   const [mapDialog, setMapDialog] = useState(null);
+  const plannedCourseIds = plannedCourses.map((item) => item.course_id);
 
   useEffect(() => {
-    localStorage.setItem("nutn-tasks-v2", JSON.stringify(tasks));
-  }, [tasks]);
-  useEffect(() => {
-    localStorage.setItem("nutn-events-v1", JSON.stringify(personalEvents));
-  }, [personalEvents]);
-  useEffect(() => {
-    localStorage.setItem("nutn-study-v1", JSON.stringify(studySessions));
-  }, [studySessions]);
-  useEffect(() => {
-    localStorage.setItem("nutn-courses-v1", JSON.stringify(plannedCourseIds));
-  }, [plannedCourseIds]);
+    let active = true;
+    initializePlannerState()
+      .then((state) => {
+        if (!active) return;
+        setTasks(state.tasks);
+        setPersonalEvents(state.personalEvents);
+        setStudyPlan(state.studyPlan);
+        setStudySessions(state.studySessions);
+        setPlannedCourses(state.plannedCourses);
+        setAcademic(state.academic);
+        const integrated =
+          state.academic.rule?.rule_set_id === "nutn-csie-115-integrated-v2";
+        const migrationWarnings = state.migrationWarnings || [];
+        setBackendState({
+          status: integrated && !migrationWarnings.length ? "ready" : "error",
+          message: !integrated
+            ? "後端尚未選用 115 整合規格，請執行 scripts/select-demo-profile-115.sh。"
+            : migrationWarnings.length
+              ? `115 後端資料已載入；${migrationWarnings.length} 組舊版瀏覽器資料因衝突而保留，未覆寫 SQLite。`
+              : "待辦、行程、讀書時段、課表、課程、修課紀錄與畢業規則已由 Flask／SQLite 管理。",
+        });
+      })
+      .catch((error) => {
+        if (!active) return;
+        setBackendState({
+          status: "error",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  function saveItem(item) {
-    if (item.kind === "event") {
-      setPersonalEvents((current) =>
-        current.some((event) => event.id === item.id)
-          ? current.map((event) => (event.id === item.id ? item : event))
-          : [...current, item],
-      );
-    } else {
-      setTasks((current) =>
-        current.some((task) => task.id === item.id)
-          ? current.map((task) =>
-              task.id === item.id
-                ? { ...item, completed: task.completed }
-                : task,
-            )
-          : [...current, { ...item, completed: false }],
-      );
+  function reportBackendError(error) {
+    const message = error instanceof Error ? error.message : String(error);
+    setBackendState({ status: "error", message });
+    return error instanceof Error ? error : new Error(message);
+  }
+
+  function reportBackendReady(message) {
+    setBackendState({ status: "ready", message });
+  }
+
+  async function saveItem(item) {
+    try {
+      if (item.kind === "event") {
+        const original = personalEvents.find((event) => event.id === item.id);
+        const saved = await savePersonalEvent({
+          ...item,
+          backendId: original?.backendId,
+        });
+        setPersonalEvents((current) =>
+          current.some((event) => event.id === saved.id)
+            ? current.map((event) => (event.id === saved.id ? saved : event))
+            : [...current, saved],
+        );
+      } else {
+        const original = tasks.find((task) => task.id === item.id);
+        const saved = await saveTask({
+          ...item,
+          backendId: original?.backendId,
+          completed: original?.completed || false,
+        });
+        setTasks((current) =>
+          current.some((task) => task.id === saved.id)
+            ? current.map((task) => (task.id === saved.id ? saved : task))
+            : [...current, saved],
+        );
+      }
+      reportBackendReady("已儲存到後端 SQLite。");
+      setDialog(null);
+    } catch (error) {
+      throw reportBackendError(error);
     }
-    setDialog(null);
   }
 
-  function deleteItem(item) {
-    if (dialog?.kind === "event")
-      setPersonalEvents((current) =>
-        current.filter((event) => event.id !== item.id),
+  async function removeItem(item) {
+    try {
+      if (dialog?.kind === "event") {
+        await deletePersonalEvent(item);
+        setPersonalEvents((current) =>
+          current.filter((event) => event.id !== item.id),
+        );
+      } else {
+        await deleteTask(item);
+        setTasks((current) => current.filter((task) => task.id !== item.id));
+      }
+      reportBackendReady("已從後端刪除資料。");
+      setDialog(null);
+    } catch (error) {
+      throw reportBackendError(error);
+    }
+  }
+
+  async function toggleTask(taskId) {
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task) return;
+    try {
+      const saved = await setTaskCompleted(task, !task.completed);
+      setTasks((current) =>
+        current.map((item) => (item.id === saved.id ? saved : item)),
       );
-    else setTasks((current) => current.filter((task) => task.id !== item.id));
-    setDialog(null);
+      reportBackendReady("待辦狀態已同步到後端。");
+    } catch (error) {
+      reportBackendError(error);
+    }
   }
 
-  function toggleCourse(courseId) {
-    setPlannedCourseIds((current) =>
-      current.includes(courseId)
-        ? current.filter((id) => id !== courseId)
-        : [...current, courseId],
-    );
+  async function toggleCourse(courseId) {
+    const existing = plannedCourses.find((item) => item.course_id === courseId);
+    try {
+      if (existing) {
+        const courseName =
+          academic.courses.find((course) => course.id === courseId)?.name ||
+          "這門課程";
+        if (
+          typeof globalThis.confirm === "function" &&
+          !globalThis.confirm(`確定要把「${courseName}」移出修課規劃嗎？`)
+        ) {
+          return;
+        }
+        await deletePlannedCourse(existing);
+        setPlannedCourses((current) =>
+          current.filter(
+            (item) => item.planned_course_id !== existing.planned_course_id,
+          ),
+        );
+      } else {
+        const saved = await addPlannedCourse(
+          courseId,
+          academic.profile.current_semester_id || "semester-115-1",
+        );
+        setPlannedCourses((current) => [...current, saved]);
+      }
+      reportBackendReady("115 修課規劃已同步到後端。");
+    } catch (error) {
+      reportBackendError(error);
+    }
+  }
+
+  async function replaceSchedule(payload) {
+    try {
+      const saved = await replaceStudySchedule(payload);
+      setStudyPlan(saved.plan);
+      setStudySessions(saved.sessions);
+      reportBackendReady("讀書計畫與時段已儲存到後端。");
+      return saved.sessions;
+    } catch (error) {
+      throw reportBackendError(error);
+    }
+  }
+
+  async function editStudySession(session, draft) {
+    try {
+      const saved = await updateStudySession(session, draft);
+      setStudySessions(saved.sessions);
+      reportBackendReady("讀書時段已更新到後端。");
+      return saved.sessions;
+    } catch (error) {
+      throw reportBackendError(error);
+    }
+  }
+
+  async function removeStudySession(session) {
+    try {
+      const saved = await deleteStudySession(session);
+      setStudyPlan(saved.plan || studyPlan);
+      setStudySessions(saved.sessions);
+      reportBackendReady("讀書時段已從後端刪除。");
+      return saved.sessions;
+    } catch (error) {
+      throw reportBackendError(error);
+    }
   }
 
   return (
@@ -115,7 +257,7 @@ export default function App() {
           onClick={() => setActivePage("dashboard")}
         >
           <Icon name="calendar" size={25} />
-          <span>校園日程・113</span>
+          <span>校園日程・115</span>
         </button>
         <div className="mobile-top-actions">
           <button
@@ -137,6 +279,16 @@ export default function App() {
         </div>
       </div>
       <main className="main-content">
+        <div
+          className={`notice ${backendState.status === "error" ? "notice-warning" : "notice-info"}`}
+          role={backendState.status === "error" ? "alert" : "status"}
+        >
+          <Icon
+            name={backendState.status === "error" ? "alert" : "check"}
+            size={18}
+          />
+          {backendState.message}
+        </div>
         {activePage === "dashboard" && (
           <Dashboard
             selectedDate={selectedDate}
@@ -144,15 +296,10 @@ export default function App() {
             tasks={tasks}
             personalEvents={personalEvents}
             studySessions={studySessions}
-            onToggleTask={(taskId) =>
-              setTasks((current) =>
-                current.map((task) =>
-                  task.id === taskId
-                    ? { ...task, completed: !task.completed }
-                    : task,
-                ),
-              )
-            }
+            weeklyClasses={academic.weeklyClasses}
+            graduationProgress={academic.graduationProgress}
+            academicYear={academic.rule?.admission_year || 115}
+            onToggleTask={toggleTask}
             onEditTask={(item) => setDialog({ kind: "task", initial: item })}
             onEditEvent={(item) => setDialog({ kind: "event", initial: item })}
             onAdd={(kind) => setDialog({ kind })}
@@ -164,13 +311,18 @@ export default function App() {
           <StudyPlanner
             personalEvents={personalEvents}
             studySessions={studySessions}
-            onUpdateSessions={setStudySessions}
+            courses={academic.courses}
+            weeklyClasses={academic.weeklyClasses}
+            onReplaceSchedule={replaceSchedule}
+            onUpdateSession={editStudySession}
+            onDeleteSession={removeStudySession}
           />
         )}
         {activePage === "courses" && (
           <CoursePlanner
             plannedCourseIds={plannedCourseIds}
             onToggleCourse={toggleCourse}
+            academic={academic}
           />
         )}
         {activePage === "graduation" && (
@@ -178,6 +330,7 @@ export default function App() {
             plannedCourseIds={plannedCourseIds}
             onToggleCourse={toggleCourse}
             onNavigate={setActivePage}
+            initialAcademic={academic}
           />
         )}
         {activePage === "evidence" && (
@@ -192,9 +345,10 @@ export default function App() {
           initialKind={dialog.kind}
           selectedDate={selectedDate}
           personalEvents={personalEvents}
+          weeklyClasses={academic.weeklyClasses}
           onClose={() => setDialog(null)}
           onSave={saveItem}
-          onDelete={deleteItem}
+          onDelete={removeItem}
         />
       )}
       {mapDialog && (

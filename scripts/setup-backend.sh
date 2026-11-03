@@ -24,6 +24,6 @@ mkdir -p .cache/tmp
 export TMPDIR="$PROJECT_ROOT/.cache/tmp"
 export PYTHONDONTWRITEBYTECODE=1
 .venv/bin/python -m pip --isolated --disable-pip-version-check --no-cache-dir install \
-  -r backend/requirements-dev.lock.txt \
-  -r backend/requirements-framework.lock.txt
+  -r requirements-integrated.txt
 .venv/bin/python -m pip --isolated --disable-pip-version-check --no-cache-dir check
+.venv/bin/python scripts/verify_environment.py

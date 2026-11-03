@@ -1,5 +1,5 @@
-export const DEFAULT_STUDY_MEMORY_ENDPOINT = "/api/study-memory/preference";
-export const DEMO_STUDY_USER_ID = "demo-student-001";
+export const DEFAULT_STUDY_MEMORY_ENDPOINT = "/api/v1/study-memory/preference";
+export const DEMO_STUDY_USER_ID = "user-demo-001";
 
 export function createMemoryOperationId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();

@@ -12,17 +12,22 @@ import {
   GraduationMemory,
   VALIDITY_MESSAGES,
 } from "../lib/graduationMemory.js";
-import {
-  curriculumMeta113,
-  graduationRequirements113,
-} from "../data/curriculum113.js";
+import { loadAcademicState } from "../lib/plannerApiClient.js";
 
-export default function GraduationProgress({ onNavigate }) {
-  const [progress, setProgress] = useState(null);
-  const [planned, setPlanned] = useState(null);
+export default function GraduationProgress({
+  onNavigate,
+  plannedCourseIds,
+  initialAcademic,
+}) {
+  const [progress, setProgress] = useState(
+    initialAcademic.graduationProgress || null,
+  );
+  const [rule, setRule] = useState(initialAcademic.rule || null);
+  const [enrollments, setEnrollments] = useState(
+    initialAcademic.enrollments || [],
+  );
   const [workflow, setWorkflow] = useState(null);
   const [error, setError] = useState("");
-  const [plannedError, setPlannedError] = useState("");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [reload, setReload] = useState(0);
@@ -82,23 +87,20 @@ export default function GraduationProgress({ onNavigate }) {
       });
     setLoading(true);
     setProgress(null);
-    setPlanned(null);
     setWorkflow(null);
     setError("");
-    setPlannedError("");
-    graduationRequest("graduation-progress", { signal: controller.signal })
-      .then(setProgress)
+    loadAcademicState()
+      .then((state) => {
+        if (controller.signal.aborted) return;
+        setProgress(state.graduationProgress);
+        setRule(state.rule);
+        setEnrollments(state.enrollments);
+      })
       .catch((e) => {
         if (!controller.signal.aborted) setError(e.message);
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
-      });
-    graduationRequest("planned-courses", { signal: controller.signal })
-      .then(setPlanned)
-      .catch(() => {
-        if (!controller.signal.aborted)
-          setPlannedError("修課規劃暫時無法讀取，不能當作零門。");
       });
     return () => controller.abort();
   }, [reload]);
@@ -112,8 +114,10 @@ export default function GraduationProgress({ onNavigate }) {
       <header className="page-header">
         <div>
           <div className="title-line">
-            <h1>113 學年度畢業進度</h1>
-            <span className="academic-year-badge">113 學年度</span>
+            <h1>{rule?.admission_year || 115} 學年度畢業進度</h1>
+            <span className="academic-year-badge">
+              {rule?.rule_set_id || "規則讀取中"}
+            </span>
           </div>
           <p>
             依目前使用者紀錄與啟用規則，逐項確認已完成、未完成與待確認事項。
@@ -130,23 +134,32 @@ export default function GraduationProgress({ onNavigate }) {
       <section className="graduation-rule-baseline">
         <div>
           <span>最低總學分</span>
-          <strong>{graduationRequirements113.minimumTotalCredits}</strong>
+          <strong>
+            {rule?.credit_requirements?.minimum_total_credits ?? "—"}
+          </strong>
         </div>
         <div>
           <span>系專業必選修</span>
-          <strong>{graduationRequirements113.minimumDepartmentCredits}</strong>
+          <strong>
+            {rule
+              ? rule.credit_requirements.department_required.required_credits +
+                rule.credit_requirements.department_elective.minimum_credits
+              : "—"}
+          </strong>
         </div>
         <div>
           <span>學術講座</span>
-          <strong>{graduationRequirements113.requiredLectureCount} 場</strong>
+          <strong>
+            {rule?.lecture_requirements?.professional?.minimum_count ?? "—"} 場
+          </strong>
         </div>
         <div>
           <span>領域學程證書</span>
           <strong>
-            {graduationRequirements113.minimumCompletedPrograms} 個
+            {rule?.program_requirements?.minimum_completed_programs ?? "—"} 個
           </strong>
         </div>
-        <p>{curriculumMeta113.verificationNote}</p>
+        <p>{rule?.verification_scope}</p>
       </section>
       <button
         className="text-link"
@@ -163,11 +176,10 @@ export default function GraduationProgress({ onNavigate }) {
       )}
       {progress && (
         <>
-          {!progress.rule_set_id?.includes("-113-") && (
+          {progress.rule_set_id !== "nutn-csie-115-integrated-v2" && (
             <p role="alert" className="graduation-notice">
-              後端目前載入的「{progress.rule_set_id || "未選定"}」不是 113
-              學年度規則，因此下方即時計算不可當作 113
-              畢業審核結果。請先把示範身分切換到 113 規則。
+              後端目前載入的「{progress.rule_set_id || "未選定"}」不是指定的
+              nutn-csie-115-integrated-v2，請先切換 115 示範身分。
             </p>
           )}
           <section className="graduation-hero">
@@ -229,16 +241,31 @@ export default function GraduationProgress({ onNavigate }) {
           <section className="panel graduation-section">
             <h2>規劃中的課程</h2>
             <p>
-              {plannedError ||
-                (planned === null
-                  ? "正在讀取修課規劃…"
-                  : `後端紀錄有 ${planned.length} 門規劃課程。`)}
+              後端紀錄有 {plannedCourseIds.length} 門規劃課程。
               規劃中或修習中課程不計入已取得學分。
             </p>
-            <p>修課規劃頁目前另使用本機示範資料；此處以後端紀錄為準。</p>
             <button className="text-link" onClick={() => onNavigate("courses")}>
               查看修課規劃
             </button>
+          </section>
+          <section className="panel graduation-section">
+            <h2>後端已修紀錄</h2>
+            {enrollments.length ? (
+              <ul>
+                {enrollments.map((enrollment) => (
+                  <li key={enrollment.enrollment_id}>
+                    {enrollment.course_snapshot.name}・
+                    {enrollment.enrollment_status === "finished"
+                      ? enrollment.passed
+                        ? "已通過，認列狀態依 v2 規則檢查"
+                        : "未通過"
+                      : "修習中"}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>目前沒有已修紀錄；空清單不會被當成已取得學分。</p>
+            )}
           </section>
           <section className="panel graduation-section" aria-live="polite">
             <h2>缺項說明與下一步</h2>

@@ -20,7 +20,7 @@ from app.db import get_db, init_db
 
 PREFIX = "/api/v1/"
 COURSE, SEM = "course-demo-001", "semester-115-1"
-RULE = "nutn-csie-115-mvp-v1"
+RULE = "nutn-csie-115-integrated-v2"
 RULE_113 = "nutn-csie-113-source-v1"
 
 
@@ -189,10 +189,11 @@ def test_X09_X10_bad_json_and_user_id(api, kind):
 
 def test_E01_E02_E03_enrollment(api):
     select_rule(api)
-    api("POST", "enrollments", {**DATA["enrollments"], "grade": 50}, 422, phase="L3")
-    row = create(api, "enrollments")
+    row = api("POST", "enrollments", {**DATA["enrollments"], "grade": 50}, 201)
     assert row["course_snapshot"]["credits"] == 3 and row["course_snapshot"]["version_basis"].startswith("sha256:")
-    assert api("GET", "graduation-progress")["earned_credits"] == 3
+    progress = api("GET", "graduation-progress")
+    assert progress["earned_credits"] is None
+    assert any(error["code"] == "RECOGNITION_PENDING" for error in progress["data_errors"])
     api("POST", "enrollments", DATA["enrollments"], 409, phase="L3")
     api("POST", "enrollments", {**DATA["enrollments"], "semester_id": "semester-115-2"}, 409)
 
@@ -366,6 +367,8 @@ def test_CK01_CK02_planning_check(api):
 def test_GR01_GR02_PR01_PR02_rules(api):
     rule = api("GET", "graduation-rules/" + RULE)
     assert rule["total_credits_required"] == 133 and rule["sources"] and rule["verification_scope"]
+    assert rule["backend_status"] == "active" and len(rule["planning_courses"]) == 60
+    assert rule["passing_and_recognition"]["common_recognition_scope"]["course_ids"] is None
     assert rule["unmapped_required_courses"] and rule["required_course_ids"] == []
     api("GET", "graduation-rules/unknown", status=404)
     ps = api("GET", "programs?rule_set_id=" + RULE)
@@ -415,17 +418,26 @@ def test_GP01_GP02_GP03_GP04_progress(api, mutate):
     create(api, "planned-courses", course_id="course-demo-003")
     result = api("GET", "graduation-progress")
     total = next(c for c in result["checks"] if c["check_id"] == "total_credits")
-    assert total["actual_value"] == 100 and total["remaining_value"] == 33
+    assert total["actual_value"] is None and total["remaining_value"] is None
     assert any(c["status"] == "needs_confirmation" for c in result["checks"])
     api("PUT", "lecture-progress", {"professional_count": 10, "general_count": 11})
     checks = {c["check_id"]: c for c in api("GET", "graduation-progress")["checks"]}
     assert checks["lecture_professional"]["remaining_value"] == 0 and checks["lecture_general"]["remaining_value"] == 1
 
 
-def test_GP05_allocation_once(api, mutate):
+def test_GP05_allocation_once(api, mutate, planner_app):
     select_rule(api)
     mutate("UPDATE courses SET credits=24 WHERE course_id=?", (COURSE,))
     mutate("INSERT INTO course_classifications VALUES (?,?,?)", (COURSE, RULE, "department_elective"))
+    with planner_app.app_context():
+        db = get_db()
+        row = db.execute("SELECT document FROM graduation_rule_documents WHERE rule_set_id=?", (RULE,)).fetchone()
+        document = json.loads(row["document"])
+        document["passing_and_recognition"]["common_recognition_scope"]["course_ids"] = [COURSE]
+        encoded = json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        db.execute("UPDATE graduation_rule_documents SET document=?,digest=? WHERE rule_set_id=?",
+                   (encoded, hashlib.sha256(encoded.encode()).hexdigest(), RULE))
+        db.commit()
     create(api, "enrollments")
     result = api("GET", "graduation-progress")
     assert result["earned_credits"] == 24
@@ -679,10 +691,12 @@ def test_B20_fully_mapped_synthetic_graduation_met(api, planner_app, evidence):
         db = get_db()
         d = document(db, RULE)
         counter = 0
+        recognized = []
         def passed_course(name, credits, category, source_key=None, domain=None):
             nonlocal counter
             counter += 1
             cid = "test-confirmed-" + str(counter)
+            recognized.append(cid)
             db.execute("INSERT INTO courses VALUES (?,?,?,?,?,?,?,?)", (cid, None, name, credits, "dept-nutn-csie", "unknown", None, None))
             db.execute("INSERT INTO course_classifications VALUES (?,?,?)", (cid, RULE, category))
             if source_key:
@@ -707,6 +721,10 @@ def test_B20_fully_mapped_synthetic_graduation_met(api, planner_app, evidence):
         for p in d["program_requirements"]["programs"]:
             for i, name in enumerate(p["courses"][:3]):
                 passed_course(name + "（零學分測試項目）", 0, "free_elective", f"program:{p['id']}:{i}")
+        d["passing_and_recognition"]["common_recognition_scope"]["course_ids"] = recognized
+        encoded = dump(d)
+        db.execute("UPDATE graduation_rule_documents SET document=?,digest=? WHERE rule_set_id=?",
+                   (encoded, hashlib.sha256(encoded.encode()).hexdigest(), RULE))
         db.commit()
     evidence.append({"synthetic_fixture": "133 credits with explicit required/core/domain/program mappings; 0-credit program fixtures are test-only"})
     api("PUT", "lecture-progress", {"professional_count": 10, "general_count": 12})

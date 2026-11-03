@@ -16,7 +16,7 @@
 另一個終端啟動前端：
 
 ```bash
-./scripts/select-demo-profile-113.sh
+./scripts/select-demo-profile-115.sh
 cd frontend
 npm install
 npm run dev
@@ -30,14 +30,23 @@ npm test
 npm run format:check
 ```
 
+若 5050 已被另一個本機服務使用，可讓 Flask 改用其他 port，並只用非敏感的 proxy 設定指向它：
+
+```bash
+PORT=5051 ./scripts/run-backend.sh
+BACKEND_PROXY_TARGET=http://127.0.0.1:5051 npm run dev
+```
+
+`BACKEND_PROXY_TARGET` 只供 Vite 開發代理使用；不得改用 `VITE_*` 傳遞 API key。
+
 ## 目前可操作的功能
 
 - 今日／本週：週課表與單日時間軸切換、日期切換、待辦完成狀態、新增／編輯／刪除待辦與私人行程。
 - 私人行程與既有課程或其他私人行程時間重疊時，表單會提示衝突並要求調整。
 - 智慧學習：先預覽本週課程與個人行程，再設定考試日期、複習時數和可安排時段，計算不與課程和行程重疊的複習建議；時段不足會顯示缺少時數，亦可手動調整或移除建議。
 - 學習偏好記憶：使用者可明確確認一個每次複習分鐘數；新 session 會讀回並預選，可更正、到期與撤回。本次手動選擇的時長不會自動保存。
-- 修課規劃：以 113 學年度資工系課程規劃表與課程地圖呈現 25 門專業必修、35 門專業選修、三個領域學程與資料來源界線；可搜尋並加入個人清單。
-- 畢業進度：以 113 學年度最低 134 學分、10 場相關學術講座與至少 2 個領域學程證書為基準；規劃中的課程不計入已取得學分。
+- 修課規劃：由 Flask 的 `nutn-csie-115-integrated-v2` 呈現 25 門專業必修、35 門專業選修及三個領域學程；可搜尋並把規劃寫回 SQLite。
+- 畢業進度：以 115 學年度最低 133 學分、專業／一般講座及至少 2 個領域學程為基準；課程、已修紀錄、規劃與規則都由後端讀取。
 - 資料證據：整理 Week 03 gate 的 proposal、source cards、3 個 fixed queries、top-k trace、generator comparison JSON 與 failure observation；目前使用學生系統 fixture 驗證，不把羽球場 baseline 範例當成產品需求。
 - 校區地圖：府城校區總覽、府城教室配置與榮譽教學中心配置；點選課表中的課程地點可開啟對應地圖，並能縮放及查看原圖。
 
@@ -94,8 +103,8 @@ npm run agent:smoke
 
 ## Week 07 已確認偏好記憶
 
-「智慧學習」會透過同源 `/api/study-memory/preference` API 讀寫一筆 `study_session_minutes`。只有按下「確認並保存」才會寫入；記憶包含 owner、來源、版本與 30 天期限，撤回或到期後不再回填。記憶只預選 UI 的每次安排時長，原排程仍重新檢查課表、私人行程與本次輸入。
+「智慧學習」會透過同源 `/api/v1/study-memory/preference` API 讀寫一筆 `study_session_minutes`。只有按下「確認並保存」才會寫入；記憶包含 owner、來源、版本與 30 天期限，撤回或到期後不再回填。記憶只預選 UI 的每次安排時長，原排程仍重新檢查課表、私人行程與本次輸入。
 
-預設資料檔是 `data/study-memory.json`，已由專案根目錄 `.gitignore` 排除。這是本機課堂原型，示範 user header 不是正式登入驗證；不要在該檔放入真實個資。實作、測試矩陣、比較表與 ADR 請見 [`../docs/week07/README.md`](../docs/week07/README.md)。
+偏好、待辦、私人行程、讀書計畫、115 修課規劃、課表與已修紀錄均保存於後端 `ME_DATABASE` 指定的 SQLite；課程與畢業規則也由同一個 Flask API 提供。Vite 不再維護另一份 JSON 記憶服務。這仍是固定示範 user 的本機課堂原型，不得放入真實個資。
 
-目前使用固定示範日期 **2026-09-17** 和本機合成使用者資料。使用者的待辦、私人行程、複習建議與修課規劃會保存在瀏覽器 `localStorage`。113 課程資料來源與雜湊見 [`../docs/sources/113-academic-year/`](../docs/sources/113-academic-year/README.md)。尚未連接登入或學校課務系統；實際開課、抵免與畢業資格仍以校方審核為準。
+目前使用固定示範日期 **2026-09-17** 和本機合成使用者資料。升級後第一次開啟會在後端對應集合為空時，將舊版 `nutn-tasks-v2`、`nutn-events-v1`、`nutn-study-v1`、`nutn-courses-v1` 遷移至 Flask；成功後刪除舊 key。之後每次重新整理都由後端讀回。尚未連接登入或學校課務系統；共同認列範圍、實際開課、抵免與正式畢業資格仍以校方資料及審核為準。

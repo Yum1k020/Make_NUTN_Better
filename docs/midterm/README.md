@@ -6,7 +6,7 @@
 
 報告檔案：[`PDF`](../../reports/midterm/Make_NUTN_Better_Midterm_2026-11-04.pdf)／[`可編輯 PPTX`](../../reports/midterm/Make_NUTN_Better_Midterm_2026-11-04.pptx)
 
-第 3–7 週課堂概念、程式證據、示範方式與未完成界線見 [`COURSE_CONCEPT_MAPPING.md`](COURSE_CONCEPT_MAPPING.md)。
+第 3–7 週課堂概念、程式證據、示範方式與未完成界線見 [`COURSE_CONCEPT_MAPPING.md`](COURSE_CONCEPT_MAPPING.md)。實際操作請看 [`USER_GUIDE.md`](USER_GUIDE.md)，逐字講稿請看 [`PRESENTATION_SCRIPT.md`](PRESENTATION_SCRIPT.md)，遠端分支盤點請看 [`BRANCH_INTEGRATION.md`](BRANCH_INTEGRATION.md)。
 
 ## 組員
 
@@ -85,14 +85,14 @@ flowchart LR
 | --- | --- |
 | 已完成並驗證 | 課表／待辦／私人行程 UI、確定性複習排程、兩個工具契約、Prompt Chaining Gate、偏好保存／更正／到期／撤回／冪等、畢業進度與說明有效性、前後端測試與 production build；選用 OpenAI 後端為 LIVE_PASS |
 | 已實作但尚未完成真實驗證 | Google Cloud ADC Gemini 正常主流程；目前環境沒有 ADC、project 與模型設定，證據為 `LIVE_NOT_RUN` |
-| 規劃中 | 正式登入與多使用者授權、校務資料匯入、mvp-v1 至正式規則遷移、正式多實例資料庫、部署與大量並行測試 |
+| 規劃中 | 正式登入與多使用者授權、校務資料匯入、寫入工具接入主 Agent、正式多實例資料庫、部署與大量並行測試 |
 
 ## 6. 測試、失敗案例與限制
 
 最新本機結果：
 
-- Python：345 passed、5 skipped、1 xfailed（其中 3 個真實 HTTP 測試需允許本機 loopback；允許後通過）。
-- Frontend：39/39 passed。
+- Python：356 passed、5 skipped、1 xfailed。
+- Frontend：38/38 passed。
 - Vite production build：通過。
 - Prettier：通過。
 - Google Cloud／ADC live：`LIVE_NOT_RUN`，原因是本機沒有 ADC、project 與模型設定。
@@ -109,7 +109,7 @@ flowchart LR
 | 記憶過期或撤回 | 新 session 不再回填 | 測試通過 |
 | 畢業說明來源更新 | 清除舊說明 | `SOURCE_CHANGED` 控制測試通過 |
 
-主要限制：固定示範 user 不是正式登入；課表與規則不是即時校務資料；JSON 記憶只適合單機；真實 Gemini 與正式跨 user 仍需補驗證。
+主要限制：固定示範 user 不是正式登入；課表與規則不是即時校務資料；SQLite 仍是單機開發資料庫；真實 Gemini 與正式跨 user 仍需補驗證。
 
 ## 7. 團隊分工與後續計畫
 
@@ -119,15 +119,15 @@ Git 歷史沒有可靠記錄四位組員各自完成的檔案，不能自動推�
 
 1. 完成 ADC 登入與真實 Gemini E2E，驗收 `LIVE_PASS`、run ID、usage 與畫面截圖。
 2. 加入正式登入與 server-side user ID，完成兩位真實 session 的隔離測試。
-3. 將本機 JSON 記憶遷移至具交易與權限控制的資料庫。
-4. 與校方規則／課務來源確認資料版本，完成 mvp-v1 遷移與引用。
+3. 將已具確認與冪等保護的寫入工具接入主 Agent，保留人工確認 Gate。
+4. 與校方規則／課務來源確認資料版本，完成正式引用與版本遷移。
 5. 部署後執行 Chrome／Safari、手機版與大量並行測試。
 
 ## 8. 版本與安全
 
 - Repository：[Yum1k020/Make_NUTN_Better](https://github.com/Yum1k020/Make_NUTN_Better)
-- 報告分支：`codex/midterm-integrated-report`
-- 報告程式基線 commit：`fa740a8563eaf0f0b55853d6e9542b88d6fb2545`。
+- 報告分支：`codex/backend-persistence`
+- 報告程式基線 commit：以本次推送後的分支 HEAD 為準；PPTX／PDF 頁尾與證據 JSON 會同步標示。
 - 示範只使用合成資料；不提交或展示 ADC JSON、API key、access token、`.env` 或真實個資。
 
 Google Cloud 技術依據：[Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc)、[Vertex AI function calling](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling)。

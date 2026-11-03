@@ -1,18 +1,18 @@
 # 期中證據索引
 
-課堂報告基線：`fa740a8563eaf0f0b55853d6e9542b88d6fb2545`；選用 OpenAI 後端擴充版本：`ea6798f5f32b7e8d2741126645aadffd85c5f7ce`（2026-11-03）。
+課堂報告分支：`codex/backend-persistence`；程式基線以本次推送後的分支 HEAD 為準。選用 OpenAI 後端既有證據版本：`ea6798f5f32b7e8d2741126645aadffd85c5f7ce`（2026-11-03）。
 
 | ID | 類型 | 案例 | 證據 | 目前狀態 |
 | --- | --- | --- | --- | --- |
-| M01 | 正常 | Python 完整回歸 | `python -m pytest` | 345 passed、5 skipped、1 xfailed |
-| M02 | 正常 | 前端互動單元測試 | `frontend` 的 `npm test` | 39/39 passed |
+| M01 | 正常 | Python 完整回歸 | `.venv/bin/python -m pytest` | 356 passed、5 skipped、1 xfailed |
+| M02 | 正常 | 前端互動單元測試 | `frontend` 的 `npm test` | 38/38 passed |
 | M03 | 正常 | Production build | `frontend` 的 `npm run build` | PASS |
 | M04 | 正常 | 格式檢查 | `frontend` 的 `npm run format:check` | PASS |
 | M05 | 主流程 | Gemini ADC function calling | `evidence/study-agent-live.json` | LIVE_NOT_RUN；project 與 model 未設定，未送出請求 |
 | M06 | 邊界 | 模型工具參數改寫 | `backend/tests/test_study_agent_vertex.py` | PASS，工具 0 次 |
 | M07 | 邊界 | 非法輸入 | `backend/tests/test_study_agent_vertex.py` | PASS，HTTP 422 |
 | M08 | 寫入 | 未確認與重送 | `tests/test_week04_tools.py`、`tests/test_week05_langgraph.py` | PASS |
-| M09 | 記憶 | 更正、撤回、到期、跨 user、冪等 | `tests/test_week07_memory.py`、`frontend/tests/studyMemory.test.js` | PASS |
+| M09 | 記憶 | 更正、撤回、到期、跨 user、冪等 | `backend/tests/test_study_memory.py`、`tests/test_week07_memory.py`、`frontend/tests/plannerApiClient.test.js` | PASS |
 | M10 | 畢業說明 | 來源更新、TTL、舊回應 | `backend/tests/test_graduation_validity.py`、`frontend/tests/graduationMemory.test.js` | PASS_OFFLINE |
 | M11 | 報告 | 14 頁 PDF 與可編輯 PPTX | `reports/midterm/` | PPTX package／layout 驗證通過；PDF 逐頁渲染檢查通過 |
 | M12 | 選用流程 | OpenAI Responses API function calling | `evidence/study-agent-openai-live.json` | LIVE_PASS；HTTP 200、workflow completed、60 分鐘排程 |

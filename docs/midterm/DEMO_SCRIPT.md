@@ -35,10 +35,10 @@
 
 ## 12:30–14:00 測試與限制
 
-- Python 341 passed、前端 39/39、build/format PASS。
+- Python 356 passed、5 skipped、1 xfailed；前端 38/38；build／format PASS。
 - 真實 Gemini 與正式跨 user 若未完成，明確標示狀態與補驗證計畫。
 
 ## 14:00–15:00 分工與下一步
 
 - 每位組員一句話說明自己完成的模組與可回答問題。
-- 期末優先做 ADC live、正式登入隔離、資料庫記憶與校務資料版本。
+- 期末優先做 ADC live、正式登入隔離、寫入工具接入主 Agent 與校務資料版本。

@@ -1,5 +1,8 @@
 """Idempotent, synthetic catalog fixtures; never import real school records implicitly."""
 
+import json
+from pathlib import Path
+
 
 def init_catalog(db):
     # Upgrade the original /me ID-only semester table without replacing any rows.
@@ -28,6 +31,9 @@ def init_catalog(db):
             meeting_id TEXT PRIMARY KEY, offering_id TEXT NOT NULL REFERENCES course_offerings(offering_id),
             weekday INTEGER NOT NULL, start_time TEXT NOT NULL, end_time TEXT NOT NULL,
             campus_id TEXT REFERENCES campuses(id), location TEXT)""",
+        """CREATE TABLE IF NOT EXISTS ui_courses (
+            course_id TEXT PRIMARY KEY, course_code TEXT, name TEXT NOT NULL,
+            credits REAL NOT NULL)""",
     ):
         db.execute(statement)
     for semester in (
@@ -55,6 +61,30 @@ def init_catalog(db):
         ("course-demo-005", "DEMO-ANY", "跨域專題", 0, "dept-demo", "known", "any", source),
         ("course-demo-006", None, "探索課程", 1, None, "unknown", None, None),
     ])
+    catalog_path = Path(__file__).with_name("data") / "nutn_csie_113_course_catalog_v1.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    integrated_path = Path(__file__).parents[2] / "nutn_csie_115_graduation_rules.json"
+    integrated = json.loads(integrated_path.read_text(encoding="utf-8"))
+    integrated_courses = (
+        integrated["credit_requirements"]["department_required"]["courses"]
+        + integrated["course_catalog"]["department_electives"]
+    )
+    db.executemany(
+        "INSERT OR IGNORE INTO ui_courses VALUES (?,?,?,?)",
+        [
+            (course_id, code, name, credits)
+            for course_id, code, name, credits in catalog["courses"]
+        ] + [
+            (f"nutn-115-{course['course_code'].lower()}", course["course_code"],
+             course["name"], course["credits"])
+            for course in integrated_courses
+        ] + [
+            ("ui-calculus", "MATH101", "微積分（一）", 3),
+            ("ui-english", "ENG102", "英文閱讀與寫作", 2),
+            ("ui-psychology", "GE210", "普通心理學", 2),
+            ("ui-seminar", None, "專題討論", 0),
+        ],
+    )
     db.executemany("INSERT OR IGNORE INTO course_classifications VALUES (?,?,?)", [
         ("course-demo-001", "rules-csie-115-v1", "department_required"),
         ("course-demo-001", "rules-demo-114-v1", "free_elective"),

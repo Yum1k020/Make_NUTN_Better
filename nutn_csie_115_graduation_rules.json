@@ -538,15 +538,15 @@
   },
   "implementation_notes": [
     "本檔是唯一整合規則來源；舊版根目錄檔案已由Git歷史保留。",
-    "本次只有規則及文件整合，尚未遷移Flask後端；backend/app/data/中的mvp-v1是現行相容快照。",
-    "消費端不可直接用本檔覆蓋舊後端規則：通過政策、共同認列範圍、證書欄位與JSON結構都需要程式更新。",
+    "Flask後端以內容雜湊載入本檔；backend/app/data/中的mvp-v1保留為legacy相容快照。",
+    "後端已套用明確通過狀態、共同認列範圍及待確認語意；校方證書驗證流程仍不在本次範圍。",
     "共同認列範圍未提供時，相關採計待確認；不可使用35門選修目錄或114學程名單代替共同範圍。",
     "各policy_provenance條目覆蓋該路徑及子項；更具體路徑優先。來源章節只是追溯依據，不代表本次重新驗證校方規定。"
   ],
   "version": "2.0.0",
   "decision_date": "2026-10-03",
   "document_type": "graduation_rule_configuration",
-  "implementation_status": "specification_only_backend_not_migrated",
+  "implementation_status": "flask_sqlite_active",
   "course_catalog": {
     "department_electives": [
       {
@@ -828,7 +828,7 @@
     "正式課程ID與學程課名對照",
     "通識分級與細部領域規則",
     "特殊課程採計依據",
-    "後端新規則與資料欄位遷移"
+    "校方學程證書驗證流程"
   ],
   "policy_provenance": [
     {

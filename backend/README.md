@@ -1,6 +1,6 @@
 # 後端開發環境
 
-目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供課程、學生安排、畢業規則與 `POST /api/v1/study-agent/run`。智慧學習 Agent 透過 Google Cloud ADC 呼叫 Vertex AI Gemini；尚未建立正式登入，前端仍含本機示範資料。
+目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供課程、學生安排、已確認偏好、畢業規則與 `POST /api/v1/study-agent/run`。React 已透過 `/api/v1` 儲存待辦、私人行程、讀書時段、規劃課程與偏好記憶；智慧學習 Agent 透過 Google Cloud ADC 呼叫 Vertex AI Gemini。尚未建立正式登入，資料仍是本機合成示範內容。
 
 ## 位置與分支
 
@@ -9,7 +9,7 @@
 - 課程查詢 API 分支：`feature/course-catalog-api`，由使用者資料 API 分支延伸；沿用已決定的 Flask，調整原規格的 FastAPI baseline。
 - 使用者資料 API 分支：`feature/user-profile-api`，從 `dev/backend-setup` 建立並保留原本未提交的環境檔案。
 - 前端與資料指南已合併至 `main`，原本的前端／文件功能分支已清理；此課程 API 分支尚未合併 `main` 的文件歷史。
-- 根目錄的 `DATA_GUIDE.md` 與整合規則 JSON 不直接匯入；初始化使用已納入 `backend/app/data/` 的版本化規則副本，正式課程對照仍待確認。
+- 根目錄的 `nutn_csie_115_graduation_rules.json` 是 115 唯一整合規格；初始化會以內容雜湊載入 SQLite。舊後端快照保留在 legacy 規則 ID，正式認列範圍與部分課程對照仍待提供。
 - 後端環境、使用者資料 API 與測試證據一併納入此功能分支；本機資料庫與虛擬環境由 .gitignore 排除。
 
 ## 開發工具
@@ -43,6 +43,16 @@
 - 測試網頁：<http://127.0.0.1:5050/docs>
 - 健康檢查：<http://127.0.0.1:5050/api/health>
 - OpenAPI：<http://127.0.0.1:5050/openapi.json>
+
+## 前端持久化 API
+
+- 待辦：`GET/POST /api/v1/tasks`、`PATCH/DELETE /api/v1/tasks/{id}`。
+- 私人行程：`GET/POST /api/v1/personal-events`、`PATCH/DELETE /api/v1/personal-events/{id}`。
+- 讀書計畫：`GET/PUT /api/v1/study-schedule` 會在同一個交易中替換目前計畫及全部時段；單筆調整沿用 `/api/v1/study-sessions/{id}` 與版本檢查。
+- 115 修課規劃：`/api/v1/planned-courses`；整合規格的 25 門必修與 35 門選修使用穩定 ID 保存在獨立 `ui_courses` 參照表，不混入既有六筆合成 `/courses` 查詢結果。
+- 偏好記憶：`GET/PUT/DELETE /api/v1/study-memory/preference`；保存於 `study_preferences` 與 `study_preference_operations`，保留明確確認、版本、期限、撤回與 operation ID 冪等。
+
+四類個人安排與偏好都使用 `ME_DATABASE` 指定的同一個 SQLite 檔。前端成功遷移舊版 `localStorage` 後會移除四組舊 key；之後瀏覽器不再是主要資料來源。
 
 ## Gemini／ADC 設定
 
@@ -118,7 +128,7 @@ PYTHON_BIN=/absolute/path/to/python3.12 ./scripts/setup-backend.sh
 - pytest 快取放在 `.cache/pytest/`；執行腳本禁用 Python bytecode 寫入。
 - `.venv/`、`.cache/`、bytecode、私密環境設定與未來本地 instance 資料均由 `.gitignore` 排除。
 - 沒有改動 shell 啟動檔、全域 PATH、全域 Git 設定，沒有安裝資料庫伺服器或建立背景服務。
-- 沒有安裝前端 npm 套件；目前前端原始碼已抓取但尚未串接後端。
+- 前端 npm 套件仍由 `frontend/` 自行管理；業務資料已串接本 Flask 後端。
 
 只想重建 Python 環境：停止服務，在檔案管理器刪除本專案 `.venv` 與 `.cache`，再執行 setup 腳本。請保留原始碼及 lock 檔。
 
@@ -135,7 +145,7 @@ PYTHON_BIN=/absolute/path/to/python3.12 ./scripts/setup-backend.sh
 
 ## 畢業規則整合狀態
 
-113 學年度網站展示規則位於 `app/data/nutn_csie_113_graduation_rules_v1.json`，ID 為 `nutn-csie-113-source-v1`。它依使用者提供的 113 學年度課程規劃表與課程地圖整理，最低 134 學分；執行 `../scripts/select-demo-profile-113.sh` 可將本機固定測試身分切換到這份規則。來源、雜湊與限制見 [`../docs/sources/113-academic-year/`](../docs/sources/113-academic-year/README.md)。
+113 學年度規則位於 `app/data/nutn_csie_113_graduation_rules_v1.json`，ID 為 `nutn-csie-113-source-v1`，只保留版本化回歸與年度切換能力。
 
-根目錄的 [115 整合規則](../nutn_csie_115_graduation_rules.json) 與 [決策紀錄](../docs/decisions/CHANGE_DECISIONS.md) 是另一個年度的目標規格。後端保留 `app/data/nutn_csie_115_graduation_rules_v1.json` 供既有回歸測試，尚未實作共同認列範圍、證書推定狀態或可停用的 60 分政策；不得把 115 快照與 113 規則混用。
+根目錄的 [115 整合規則](../nutn_csie_115_graduation_rules.json) 已成為 `dept-nutn-csie`／115 的啟用版本，ID `nutn-csie-115-integrated-v2`。舊 `mvp-v1` 被移到 legacy 系所鍵以保留查詢歷史；60 分推導預設停用，必須有明確 `passed`。共同認列範圍尚未提供，因此相關已修紀錄回傳待確認而不計入確認學分。
 

@@ -4,7 +4,7 @@ from collections import Counter
 from datetime import timedelta
 
 from .catalog_schemas import PrerequisiteSchema
-from .planner_core import at, day, moment, offering, records, reference
+from .planner_core import at, day, moment, offering, planner_course, records, reference
 from .planner_schedule import calendar, check, expand, minutes, occupied, overlap, semester_dates
 from .planner_graduation import progress
 
@@ -17,7 +17,7 @@ def planned_check(db, semester_id, items):
     prereqs, warnings, events = [], [], {}
     complete = True
     for item in items:
-        course = reference(db, "courses", "course_id", item["course_id"], "course_id")
+        course = planner_course(db, item["course_id"])
         ids = [r[0] for r in db.execute("SELECT prerequisite_id FROM course_prerequisites WHERE course_id=? ORDER BY prerequisite_id", (item["course_id"],))]
         if course["prerequisite_status"] != "known" and ids:
             raise ValueError("Invalid stored prerequisite relationship")

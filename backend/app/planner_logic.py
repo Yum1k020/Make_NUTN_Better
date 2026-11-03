@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from .planner_core import (
     RESOURCE, Problem, at, conflict, course_snapshot, day, invalid, moment, offering,
-    owned, records, reference, remove, shape, stage, store_resource,
+    owned, planner_course, records, reference, remove, shape, stage, store_resource,
 )
 from .planner_schedule import (
     available, check, expand, merge, minutes, overlap, plan_windows, reject_conflicts, semester_dates,
@@ -83,7 +83,7 @@ def save(db, kind, payload, old=None):
         validate_plan(data)
     stage("L3")
     if data.get("course_id"):
-        reference(db, "courses", "course_id", data["course_id"], "course_id")
+        planner_course(db, data["course_id"])
     sem = data.get("semester_id", data.get("target_semester_id"))
     if sem:
         reference(db, "semesters", "id", sem, "semester_id")
@@ -100,8 +100,8 @@ def save(db, kind, payload, old=None):
                 invalid("passed", "修習中不接受成績或通過狀態")
         elif type(data["passed"]) is not bool:
             invalid("passed", "finished 必須明確提供通過狀態")
-        if data["grade"] is not None and data["passed"] != (data["grade"] >= 60):
-            invalid("grade", "成績與通過狀態矛盾")
+        # integrated-v2 requires an explicit pass status and keeps the numeric
+        # threshold disabled by default; a grade alone never overrides it.
         if old:
             for entry in records(db, "timetable-entries"):
                 if entry["enrollment_id"] == old[key] and any(data[f] != old[f] for f in ("course_id", "semester_id", "offering_id")):

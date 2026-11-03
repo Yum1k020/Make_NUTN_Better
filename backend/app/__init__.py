@@ -74,11 +74,12 @@ def create_app(test_config=None):
 
     api.register_blueprint(routes)
 
-    from . import catalog, db, profile, study_agent_api
+    from . import catalog, db, profile, study_agent_api, study_memory
     db.init_app(app)
     api.register_blueprint(profile.routes)
     api.register_blueprint(catalog.routes)
     api.register_blueprint(study_agent_api.routes)
+    api.register_blueprint(study_memory.routes)
     from . import planner
     planner.init_app(app, api)
 

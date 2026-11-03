@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from .planner_core import (
     TZ, Problem, at, checked, clock, conflict, day, interval, moment, offering,
-    owned, records, reference, stage, weekly,
+    owned, planner_course, records, reference, stage, weekly,
 )
 
 
@@ -88,7 +88,7 @@ def occupied(db, start, end, exclude=(), ignore_entries=(), ignore_enrollments=(
         first, last = max(first, start.astimezone(TZ).date()), min(last, (end - timedelta(microseconds=1)).astimezone(TZ).date())
         if first > last:
             continue
-        course = reference(db, "courses", "course_id", course_id, "course_id")
+        course = planner_course(db, course_id)
         if not meetings:
             warnings.append({"code": "UNKNOWN_CLASS_TIME", "source_type": "class", "source_id": source_id})
         else:

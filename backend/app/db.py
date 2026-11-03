@@ -46,7 +46,7 @@ def init_db():
         ):
             db.execute(statement)
         db.executemany("INSERT OR IGNORE INTO departments VALUES (?)",
-                       [("dept-csie",), ("dept-demo",)])
+                       [("dept-csie",), ("dept-demo",), ("dept-nutn-csie",)])
         db.executemany(
             "INSERT OR IGNORE INTO admission_years VALUES (?)",
             [(113,), (114,), (115,)],
@@ -61,8 +61,10 @@ def init_db():
         init_catalog(db)
         from .planner_core import init_planner
         from .planner_graduation import init_graduation
+        from .study_memory import init_study_memory
         init_planner(db)
         init_graduation(db)
+        init_study_memory(db)
 
 
 def init_app(app):

@@ -209,7 +209,7 @@ class VertexGeminiADCClient:
                                 "輸出單一 JSON 物件，欄位為 summary、warnings、citations、refused。"
                                 "summary 使用繁體中文且不超過 300 字。"
                                 "warnings 是字串陣列；剩餘分鐘為 0 時必須是空陣列。"
-                                "citations 只能包含 planner-rule、weekly-classes-fixture、tasks-events-local。"
+                                "citations 只能包含 planner-rule、weekly-classes-fixture、planner-backend-sqlite。"
                                 "refused 在正常輸入時為 false。不得改寫任何排程時段。"
                             )
                         }

@@ -260,9 +260,8 @@ def unpack(row):
                 or type(snapshot.get("credits")) not in (int, float) or not math.isfinite(snapshot["credits"]) or snapshot["credits"] < 0):
             raise ValueError("Invalid stored course snapshot")
         if (data["enrollment_status"] == "in_progress" and (data["passed"] is not None or data["grade"] is not None)
-                or data["enrollment_status"] == "finished" and type(data["passed"]) is not bool
-                or data["grade"] is not None and data["passed"] != (data["grade"] >= 60)):
-            raise ValueError("Stored enrollment status and grade disagree")
+                or data["enrollment_status"] == "finished" and type(data["passed"]) is not bool):
+            raise ValueError("Stored enrollment status is invalid")
     return {**data, id_field: row["id"], "user_id": row["user_id"],
             "created_at": row["created_at"], "updated_at": row["updated_at"]}
 
@@ -307,8 +306,24 @@ def reference(db, table, key, value, field):
     return dict(row)
 
 
+def planner_course(db, course_id, field="course_id"):
+    row = db.execute("SELECT * FROM courses WHERE course_id=?", (course_id,)).fetchone()
+    if row is not None:
+        return dict(row)
+    row = db.execute("SELECT * FROM ui_courses WHERE course_id=?", (course_id,)).fetchone()
+    if row is None:
+        invalid(field, "參照資料不存在")
+    return {
+        **dict(row),
+        "offering_department_id": None,
+        "prerequisite_status": "unknown",
+        "prerequisite_mode": None,
+        "prerequisite_source": None,
+    }
+
+
 def course_snapshot(db, course_id):
-    course = reference(db, "courses", "course_id", course_id, "course_id")
+    course = planner_course(db, course_id)
     if not course["name"] or type(course["credits"]) not in (int, float) or not math.isfinite(course["credits"]) or course["credits"] < 0:
         raise ValueError("Invalid course data")
     return {"course_id": course_id, "name": course["name"], "credits": course["credits"],
