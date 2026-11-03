@@ -37,7 +37,7 @@
 - Week 07 semantic preference memory 與畢業說明有效期。
 - 115 畢業規則、課程目錄、修課規劃與畢業進度。
 - Gemini／ADC 主 adapter 與 OpenAI 選用 adapter。
-- 期中報告、證據索引、使用說明與講稿。
+- 期中報告、測試結果與課程概念對照。
 
 ## 推送界線
 

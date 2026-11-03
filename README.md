@@ -47,9 +47,7 @@ Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`do
 ### 期中報告版本
 
 - 繳交用 PDF 與可編輯 PPTX：[`reports/midterm/`](reports/midterm/README.md)。
-- 完整報告、架構、示範腳本、測試結果與證據索引：[`docs/midterm/`](docs/midterm/README.md)。
-- 網站操作步驟：[`docs/midterm/USER_GUIDE.md`](docs/midterm/USER_GUIDE.md)。
-- 14 分鐘口頭講稿與問答：[`docs/midterm/PRESENTATION_SCRIPT.md`](docs/midterm/PRESENTATION_SCRIPT.md)。
+- 報告架構、課程概念對照與測試結果：[`docs/midterm/`](docs/midterm/README.md)。
 - GitHub 分支盤點與整合判定：[`docs/midterm/BRANCH_INTEGRATION.md`](docs/midterm/BRANCH_INTEGRATION.md)。
 - 主示範工具：`get_validated_study_plan`，唯讀預覽；模型參數必須通過後端驗證。
 - 寫入工具：`save_study_plan`，必須 `confirmed=true` 並以 `request_id` 防止重複寫入。

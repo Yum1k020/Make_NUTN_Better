@@ -6,7 +6,7 @@
 
 報告檔案：[`PDF`](../../reports/midterm/Make_NUTN_Better_Midterm_2026-11-04.pdf)／[`可編輯 PPTX`](../../reports/midterm/Make_NUTN_Better_Midterm_2026-11-04.pptx)
 
-第 3–7 週課堂概念、程式證據、示範方式與未完成界線見 [`COURSE_CONCEPT_MAPPING.md`](COURSE_CONCEPT_MAPPING.md)。實際操作請看 [`USER_GUIDE.md`](USER_GUIDE.md)，逐字講稿請看 [`PRESENTATION_SCRIPT.md`](PRESENTATION_SCRIPT.md)，遠端分支盤點請看 [`BRANCH_INTEGRATION.md`](BRANCH_INTEGRATION.md)。
+第 3–7 週課堂概念、程式證據、示範方式與未完成界線見 [`COURSE_CONCEPT_MAPPING.md`](COURSE_CONCEPT_MAPPING.md)，遠端分支盤點請看 [`BRANCH_INTEGRATION.md`](BRANCH_INTEGRATION.md)。
 
 ## 組員
 
