@@ -51,6 +51,7 @@ flowchart LR
 設計選擇：
 
 - 主流程使用 Google Cloud Vertex AI Gemini，後端透過 ADC 取得短期憑證。瀏覽器不持有金鑰或 token。
+- 後端另提供可切換的 OpenAI Responses API 介面，API key 只存在伺服器端；此選用流程已有 `LIVE_PASS`，但不取代課程指定的 Gemini／ADC 驗證。
 - 規則排程是唯一時段結果來源。Gemini 工具參數若與已驗證需求不一致，工具執行次數為 0。
 - 唯讀預覽不需人工確認；寫入 `save_study_plan` 必須 `confirmed=true`，並以 `request_id` 保證重送不重複寫入。
 - 沒有外部校務知識，因此主排程不使用 RAG。畢業規則使用版本化本機規則快照與來源 ID，未知值保持 `null`。
@@ -80,7 +81,7 @@ flowchart LR
 
 | 狀態 | 功能 |
 | --- | --- |
-| 已完成並離線驗證 | 課表／待辦／私人行程 UI、確定性複習排程、兩個工具契約、Prompt Chaining Gate、偏好保存／更正／到期／撤回／冪等、畢業進度與說明有效性、前後端測試與 production build |
+| 已完成並驗證 | 課表／待辦／私人行程 UI、確定性複習排程、兩個工具契約、Prompt Chaining Gate、偏好保存／更正／到期／撤回／冪等、畢業進度與說明有效性、前後端測試與 production build；選用 OpenAI 後端為 LIVE_PASS |
 | 已實作但尚未完成真實驗證 | Google Cloud ADC Gemini 正常主流程；目前環境沒有 ADC、project 與模型設定，證據為 `LIVE_NOT_RUN` |
 | 規劃中 | 正式登入與多使用者授權、校務資料匯入、mvp-v1 至正式規則遷移、正式多實例資料庫、部署與大量並行測試 |
 
@@ -88,11 +89,12 @@ flowchart LR
 
 最新本機結果：
 
-- Python：341 passed、5 skipped、1 xfailed（其中 3 個真實 HTTP 測試需允許本機 loopback；允許後通過）。
+- Python：345 passed、5 skipped、1 xfailed（其中 3 個真實 HTTP 測試需允許本機 loopback；允許後通過）。
 - Frontend：39/39 passed。
 - Vite production build：通過。
 - Prettier：通過。
 - Google Cloud／ADC live：`LIVE_NOT_RUN`，原因是本機沒有 ADC、project 與模型設定。
+- OpenAI Responses API live：`LIVE_PASS`，使用合成資料完成 function call、參數 Gate、工具執行與結構化摘要；此結果不取代 Gemini 主流程要求。
 
 失敗／邊界案例：
 

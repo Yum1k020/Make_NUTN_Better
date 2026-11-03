@@ -1,0 +1,24 @@
+{
+  "schema_version": "midterm-live-v1",
+  "executed_at": "2026-11-03",
+  "source_version": "ea6798f4d081d50c8c61f1ca13a8ba1609ff274b",
+  "flow": "user request -> OpenAI function call -> parameter validation -> deterministic tool -> function_call_output -> OpenAI structured summary",
+  "provider": "OpenAI Responses API",
+  "authentication": "server-side OPENAI_API_KEY",
+  "model": "gpt-5-mini",
+  "input_kind": "synthetic",
+  "live_status": "LIVE_PASS",
+  "actual_call": {
+    "http_status": 200,
+    "workflow_status": "completed"
+  },
+  "result": {
+    "scheduled_minutes": 60
+  },
+  "security": {
+    "credentials_recorded": false,
+    "tokens_recorded": false,
+    "personal_data_recorded": false
+  },
+  "course_scope_note": "This optional OpenAI proof does not replace the required Gemini/ADC main-flow evidence."
+}
