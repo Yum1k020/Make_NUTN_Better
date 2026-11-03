@@ -1,0 +1,23 @@
+{
+  "schema_version": "midterm-live-v1",
+  "executed_at": "2026-11-03T14:17:41+08:00",
+  "source_version": "fa740a8563eaf0f0b55853d6e9542b88d6fb2545",
+  "flow": "user request -> Gemini function call -> parameter validation -> deterministic tool -> functionResponse -> Gemini summary",
+  "provider": "Google Cloud Vertex AI Gemini",
+  "authentication": "Application Default Credentials",
+  "input_kind": "synthetic",
+  "configured": {
+    "project": false,
+    "location": false,
+    "model": false
+  },
+  "live_status": "LIVE_NOT_RUN",
+  "reason_code": "GOOGLE_CLOUD_PROJECT_OR_MODEL_NOT_CONFIGURED",
+  "actual_call": null,
+  "result": null,
+  "security": {
+    "credentials_recorded": false,
+    "tokens_recorded": false,
+    "personal_data_recorded": false
+  }
+}

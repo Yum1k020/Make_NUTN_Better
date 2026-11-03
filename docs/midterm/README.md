@@ -4,6 +4,8 @@
 
 專題：學生個人安排系統
 
+報告檔案：[`PDF`](../../reports/midterm/Make_NUTN_Better_Midterm_2026-11-04.pdf)／[`可編輯 PPTX`](../../reports/midterm/Make_NUTN_Better_Midterm_2026-11-04.pptx)
+
 ## 組員
 
 | 姓名 | 學號 | 報告責任 |
@@ -121,7 +123,7 @@ Git 歷史沒有可靠記錄四位組員各自完成的檔案，不能自動推�
 
 - Repository：[Yum1k020/Make_NUTN_Better](https://github.com/Yum1k020/Make_NUTN_Better)
 - 報告分支：`codex/midterm-integrated-report`
-- 報告使用的 commit：建立本機整合 commit 後填入簡報與證據索引。
+- 報告程式基線 commit：`fa740a8563eaf0f0b55853d6e9542b88d6fb2545`。
 - 示範只使用合成資料；不提交或展示 ADC JSON、API key、access token、`.env` 或真實個資。
 
 Google Cloud 技術依據：[Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc)、[Vertex AI function calling](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling)。
