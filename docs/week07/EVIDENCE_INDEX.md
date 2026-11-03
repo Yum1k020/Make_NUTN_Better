@@ -1,35 +1,32 @@
-# Week 07 Evidence Index
+# Week 07 證據索引
 
-| 證據 | 位置 | 狀態 |
-|---|---|---|
-| Memory implementation | backend/week07_memory.py | implementation SHA 72380961e4d096b8d334d87d53546f750d4292ac |
-| Route A tests | tests/test_week07_memory.py | PASS |
-| Offline comparison | week07/evidence/offline_comparison.json | offline_all_pass=true |
-| Gemini Live runner | week07/live_memory.py | 已實作 |
-| Live evidence | week07/evidence/W07-LIVE-*.json | LIVE_NOT_RUN |
-| ADR | docs/week07/ADR.md | Accepted offline |
-| Baseline / Candidate | docs/week07/COMPARISON.md | 已補實測 |
+## 智慧學習偏好
 
-## CI Evidence
+| 證據 | 位置 | 可核對內容 |
+| --- | --- | --- |
+| Route A 實作 | `backend/week07_memory.py` | owner、版本、到期、撤回與冪等 |
+| Route A 測試 | `tests/test_week07_memory.py` | 新 session、更正、撤回、跨 user、未確認、重送 |
+| 離線比較 | `week07/evidence/offline_comparison.json` | baseline/candidate 與 `offline_all_pass` |
+| Live runner | `week07/live_memory.py` | Gemini proposal、人工確認、寫入、讀回與摘要 |
+| Live 狀態 | `week07/evidence/LIVE_NOT_RUN.json` | 沒有 provider 憑證時不冒充成功 |
 
-- Run ID：40618188523
-- Job ID：122585522782
-- Pytest：31 passed, 1 xfailed
-- Artifact ID：12786022642
-- Workflow：success
+## 畢業說明有效性
 
-## 共同與 Route A 案例
+| 證據 | 位置 | 可核對內容 |
+| --- | --- | --- |
+| focused | `docs/week07/evidence/focused.json` | 後端 TTL、來源與 scope 案例 |
+| regression | `docs/week07/evidence/regression.json` | 後端可執行回歸與 skip 原因 |
+| frontend TAP | `docs/week07/evidence/frontend.tap` | 前端記憶有效性測試 |
+| build | `docs/week07/evidence/frontend-build.log` | production build |
+| baseline/candidate | `docs/week07/evidence/baseline.json`、`candidate.json` | fixture 控制結果與 run ID |
+| comparison | `docs/week07/evidence/comparison.json` | 來源更新、TTL、呼叫數與 fixture 延遲 |
+| live | `docs/week07/evidence/live.json` | `LIVE_NOT_RUN`，不是 Gemini 成功證據 |
+| UI fixture | `docs/week07/evidence/ui-fixture.png`、`ui-check.json` | 合成模式畫面與操作觀察 |
+| summary | `docs/week07/evidence/validation-summary.json` | 測試數、平台限制與待補驗證 |
 
-- C01：PASS；確認 v1 後，新 session 讀回 60 並完成 180 分鐘 preview。
-- C02：PASS；跨 user forbidden。
-- A 更正：PASS；60 → 30，讀 v2。
-- A 撤回：PASS；撤回後 not_found。
-- W01：PASS；未確認不寫。
-- W02：PASS；同 request_id replay，不增加 records。
-- Expiry：PASS；到期排除。
-- Illegal value：PASS；有限停止，沒有檔案副作用。
-- LIVE：LIVE_NOT_RUN；需本週真實 Gemini。
+## 未完成與資料安全
 
-## 清理
-
-Evidence 只含合成 user id、來源 id、版本、工具結果與 provider error。不得提交 API key、token、ADC JSON、.env 或真實個資。
+- 正式跨 user 授權：`NOT_RUN`。瀏覽器 scope 不是登入使用者。
+- 真實 Gemini 正常流程：`LIVE_NOT_RUN`，必須使用私有環境補驗證。
+- 沒有新增畢業紀錄寫入工具，因此 W01/W02 業務寫入案例不適用。
+- 公開證據只保留合成資料、控制流程、雜湊與狀態，不得加入金鑰、憑證、真實個資或未清理日誌。

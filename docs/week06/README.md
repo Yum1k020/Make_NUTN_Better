@@ -1,21 +1,13 @@
-# Week 06 — Prompt Chaining Workflow
+# Week 06 — 兩條可驗證的 Agent Workflow
 
-## 一句話交付
+整合後的專案保留兩條互不取代的 Week 06 子流程。兩者都把模型限制在明確資料契約內，讓一般程式負責可重現的計算與安全檢查。
 
-「智慧學習」的規劃子流程使用 Prompt chaining，將需求驗證、確定性排程、衝突與完整性 Gate、模型說明分成可檢查的階段。Gate 拒絕後必須有限停止，不可再呼叫下游模型。
+| 子流程 | 使用者目標 | 模型責任 | 一般程式責任 | 主要入口 |
+| --- | --- | --- | --- | --- |
+| 智慧學習 | 依課程、私人行程與考試需求安排複習 | 擷取結構化需求、整理已驗證排程 | 規則排程、衝突與完整性 Gate、停止條件 | `backend/week06_chaining.py`、`frontend/server/studyPlanWorkflow.js` |
+| 畢業進度 | 將畢業缺項整理成可核對的說明 | 產生結構化說明，依評估錯誤最多修正一次 | 學分與條件計算、來源核對、同規準評估、回退 | `backend/app/graduation_explanation_api.py`、`backend/app/graduation_explanation_core.py` |
 
-## 整合後的兩個執行面
-
-合併歷史保留了兩個使用相同控制邊界的實作：
-
-| 執行面 | 用途 | 主要入口 | Provider |
-| --- | --- | --- | --- |
-| Python 課堂驗收 | 離線比較、Gemini live runner 與 CI 證據 | `backend/week06_chaining.py`、`week06/live_chaining.py` | Gemini |
-| React 網站 | 使用者觸發規劃時顯示四階段 trace | `frontend/server/studyPlanWorkflow.js`、`frontend/src/components/StudyPlanner.jsx` | OpenAI Agents SDK |
-
-兩邊都保留原本的規則排程為真正結果來源；模型只做結構化抽取或說明，不得跳過 Gate 修改排程。
-
-## 固定 Workflow
+## 智慧學習 Prompt Chaining
 
 ```text
 需求驗證
@@ -24,30 +16,29 @@
   -> 模型說明
 ```
 
-| 階段 | 放行條件 | 失敗後續 |
-| --- | --- | --- |
-| 需求驗證 | 日期、時數、時段與輸入 schema 合法 | 不執行排程與 Agent |
-| 規則排程 | 回傳 sessions、scheduledMinutes、remainingMinutes | 不進入 Gate |
-| 安全 Gate | 日期、時段、衝突、時數與 ID 均通過 | 不呼叫 Agent |
-| 模型說明 | Provider 成功且輸出符合 schema | 保留原規則排程與錯誤說明 |
+- `INVALID_REQUEST`：輸入不合法，不執行排程或模型。
+- `RULE_ENGINE_FAILED`：規則排程失敗，不進入 Gate。
+- `PLAN_GATE_REJECTED`：Gate 拒絕，模型呼叫數必須為 0。
+- `AGENT_STAGE_FAILED`：模型說明失敗，仍保留規則排程。
 
-## 公開停止狀態
+Python 課堂驗收使用 Gemini；網站整合沿用伺服器端 OpenAI Agents SDK。兩者都以規則排程為唯一時段結果來源。詳見 [`adr-001-study-plan-prompt-chaining.md`](adr-001-study-plan-prompt-chaining.md)、[`COMPARISON.md`](COMPARISON.md) 與 [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md)。
 
-- `INVALID_REQUEST`：需求驗證失敗。
-- `RULE_ENGINE_FAILED`：規則排程失敗。
-- `PLAN_GATE_REJECTED`：Gate 拒絕，Agent 呼叫數必須為 0。
-- `AGENT_STAGE_FAILED`：模型說明失敗，當次規則結果仍可使用。
+## 畢業缺項 Evaluator–optimizer
 
-Trace 只保留階段、狀態、計數、公開 stop reason 與 run ID，不保存 API key、完整 prompt、私人行程內容或模型內部推理。
+```text
+讀取目前使用者與規則
+  -> 一般程式計算畢業進度
+  -> Gemini 產生結構化說明 A
+  -> 固定規準評估
+  -> 未通過時產生 B，使用同一規準重評
+  -> 通過則顯示；否則回退基本進度
+```
 
-## 程式與驗證
+模型只取得去識別的彙整檢查，不取得姓名、學號、逐筆成績、登入憑證或寫入工具。每次操作最多兩次模型請求，provider 失敗或第二稿仍不合格時有限停止。`GET /api/v1/graduation-progress` 保持零模型呼叫；使用者明確按下按鈕才呼叫 `POST /api/v1/graduation-explanation`。
 
-- `backend/week06_chaining.py`：Python workflow 與 Gate。
-- `week06/gemini_client.py`：Gemini extraction 與 summary client。
-- `frontend/server/studyPlanWorkflow.js`：網站四階段 workflow。
-- `frontend/server/studyAgent.js`：Gate 通過後才呼叫 Agents SDK。
-- `frontend/src/components/StudyPlanner.jsx`：顯示階段、結果、stop reason 與 run ID。
-- `tests/test_week06_chaining.py` 與 `frontend/tests/studyPlanWorkflow.test.js`：正常、非法輸入、provider 失敗與 Gate 邊界。
+完整契約、執行方式與限制見 [`GRADUATION_EXPLANATION.md`](GRADUATION_EXPLANATION.md)、[`contract.md`](contract.md) 與 [`comparison.md`](comparison.md)。匯入分支中的 `evidence/live.json` 為 `LIVE_NOT_RUN`，不可把 fixture 當成真實 Gemini。
+
+## 本機驗證
 
 ```bash
 ./.venv/bin/python -m pytest
@@ -59,4 +50,4 @@ npm run build
 npm run format:check
 ```
 
-Python 離線比較已驗證 `offline_all_pass=true`；網站的真實 provider 需在本機安全設定 `OPENAI_API_KEY` 後另行執行。CI 沒有私人 key 時，不得將 fixture 宣稱為 live pass。
+需要真實 provider 的測試必須另行執行並標示 `LIVE_NOT_RUN`、`LIVE_FAIL` 或 `LIVE_PASS`。不得提交 `.env`、API key、ADC JSON、token 或個人資料。

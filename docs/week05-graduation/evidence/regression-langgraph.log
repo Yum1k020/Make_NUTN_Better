@@ -1,0 +1,11 @@
+........................................................................ [ 27%]
+.............s...................................s...................... [ 54%]
+............................s.............................s............. [ 81%]
+..................................................                       [100%]
+============================== warnings summary ===============================
+tests/test_planner.py::test_E01_E02_E03_enrollment
+  <WORKSPACE>\work\venv\Lib\site-packages\langgraph\cache\base\__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+    from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+262 passed, 4 skipped, 3 deselected, 1 warning in 45.27s

@@ -1,35 +1,27 @@
-# Week 07 Baseline vs Memory Candidate
+# Week 07 原版與候選比較總覽
 
-Baseline SHA：9e2407a9a9a160b5ca5b51fc6e4a090ba077768e
+## 智慧學習偏好 Route A
 
-Implementation SHA：72380961e4d096b8d334d87d53546f750d4292ac
+| 比較項目 | 原版 | 候選 |
+| --- | --- | --- |
+| 新 session 的每次複習分鐘數 | 必須重新輸入 | 缺值時讀取有效偏好 |
+| owner 隔離 | 無長期偏好 | 跨 user 拒絕 |
+| 更正與版本 | 不適用 | 新版本取代舊版本，舊版本寫入拒絕 |
+| 撤回與到期 | 不適用 | 撤回或 30 天到期後不回填 |
+| 重送 | 不適用 | 相同 operation ID 回放，不重複寫入 |
+| 排程結果 | `scheduler_v1` | 同一規則重新計算，記憶不取代排程 |
 
-| 比較項目 | Baseline | Route A candidate |
-|---|---|---|
-| 新 session 的 session_minutes | 必須重新提供 | 缺值時讀有效偏好 |
-| 偏好來源 | 無持久偏好來源 | source_type + source_id |
-| owner 隔離 | N/A | PASS：另一 user forbidden |
-| 更正 | N/A | PASS：v1 superseded，讀 v2 |
-| 撤回 | N/A | PASS：revoked 後 not_found |
-| 到期 | N/A | PASS：expires_at 後不回填 |
-| 未確認寫入 | N/A | PASS：confirmation_required，0 write |
-| 同 ID 重送 | N/A | PASS：replayed=true，0 duplicate |
-| 原 scheduler | scheduler_v1 | 不修改 |
-| 固定業務終點 | study-plan preview | PASS：仍排滿 180 分鐘 |
-| 真實 Gemini | 本週 baseline 不另跑 | LIVE_NOT_RUN |
+細節與實際離線結果見 `week07/evidence/offline_comparison.json`。
 
-## CI
+## 畢業說明 Route C
 
-- Run 40618188523 → success
-- Job 122585522782
-- 31 passed, 1 xfailed
-- offline_all_pass=true
-- Artifact 12786022642
+| 比較項目 | 原版 | 候選 |
+| --- | --- | --- |
+| 來源在生成期間更新 | 可能顯示舊快照的說明 | `SOURCE_CHANGED`，清除說明 |
+| 到期契約 | 無 TTL | 300 秒後排除，重查不展延 |
+| 工作階段範圍 | 重新整理時清空 | 另有 scope 與非同步世代防護 |
+| 正常模型呼叫 | fixture 1 次 | fixture 1 次，來源檢查不增加模型呼叫 |
+| 讀取成本 | 無週期重查 | 每 15 秒一次唯讀檢查，另有初始與生成前後檢查 |
+| 正式驗收 | 不適用 | 真實 Gemini `LIVE_NOT_RUN`；正式跨 user `NOT_RUN` |
 
-## 三層結果
-
-1. 檢索是否讀對：owner、最新版、未撤回、未過期皆受控。
-2. 回答是否用對：只有本輪缺 session_minutes 時才使用記憶；明確輸入優先。
-3. 任務是否完成：仍使用原 preview_study_plan；偏好不取代 busy interval、exam date 或其他業務規則。
-
-calls、tokens、latency 只在 Week 07 真實 Live 後報告；未量測不推定。
+匯入分支的單次 fixture 延遲只證明本機控制流程，不能推論真實模型變快或省錢。詳細內容見 `docs/week07/evidence/comparison.json`、`baseline.json` 與 `candidate.json`。

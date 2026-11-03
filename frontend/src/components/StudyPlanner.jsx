@@ -96,7 +96,9 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
           <h2>Agent 規劃說明</h2>
           <p className="subtle">框架負責工具協調與說明，排程仍由原規則計算。</p>
         </div>
-        <span className="agent-framework-badge">OpenAI Agents SDK</span>
+        <span className="agent-framework-badge">
+          {result?.framework || "Google Cloud Gemini"}
+        </span>
       </div>
 
       {isLoading ? (
@@ -425,8 +427,9 @@ export default function StudyPlanner({
                 {agentLoading ? "Agent 規劃中" : "用 Agent 產生學習計畫"}
               </button>
               <p className="agent-disclosure">
-                按下後會將課程名稱、日期、可用時段與目前私人行程送至 OpenAI
-                產生說明；確定性排程會先在本機完成。
+                按下後會將合成課名、日期、可用時段與私人行程送至 Flask
+                後端，再由 Google Cloud ADC 呼叫
+                Gemini；確定性排程仍由規則工具完成。
               </p>
             </form>
           </section>

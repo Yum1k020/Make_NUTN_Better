@@ -1,4 +1,4 @@
-const DEFAULT_STUDY_AGENT_ENDPOINT = "/api/study-agent/run";
+const DEFAULT_STUDY_AGENT_ENDPOINT = "/api/v1/study-agent/run";
 
 export function getStudyAgentEndpoint(env = import.meta.env || {}) {
   return env.VITE_STUDY_AGENT_ENDPOINT?.trim() || DEFAULT_STUDY_AGENT_ENDPOINT;

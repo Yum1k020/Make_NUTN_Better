@@ -33,19 +33,23 @@
 
 ### AI Agent 的用途
 
-目前 AI Agent 只用在「智慧學習」：
+目前有兩條受限 Agent 子流程：
 
-1. 既有規則引擎先根據本機示範課表、私人行程、考試日期與複習時數，計算不衝突的複習計畫。
-2. 伺服器端 OpenAI Agents SDK 透過 function tool 呼叫該規則引擎，並回傳結構化的規劃說明。
-3. Agent 呼叫失敗時，畫面仍保留規則引擎的排程結果與錯誤提示。
+1. **智慧學習主示範：** 前端將需求送到 Flask 後端；後端先驗證 schema，再透過 Google Cloud Application Default Credentials 呼叫 Vertex AI Gemini。Gemini 必須產生 `get_validated_study_plan` function call，程式驗證參數與原需求一致後才執行確定性排程，最後把工具結果回送 Gemini 整理說明。
+2. **畢業缺項說明：** 一般程式先計算學分與缺項；Gemini 只取得去識別彙整，輸出會經固定規準評估，最多修正一次。說明具有 300 秒 TTL 與來源重驗證，失效時回退基本進度。
 
-目前沒有實作課表自動匯入或正式畢業資格查詢；課表與畢業條件均使用本機示範資料。
+模型不決定正式學分、衝突、權限或寫入結果。規則引擎、Gate、版本檢查、到期、撤回與冪等都由一般程式處理。provider 失敗時，畫面仍保留安全的規則結果。
 
-「智慧學習」已完成第一個局部框架替換：伺服器端 OpenAI Agents SDK 透過 function tool 呼叫既有排程規則，再以 structured output 說明結果。API key 不再放在瀏覽器端，且 Agent 失敗時仍保留原規則排程。選擇原因、前後差異與驗收案例請見 [`docs/week04-framework-replacement.md`](docs/week04-framework-replacement.md)。
+目前沒有正式登入、課表自動匯入或校務系統連線；課表與畢業條件使用本機示範／測試資料。沒有 ADC 或 Google Cloud project 時，真實主流程必須標示 `LIVE_NOT_RUN`，不得以 fixture 冒充。
 
-Week 06 將這段子流程改成可驗證的 Prompt chaining：需求驗證 → 規則排程 → 衝突與完整性 Gate → Agent 說明。程式差異、四條案例、前後比較、ADR 與證據索引請見 [`docs/week06/README.md`](docs/week06/README.md)。
+Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`docs/week06/README.md`](docs/week06/README.md) 與 [`docs/week07/README.md`](docs/week07/README.md)。
 
-Week 07 在同一條主流程加入一筆「已確認的每次複習分鐘數」記憶：新 session 可讀回，並具備更正、30 天到期、撤回、跨使用者隔離、版本檢查與冪等重送。記憶不包含私人行程，也不會送給模型；完整資料契約、比較表、測試矩陣與 ADR 請見 [`docs/week07/README.md`](docs/week07/README.md)。
+### 期中報告版本
+
+- 完整報告、架構、示範腳本、測試結果與證據索引：[`docs/midterm/`](docs/midterm/README.md)。
+- 主示範工具：`get_validated_study_plan`，唯讀預覽；模型參數必須通過後端驗證。
+- 寫入工具：`save_study_plan`，必須 `confirmed=true` 並以 `request_id` 防止重複寫入。
+- 真實 Gemini／ADC 證據：`docs/midterm/evidence/study-agent-live.json`。
 
 ## Acceptance Criteria（驗收條件）
 
@@ -69,9 +73,9 @@ Week 07 在同一條主流程加入一筆「已確認的每次複習分鐘數」
 
 ### 4. 畢業進度追蹤
 
-- **Given：** 提供測試用畢業規則：需修滿 128 學分、指定必修及 6 場講座；學生已取得 100 學分、缺少 1 門必修且完成 4 場講座。
-- **When：** 使用者查看畢業進度。
-- **Then：** 系統顯示尚缺 28 學分、該門必修名稱及 2 場講座。
+- **Given：** 後端已載入固定測試使用者、啟用中的 `nutn-csie-115-mvp-v1` 規則與合成修課紀錄。
+- **When：** 使用者查看畢業進度或明確要求產生缺項說明。
+- **Then：** 一般程式先顯示每項已取得、尚缺或待確認狀態；模型說明不得把未知當成零、把規劃中課程算成已取得，且來源更新或 300 秒到期後停止使用。
 
 ## 後端 API
 
@@ -80,6 +84,20 @@ Flask＋SQLite 已提供使用者資料、課程查詢與學生安排 API baseli
 ## 前端原型
 
 可操作的前端原型位於 [`frontend/`](frontend/README.md)。目前使用本機示範資料，提供課表、待辦與行程、複習規劃、修課規劃、畢業進度及兩個校區的地圖檢視。啟動與測試方式請見前端 README。
+
+主示範需要同時啟動 Flask 與 Vite：
+
+```bash
+./scripts/init-backend-db.sh
+./scripts/run-backend.sh
+
+# 另一個終端
+cd frontend
+npm install
+npm run dev
+```
+
+本機 ADC 設定使用 `gcloud auth application-default login`；專案只讀取 `GOOGLE_CLOUD_PROJECT`、`GOOGLE_CLOUD_LOCATION` 與 `GOOGLE_CLOUD_GEMINI_MODEL`，不得提交 ADC JSON。
 
 ## 先前提案
 
@@ -124,3 +142,7 @@ Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重�
 - [專案決策與變更紀錄](docs/decisions/CHANGE_DECISIONS.md)：逐項決定、新舊差異、影響分支與檔案，後續變更持續追加。
 - [115畢業規則整合說明](GRADUATION_PROGRESS_115.md) 與 [唯一整合JSON](nutn_csie_115_graduation_rules.json)。
 - 本次為文件與規則整合；後端仍使用mvp-v1快照，前端仍為示範資料。上方128學分驗收為早期示範，不是目前133學分整合規則。
+
+## Week 07：畢業說明記憶範圍（C 路線）
+
+[作業說明、程式差異、測試與證據索引](docs/week07/README.md)。本週對既有畢業缺項說明加入五分鐘 TTL、來源重查與工作階段清除；不改畢業判定。離線證據已提供；真實 Gemini 為 LIVE_NOT_RUN，正式跨 user 驗收為 NOT_RUN，完成提交不代表所有功能驗收通過。

@@ -206,7 +206,7 @@ test("frontend client sends only planning data and accepts structured output", a
 
   const response = await requestStudyAgentPlan({
     payload,
-    endpoint: "/api/study-agent/run",
+    endpoint: "/api/v1/study-agent/run",
     fetchImpl: async (url, options) => {
       captured = { url, options };
       return {
@@ -217,7 +217,7 @@ test("frontend client sends only planning data and accepts structured output", a
   });
 
   assert.deepEqual(response, responseBody);
-  assert.equal(captured.url, "/api/study-agent/run");
+  assert.equal(captured.url, "/api/v1/study-agent/run");
   assert.equal(captured.options.headers.Authorization, undefined);
   assert.doesNotMatch(captured.options.body, /test-api-key|OPENAI_API_KEY/);
 });

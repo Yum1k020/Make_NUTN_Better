@@ -1,6 +1,6 @@
 # 後端開發環境
 
-目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供四支唯讀的學期、課程、課程詳情及學期開課查詢 API。規格與實測證據見 [使用者資料 API](../docs/api/me.md) 與 [課程查詢 API](../docs/api/catalog.md)。另已實作學生安排、排程及畢業規則 baseline，見 [學生安排 API 與實測證據](../docs/api/student-planner.md)。尚未建立正式登入；既有前端仍使用自己的示範資料。
+目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供課程、學生安排、畢業規則與 `POST /api/v1/study-agent/run`。智慧學習 Agent 透過 Google Cloud ADC 呼叫 Vertex AI Gemini；尚未建立正式登入，前端仍含本機示範資料。
 
 ## 位置與分支
 
@@ -19,6 +19,7 @@
 - flask-smorest、Marshmallow：輸入驗證、OpenAPI 文件
 - swagger-ui-bundle：本機文件網頁資源，不依賴外部 CDN
 - pytest：開發測試
+- google-auth：只在後端透過 ADC 取得短期 access token
 
 確切安裝版本見 `requirements-dev.lock.txt`；執行環境依賴見 `requirements.lock.txt`。`.in` 檔是直接依賴範圍，重建時使用 lock 檔，以免自動升級。
 
@@ -38,6 +39,22 @@
 - 測試網頁：<http://127.0.0.1:5050/docs>
 - 健康檢查：<http://127.0.0.1:5050/api/health>
 - OpenAPI：<http://127.0.0.1:5050/openapi.json>
+
+## Gemini／ADC 設定
+
+主示範不使用 API key，後端依 Google Cloud Application Default Credentials 的標準順序尋找憑證。非敏感設定如下：
+
+```sh
+export GOOGLE_CLOUD_PROJECT="你的 Google Cloud project ID"
+export GOOGLE_CLOUD_LOCATION="global"
+export GOOGLE_CLOUD_GEMINI_MODEL="gemini-2.5-flash"
+```
+
+本機可使用 `gcloud auth application-default login` 建立 ADC。正式 Google Cloud 環境應使用綁定服務帳號與最小權限。不得將 ADC JSON、access token、API key 或 `.env` 放入 repository。
+
+- 健康檢查：`GET /api/v1/study-agent/health`。此端點只回報設定提示，`liveChecked=false`，不會假裝已完成真實模型呼叫。
+- 主流程：`POST /api/v1/study-agent/run`。只接受固定規劃 schema；Gemini 工具參數若與使用者需求不一致，工具呼叫會在執行前停止。
+- 唯讀工具：`get_validated_study_plan`。寫入工具 `save_study_plan` 仍要求明確確認與 `request_id` 冪等，未放入主示範的自動工具清單。
 
 Swagger UI 中可使用 `POST /api/dev/echo`，輸入 `{"message":"測試 Flask API"}` 後按 Try it out／Execute。合法輸入回傳200，空值、缺欄位或型別錯誤回傳422；不會寫入資料。此為環境測試介面，不是業務介面。
 
