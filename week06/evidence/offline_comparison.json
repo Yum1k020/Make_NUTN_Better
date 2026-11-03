@@ -1,0 +1,165 @@
+{
+  "workflow": "prompt_chaining",
+  "baseline_sha": "e71192abdc329446fbd28414cda14c31d2f310c4",
+  "same_input_fixture": "tests/fixtures/week04_plan.json",
+  "business_endpoint": "read-only study-plan preview",
+  "baseline_preview": {
+    "plan_id": "plan-001",
+    "suggested_sessions": [
+      {
+        "plan_id": "plan-001",
+        "starts_at": "2026-10-08T09:00:00",
+        "ends_at": "2026-10-08T10:00:00",
+        "minutes": 60
+      },
+      {
+        "plan_id": "plan-001",
+        "starts_at": "2026-10-08T11:00:00",
+        "ends_at": "2026-10-08T12:00:00",
+        "minutes": 60
+      },
+      {
+        "plan_id": "plan-001",
+        "starts_at": "2026-10-08T12:00:00",
+        "ends_at": "2026-10-08T13:00:00",
+        "minutes": 60
+      }
+    ],
+    "scheduled_minutes": 180,
+    "remaining_minutes": 0,
+    "reason": "scheduled_in_available_windows",
+    "action": "preview_study_plan",
+    "mutated": false,
+    "source": "scheduler_v1"
+  },
+  "offline_candidate": {
+    "workflow": "prompt_chaining",
+    "status": "answer_ready",
+    "stop_reason": "completed",
+    "extracted_request": {
+      "plan_id": "plan-001",
+      "start_date": "2026-10-08",
+      "exam_date": "2026-10-10",
+      "target_minutes": 180,
+      "session_minutes": 60,
+      "allowed_windows": [
+        {
+          "date": "2026-10-08",
+          "start_time": "09:00",
+          "end_time": "13:00"
+        },
+        {
+          "date": "2026-10-09",
+          "start_time": "09:00",
+          "end_time": "12:00"
+        }
+      ],
+      "busy_intervals": [
+        {
+          "source_type": "class",
+          "source_id": "class-os",
+          "title": "作業系統",
+          "starts_at": "2026-10-08T10:00:00",
+          "ends_at": "2026-10-08T11:00:00"
+        }
+      ]
+    },
+    "preview": {
+      "plan_id": "plan-001",
+      "suggested_sessions": [
+        {
+          "plan_id": "plan-001",
+          "starts_at": "2026-10-08T09:00:00",
+          "ends_at": "2026-10-08T10:00:00",
+          "minutes": 60
+        },
+        {
+          "plan_id": "plan-001",
+          "starts_at": "2026-10-08T11:00:00",
+          "ends_at": "2026-10-08T12:00:00",
+          "minutes": 60
+        },
+        {
+          "plan_id": "plan-001",
+          "starts_at": "2026-10-08T12:00:00",
+          "ends_at": "2026-10-08T13:00:00",
+          "minutes": 60
+        }
+      ],
+      "scheduled_minutes": 180,
+      "remaining_minutes": 0,
+      "reason": "scheduled_in_available_windows",
+      "action": "preview_study_plan",
+      "mutated": false,
+      "source": "scheduler_v1"
+    },
+    "answer": "已安排 180 分鐘，剩餘 0 分鐘；這是預覽，尚未寫入。",
+    "errors": [],
+    "counts": {
+      "extractor_calls": 1,
+      "preview_tool_calls": 1,
+      "summarizer_calls": 1
+    },
+    "trace": [
+      {"stage": "extract", "status": "started"},
+      {"stage": "extract", "status": "completed"},
+      {"stage": "gate", "status": "passed"},
+      {"stage": "preview_tool", "status": "started", "tool": "preview_study_plan"},
+      {"stage": "preview_tool", "status": "completed", "tool": "preview_study_plan"},
+      {"stage": "summarize", "status": "started"},
+      {"stage": "summarize", "status": "completed"}
+    ]
+  },
+  "mandatory_case_status": {
+    "case_1_normal_live": "LIVE_NOT_RUN",
+    "case_2_illegal_input": "PASS_OFFLINE",
+    "case_3_provider_failure": "PASS_INJECTED",
+    "case_4_chaining_gate_boundary": "PASS_OFFLINE"
+  },
+  "cases": {
+    "case_2_illegal_input": {
+      "status": "rejected",
+      "stop_reason": "invalid_input",
+      "counts": {
+        "extractor_calls": 0,
+        "preview_tool_calls": 0,
+        "summarizer_calls": 0
+      }
+    },
+    "case_3_provider_failure": {
+      "status": "failed",
+      "stop_reason": "provider_failure",
+      "errors": ["injected provider unavailable"],
+      "counts": {
+        "extractor_calls": 1,
+        "preview_tool_calls": 0,
+        "summarizer_calls": 0
+      }
+    },
+    "case_4_chaining_gate_boundary": {
+      "status": "rejected",
+      "stop_reason": "gate_rejected",
+      "errors": ["session_minutes must be a positive integer"],
+      "counts": {
+        "extractor_calls": 1,
+        "preview_tool_calls": 0,
+        "summarizer_calls": 0
+      }
+    }
+  },
+  "checks": {
+    "offline_candidate_matches_baseline_preview": true,
+    "empty_input_rejected_before_model_or_tool": true,
+    "provider_failure_has_finite_stop": true,
+    "gate_rejection_stops_all_downstream": true
+  },
+  "offline_all_pass": true,
+  "ci": {
+    "run_id": 39535318301,
+    "job_id": 119010509951,
+    "pytest": "23 passed, 1 xfailed",
+    "artifact_id": 12316908293,
+    "implementation_sha": "0fb360c4b98ff9fe59aac31dc7ac499d2cb10321"
+  },
+  "live_note": "The lecture requires the normal main-flow case to use a real Gemini request. CI has no private Gemini key, so offline fixtures do not claim LIVE_PASS."
+}

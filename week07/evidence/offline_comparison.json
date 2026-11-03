@@ -1,0 +1,162 @@
+{
+  "route": "A_confirmed_preference",
+  "baseline_sha": "9e2407a9a9a160b5ca5b51fc6e4a090ba077768e",
+  "preference_type": "study_session_minutes",
+  "baseline": {
+    "memory_available": false,
+    "behavior": "session_minutes must be supplied again in each new session"
+  },
+  "candidate": {
+    "saved_v1": {
+      "action": "save_preference",
+      "accepted": true,
+      "executed": true,
+      "status": "saved",
+      "request_id": "REQ-W07-SAVE-1",
+      "memory_id": "U001:study_session_minutes:v1",
+      "owner_id": "U001",
+      "preference_type": "study_session_minutes",
+      "value": 60,
+      "version": 1,
+      "expires_at": "2026-12-31T23:59:59",
+      "replayed": false
+    },
+    "new_session": {
+      "action": "preview_with_memory",
+      "status": "ok",
+      "memory_used": true,
+      "memory_read": {
+        "action": "read_preference",
+        "status": "ok",
+        "found": true,
+        "owner_id": "U001",
+        "reader_id": "U001",
+        "memory": {
+          "memory_id": "U001:study_session_minutes:v1",
+          "preference_type": "study_session_minutes",
+          "value": 60,
+          "source": {
+            "source_type": "user_confirmation",
+            "source_id": "chat-confirm-001"
+          },
+          "version": 1,
+          "expires_at": "2026-12-31T23:59:59"
+        }
+      },
+      "effective_session_minutes": 60,
+      "preview": {
+        "plan_id": "plan-001",
+        "suggested_sessions": [
+          {
+            "plan_id": "plan-001",
+            "starts_at": "2026-10-08T09:00:00",
+            "ends_at": "2026-10-08T10:00:00",
+            "minutes": 60
+          },
+          {
+            "plan_id": "plan-001",
+            "starts_at": "2026-10-08T11:00:00",
+            "ends_at": "2026-10-08T12:00:00",
+            "minutes": 60
+          },
+          {
+            "plan_id": "plan-001",
+            "starts_at": "2026-10-08T12:00:00",
+            "ends_at": "2026-10-08T13:00:00",
+            "minutes": 60
+          }
+        ],
+        "scheduled_minutes": 180,
+        "remaining_minutes": 0,
+        "reason": "scheduled_in_available_windows",
+        "action": "preview_study_plan",
+        "mutated": false,
+        "source": "scheduler_v1"
+      }
+    },
+    "cross_user": {
+      "action": "read_preference",
+      "status": "forbidden",
+      "found": false,
+      "owner_id": "U001",
+      "reader_id": "U002",
+      "memory": null
+    },
+    "saved_v2": {
+      "action": "save_preference",
+      "accepted": true,
+      "executed": true,
+      "status": "saved",
+      "request_id": "REQ-W07-SAVE-2",
+      "memory_id": "U001:study_session_minutes:v2",
+      "owner_id": "U001",
+      "preference_type": "study_session_minutes",
+      "value": 30,
+      "version": 2,
+      "expires_at": "2026-12-31T23:59:59",
+      "replayed": false
+    },
+    "corrected_read": {
+      "action": "read_preference",
+      "status": "ok",
+      "found": true,
+      "owner_id": "U001",
+      "reader_id": "U001",
+      "memory": {
+        "memory_id": "U001:study_session_minutes:v2",
+        "preference_type": "study_session_minutes",
+        "value": 30,
+        "source": {
+          "source_type": "user_confirmation",
+          "source_id": "chat-confirm-002"
+        },
+        "version": 2,
+        "expires_at": "2026-12-31T23:59:59"
+      }
+    },
+    "replay": {
+      "action": "save_preference",
+      "accepted": true,
+      "executed": true,
+      "status": "saved",
+      "request_id": "REQ-W07-SAVE-2",
+      "memory_id": "U001:study_session_minutes:v2",
+      "owner_id": "U001",
+      "preference_type": "study_session_minutes",
+      "value": 30,
+      "version": 2,
+      "expires_at": "2026-12-31T23:59:59",
+      "replayed": true
+    },
+    "revoked": {
+      "action": "revoke_preference",
+      "accepted": true,
+      "executed": true,
+      "status": "revoked",
+      "request_id": "REQ-W07-REVOKE",
+      "owner_id": "U001",
+      "memory_id": "U001:study_session_minutes:v2",
+      "version": 2,
+      "replayed": false
+    },
+    "after_revoke": {
+      "action": "read_preference",
+      "status": "not_found",
+      "found": false,
+      "owner_id": "U001",
+      "reader_id": "U001",
+      "memory": null
+    }
+  },
+  "checks": {
+    "unconfirmed_did_not_write": true,
+    "new_session_read_v1": true,
+    "cross_user_isolated": true,
+    "correction_reads_v2_only": true,
+    "same_request_id_no_duplicate": true,
+    "revocation_stops_future_reads": true
+  },
+  "offline_all_pass": true,
+  "live_status": "LIVE_NOT_RUN",
+  "live_note": "Week 07 requires current-version real Gemini evidence. CI has no private API key, so offline evidence does not claim LIVE_PASS."
+}

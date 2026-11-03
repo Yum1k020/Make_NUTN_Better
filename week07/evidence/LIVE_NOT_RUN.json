@@ -1,0 +1,15 @@
+{
+  "route": "A_confirmed_preference",
+  "case": "C01_normal_main_flow",
+  "live_status": "LIVE_NOT_RUN",
+  "reason": "GitHub CI does not have the user's private Gemini API key.",
+  "runner": "python -m week07.live_memory",
+  "required_path": [
+    "Gemini preference proposal",
+    "human confirmation",
+    "memory write result",
+    "new-session controlled read",
+    "existing study-plan preview",
+    "Gemini summary"
+  ]
+}
