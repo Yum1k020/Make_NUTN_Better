@@ -1,13 +1,14 @@
 {
-  "timestamp": "2026-10-21T11:17:16.755843+08:00",
+  "timestamp": "2026-11-04T00:13:43.274960+08:00",
   "baseline_sha": "13be93782ef44e08886f86afffedd7f8fc72333d",
-  "candidate_source_commit": "6067862d7f0bebc031985dadc96241d291c90833",
+  "candidate_source_commit": "e960faa0514ed63f26e214b13fffc537b7fcbc47",
   "source_hashes": {
-    "backend/app/graduation_explanation_api.py": "103545d56efeda84844e39aa00a4323b9c8c1b3106f3d8b6141f055192b43289",
+    "backend/app/graduation_validity.py": "d4b1baebedcc4a6c678ba73bfb41d0f822319fbe52844c716de5ba88630dcb76",
+    "backend/app/graduation_explanation_api.py": "388c9e36b51fd56fa7357822cc3b83fb11a03814c921a5b1aeb09a90756dcc0a",
+    "backend/app/graduation_openai.py": "f8abc9da73716e0157cd84ea1ca2cc8bc79c44de590b4d34961d9f897a7d6d07",
     "backend/app/graduation_explanation_core.py": "61f8fe1d5f52c4c3f956c795fa42b7a9ec377738685f45e9aa79ea34dffc68fa",
-    "backend/app/graduation_gemini.py": "776b450aad863615183f38f45964f8fd45eaa6e1dbc6a10e2276501f4485867d",
-    "backend/app/graduation_workflow.py": "87310ea08f85391b04896e715de5c7f28bd676b8708d28d3db7a674266c6bc98",
-    "backend/week06_acceptance.py": "7913268abdbe36f2aaac1b3ccb7df19baf73c89cd6ca1ec2c1bec74ad7caebdc"
+    "backend/app/graduation_workflow.py": "35cc5bdc343457d391fb7018ebab4f415701b1a4407fb7c8dbca884827b1e0d2",
+    "backend/week06_acceptance.py": "8970070a4f0eb03d1ccc63ee3e13a56ee4bad2776be22d881fb199f604c23ae1"
   },
   "dataset": "synthetic only; no student records",
   "inputs": [
@@ -59,21 +60,21 @@
       }
     ]
   ],
-  "live_status": "LIVE_NOT_RUN",
-  "normal_kind": "gemini",
-  "normal_not_run_reason": "GEMINI_API_KEY and GEMINI_MODEL are required",
+  "live_status": "LIVE_PASS",
+  "normal_kind": "openai",
+  "normal_not_run_reason": null,
   "baseline": {
     "http_status": 200,
-    "latency_ms": 1233,
+    "latency_ms": 451,
     "response": {
       "data": {
         "checks": [
           {
-            "actual_value": 3.0,
+            "actual_value": 0,
             "check_id": "total_credits",
-            "message": "尚缺 130 credits",
+            "message": "尚缺 133 credits",
             "name": "總學分",
-            "remaining_value": 130.0,
+            "remaining_value": 133,
             "required_value": 133,
             "status": "not_met",
             "unit": "credits"
@@ -229,16 +230,6 @@
             "unit": "programs"
           },
           {
-            "actual_value": 10,
-            "check_id": "lecture_professional",
-            "message": "已達第一版門檻",
-            "name": "專業講座",
-            "remaining_value": 0,
-            "required_value": 10,
-            "status": "met",
-            "unit": "lectures"
-          },
-          {
             "actual_value": null,
             "check_id": "lecture_general",
             "message": "資料待確認",
@@ -246,6 +237,16 @@
             "remaining_value": null,
             "required_value": 12,
             "status": "needs_confirmation",
+            "unit": "lectures"
+          },
+          {
+            "actual_value": 10,
+            "check_id": "lecture_professional",
+            "message": "已達第一版門檻",
+            "name": "專業講座",
+            "remaining_value": 0,
+            "required_value": 10,
+            "status": "met",
             "unit": "lectures"
           }
         ],
@@ -255,12 +256,13 @@
             "category": null,
             "course_id": "course-demo-001",
             "credits": 3.0,
-            "enrollment_id": "41162434-03ce-476d-abab-d226d8f57bb9"
+            "enrollment_id": "8a1bba79-3bf8-4d21-a16c-a5181d638c72",
+            "recognition_status": "pending_confirmation"
           }
         ],
         "data_errors": [
           {
-            "code": "CLASSIFICATION_UNKNOWN",
+            "code": "RECOGNITION_PENDING",
             "course_id": "course-demo-001"
           },
           {
@@ -419,12 +421,12 @@
             ]
           }
         ],
-        "earned_credits": 3.0,
-        "evaluated_at": "2026-10-21T11:17:16.736331+08:00",
+        "earned_credits": 0,
+        "evaluated_at": "2026-11-04T00:13:24.042292+08:00",
         "lecture_progress": {
           "general_count": null,
           "professional_count": 10,
-          "updated_at": "2026-10-21T11:17:15.485587+08:00",
+          "updated_at": "2026-11-04T00:13:23.591340+08:00",
           "user_id": "user-demo-001"
         },
         "missing_required_courses": [],
@@ -438,24 +440,43 @@
             "name": "雲端網路",
             "passed_courses": 0,
             "program_id": "cloud_network",
-            "rule_set_id": "nutn-csie-115-mvp-v1",
+            "rule_set_id": "nutn-csie-115-integrated-v2",
             "sources": [
+              {
+                "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                "id": "mvp_v1",
+                "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+              },
+              {
+                "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                "id": "source_v1",
+                "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+              },
+              {
+                "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                "id": "markdown",
+                "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+              },
               {
                 "filename": "資工系115大學部課程架構表.pdf",
                 "id": "curriculum_115",
-                "type": "provided_pdf",
-                "usage": "學分要求、必修清單、專業講座及學程門檻"
+                "role": "原文件引用的課程架構來源",
+                "verification_status": "referenced_by_input_documents_not_reverified"
               },
               {
                 "filename": "114 學年度大學部課程規劃地圖.pdf",
                 "id": "program_map_114",
-                "type": "provided_pdf",
-                "usage": "三個學程的採計課程清單"
+                "role": "舊版引用的學程清單來源",
+                "verification_status": "referenced_by_mvp_not_reverified"
               },
               {
+                "file": "docs/decisions/CHANGE_DECISIONS.md",
                 "id": "user_decisions",
-                "type": "conversation",
-                "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                "role": "本次使用者逐項確認的團隊政策",
+                "section": "GR-001～GR-015"
               }
             ],
             "status": "needs_confirmation",
@@ -481,24 +502,43 @@
             "name": "智慧計算",
             "passed_courses": 0,
             "program_id": "intelligent_computing",
-            "rule_set_id": "nutn-csie-115-mvp-v1",
+            "rule_set_id": "nutn-csie-115-integrated-v2",
             "sources": [
+              {
+                "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                "id": "mvp_v1",
+                "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+              },
+              {
+                "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                "id": "source_v1",
+                "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+              },
+              {
+                "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                "id": "markdown",
+                "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+              },
               {
                 "filename": "資工系115大學部課程架構表.pdf",
                 "id": "curriculum_115",
-                "type": "provided_pdf",
-                "usage": "學分要求、必修清單、專業講座及學程門檻"
+                "role": "原文件引用的課程架構來源",
+                "verification_status": "referenced_by_input_documents_not_reverified"
               },
               {
                 "filename": "114 學年度大學部課程規劃地圖.pdf",
                 "id": "program_map_114",
-                "type": "provided_pdf",
-                "usage": "三個學程的採計課程清單"
+                "role": "舊版引用的學程清單來源",
+                "verification_status": "referenced_by_mvp_not_reverified"
               },
               {
+                "file": "docs/decisions/CHANGE_DECISIONS.md",
                 "id": "user_decisions",
-                "type": "conversation",
-                "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                "role": "本次使用者逐項確認的團隊政策",
+                "section": "GR-001～GR-015"
               }
             ],
             "status": "needs_confirmation",
@@ -523,24 +563,43 @@
             "name": "應用資訊",
             "passed_courses": 0,
             "program_id": "applied_information",
-            "rule_set_id": "nutn-csie-115-mvp-v1",
+            "rule_set_id": "nutn-csie-115-integrated-v2",
             "sources": [
+              {
+                "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                "id": "mvp_v1",
+                "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+              },
+              {
+                "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                "id": "source_v1",
+                "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+              },
+              {
+                "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                "id": "markdown",
+                "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+              },
               {
                 "filename": "資工系115大學部課程架構表.pdf",
                 "id": "curriculum_115",
-                "type": "provided_pdf",
-                "usage": "學分要求、必修清單、專業講座及學程門檻"
+                "role": "原文件引用的課程架構來源",
+                "verification_status": "referenced_by_input_documents_not_reverified"
               },
               {
                 "filename": "114 學年度大學部課程規劃地圖.pdf",
                 "id": "program_map_114",
-                "type": "provided_pdf",
-                "usage": "三個學程的採計課程清單"
+                "role": "舊版引用的學程清單來源",
+                "verification_status": "referenced_by_mvp_not_reverified"
               },
               {
+                "file": "docs/decisions/CHANGE_DECISIONS.md",
                 "id": "user_decisions",
-                "type": "conversation",
-                "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                "role": "本次使用者逐項確認的團隊政策",
+                "section": "GR-001～GR-015"
               }
             ],
             "status": "needs_confirmation",
@@ -558,18 +617,1146 @@
             ]
           }
         ],
-        "rule_set_id": "nutn-csie-115-mvp-v1",
+        "rule_set_id": "nutn-csie-115-integrated-v2",
         "user_id": "user-demo-001",
-        "verification_scope": "依提供文件及使用者決策整理的第一版規則，非校方正式畢業資格認證"
+        "verification_scope": "依專案文件與團隊決策整合，未重新核對校方原始PDF；非校方正式認證"
       }
     }
   },
-  "candidate": null,
+  "candidate": {
+    "http_status": 200,
+    "latency_ms": 19214,
+    "response": {
+      "data": {
+        "progress": {
+          "checks": [
+            {
+              "actual_value": 0,
+              "check_id": "total_credits",
+              "message": "尚缺 133 credits",
+              "name": "總學分",
+              "remaining_value": 133,
+              "required_value": 133,
+              "status": "not_met",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_core",
+              "message": "資料待確認",
+              "name": "general_core",
+              "remaining_value": null,
+              "required_value": 12,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_domain",
+              "message": "資料待確認",
+              "name": "general_domain",
+              "remaining_value": null,
+              "required_value": 12,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "college_required",
+              "message": "資料待確認",
+              "name": "college_required",
+              "remaining_value": null,
+              "required_value": 2,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "department_required",
+              "message": "資料待確認",
+              "name": "department_required",
+              "remaining_value": null,
+              "required_value": 69,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "department_elective",
+              "message": "資料待確認",
+              "name": "department_elective",
+              "remaining_value": null,
+              "required_value": 12,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "free_elective",
+              "message": "資料待確認",
+              "name": "free_elective",
+              "remaining_value": null,
+              "required_value": 20,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_elective",
+              "message": "資料待確認",
+              "name": "通識選修",
+              "remaining_value": null,
+              "required_value": 18,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_domains",
+              "message": "資料待確認",
+              "name": "通識領域數",
+              "remaining_value": null,
+              "required_value": 3,
+              "status": "needs_confirmation",
+              "unit": "domains"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_core_0",
+              "message": "資料待確認",
+              "name": "中文閱讀與書寫",
+              "remaining_value": null,
+              "required_value": 4,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_core_1",
+              "message": "資料待確認",
+              "name": "英文",
+              "remaining_value": null,
+              "required_value": 4,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_core_2",
+              "message": "資料待確認",
+              "name": "體育",
+              "remaining_value": null,
+              "required_value": 2,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "general_core_3",
+              "message": "資料待確認",
+              "name": "運算思維與AI賦能程式設計",
+              "remaining_value": null,
+              "required_value": 2,
+              "status": "needs_confirmation",
+              "unit": "credits"
+            },
+            {
+              "actual_value": null,
+              "check_id": "college_course_0",
+              "message": "資料待確認",
+              "name": "科技法律",
+              "remaining_value": null,
+              "required_value": 1,
+              "status": "needs_confirmation",
+              "unit": "courses"
+            },
+            {
+              "actual_value": null,
+              "check_id": "required_courses",
+              "message": "資料待確認",
+              "name": "指定必修",
+              "remaining_value": null,
+              "required_value": 25,
+              "status": "needs_confirmation",
+              "unit": "courses"
+            },
+            {
+              "actual_value": null,
+              "check_id": "programs",
+              "message": "資料待確認",
+              "name": "完成學程",
+              "remaining_value": null,
+              "required_value": 2,
+              "status": "needs_confirmation",
+              "unit": "programs"
+            },
+            {
+              "actual_value": null,
+              "check_id": "lecture_general",
+              "message": "資料待確認",
+              "name": "一般講座",
+              "remaining_value": null,
+              "required_value": 12,
+              "status": "needs_confirmation",
+              "unit": "lectures"
+            },
+            {
+              "actual_value": 10,
+              "check_id": "lecture_professional",
+              "message": "已達第一版門檻",
+              "name": "專業講座",
+              "remaining_value": 0,
+              "required_value": 10,
+              "status": "met",
+              "unit": "lectures"
+            }
+          ],
+          "credit_allocation": [
+            {
+              "allocations": [],
+              "category": null,
+              "course_id": "course-demo-001",
+              "credits": 3.0,
+              "enrollment_id": "8a1bba79-3bf8-4d21-a16c-a5181d638c72",
+              "recognition_status": "pending_confirmation"
+            }
+          ],
+          "data_errors": [
+            {
+              "code": "RECOGNITION_PENDING",
+              "course_id": "course-demo-001"
+            },
+            {
+              "code": "REQUIRED_COURSES_UNMAPPED",
+              "courses": [
+                {
+                  "course_code": "NN1001",
+                  "credits": 3,
+                  "name": "微積分(一)",
+                  "recommended_term": "大一上"
+                },
+                {
+                  "course_code": "NN1014",
+                  "credits": 3,
+                  "name": "計算機概論",
+                  "recommended_term": "大一上"
+                },
+                {
+                  "course_code": "NN1204",
+                  "credits": 3,
+                  "name": "計算機程式設計(一)",
+                  "recommended_term": "大一上"
+                },
+                {
+                  "course_code": "NN1205",
+                  "credits": 2,
+                  "name": "計算機程式設計實習(一)",
+                  "recommended_term": "大一上"
+                },
+                {
+                  "course_code": "NN1009",
+                  "credits": 3,
+                  "name": "微積分(二)",
+                  "recommended_term": "大一下"
+                },
+                {
+                  "course_code": "NN1215",
+                  "credits": 3,
+                  "name": "電子電路學",
+                  "recommended_term": "大一下"
+                },
+                {
+                  "course_code": "NN1016",
+                  "credits": 3,
+                  "name": "線性代數",
+                  "recommended_term": "大一下"
+                },
+                {
+                  "course_code": "NN1206",
+                  "credits": 3,
+                  "name": "計算機程式設計(二)",
+                  "recommended_term": "大一下"
+                },
+                {
+                  "course_code": "NN1207",
+                  "credits": 2,
+                  "name": "計算機程式設計實習(二)",
+                  "recommended_term": "大一下"
+                },
+                {
+                  "course_code": "NN1013",
+                  "credits": 3,
+                  "name": "離散數學",
+                  "recommended_term": "大二上"
+                },
+                {
+                  "course_code": "NN1018",
+                  "credits": 3,
+                  "name": "資料結構",
+                  "recommended_term": "大二上"
+                },
+                {
+                  "course_code": "NN1199",
+                  "credits": 3,
+                  "name": "邏輯設計",
+                  "recommended_term": "大二上"
+                },
+                {
+                  "course_code": "NN1200",
+                  "credits": 2,
+                  "name": "邏輯設計實驗",
+                  "recommended_term": "大二上"
+                },
+                {
+                  "course_code": "NN1208",
+                  "credits": 3,
+                  "name": "機率",
+                  "recommended_term": "大二上"
+                },
+                {
+                  "course_code": "NN1023",
+                  "credits": 3,
+                  "name": "系統程式",
+                  "recommended_term": "大二下"
+                },
+                {
+                  "course_code": "NN1024",
+                  "credits": 3,
+                  "name": "計算機網路",
+                  "recommended_term": "大二下"
+                },
+                {
+                  "course_code": "NN1066",
+                  "credits": 3,
+                  "name": "數位系統",
+                  "recommended_term": "大二下"
+                },
+                {
+                  "course_code": "NN1067",
+                  "credits": 2,
+                  "name": "數位系統實驗",
+                  "recommended_term": "大二下"
+                },
+                {
+                  "course_code": "NN1037",
+                  "credits": 3,
+                  "name": "人工智慧",
+                  "recommended_term": "大二下"
+                },
+                {
+                  "course_code": "NN1031",
+                  "credits": 3,
+                  "name": "作業系統",
+                  "recommended_term": "大三上"
+                },
+                {
+                  "course_code": "NN1032",
+                  "credits": 3,
+                  "name": "演算法",
+                  "recommended_term": "大三上"
+                },
+                {
+                  "course_code": "NN1030",
+                  "credits": 3,
+                  "name": "資料庫系統",
+                  "recommended_term": "大三上"
+                },
+                {
+                  "course_code": "NN1033",
+                  "credits": 3,
+                  "name": "計算機組織",
+                  "recommended_term": "大三上"
+                },
+                {
+                  "course_code": "NN1053",
+                  "credits": 2,
+                  "name": "畢業專題實作(一)",
+                  "recommended_term": "大三下"
+                },
+                {
+                  "course_code": "NN1062",
+                  "credits": 2,
+                  "name": "畢業專題實作(二)",
+                  "recommended_term": "大四上"
+                }
+              ]
+            }
+          ],
+          "earned_credits": 0,
+          "evaluated_at": "2026-11-04T00:13:24.045992+08:00",
+          "lecture_progress": {
+            "general_count": null,
+            "professional_count": 10,
+            "updated_at": "2026-11-04T00:13:23.591340+08:00",
+            "user_id": "user-demo-001"
+          },
+          "missing_required_courses": [],
+          "overall_status": "not_met",
+          "program_progress": [
+            {
+              "course_ids": [],
+              "data_status": "needs_confirmation",
+              "list_year": 114,
+              "minimum_passed_courses": 3,
+              "name": "雲端網路",
+              "passed_courses": 0,
+              "program_id": "cloud_network",
+              "rule_set_id": "nutn-csie-115-integrated-v2",
+              "sources": [
+                {
+                  "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                  "id": "mvp_v1",
+                  "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                  "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+                },
+                {
+                  "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                  "id": "source_v1",
+                  "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                  "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+                },
+                {
+                  "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                  "id": "markdown",
+                  "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                  "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+                },
+                {
+                  "filename": "資工系115大學部課程架構表.pdf",
+                  "id": "curriculum_115",
+                  "role": "原文件引用的課程架構來源",
+                  "verification_status": "referenced_by_input_documents_not_reverified"
+                },
+                {
+                  "filename": "114 學年度大學部課程規劃地圖.pdf",
+                  "id": "program_map_114",
+                  "role": "舊版引用的學程清單來源",
+                  "verification_status": "referenced_by_mvp_not_reverified"
+                },
+                {
+                  "file": "docs/decisions/CHANGE_DECISIONS.md",
+                  "id": "user_decisions",
+                  "role": "本次使用者逐項確認的團隊政策",
+                  "section": "GR-001～GR-015"
+                }
+              ],
+              "status": "needs_confirmation",
+              "unmapped_course_names": [
+                "物聯網",
+                "無線通訊網路",
+                "雲端計算",
+                "網路通訊協定",
+                "安全程式設計",
+                "區塊鏈原理與應用",
+                "平行計算",
+                "多媒體系統",
+                "網路程式設計",
+                "網路實務應用",
+                "資訊安全"
+              ]
+            },
+            {
+              "course_ids": [],
+              "data_status": "needs_confirmation",
+              "list_year": 114,
+              "minimum_passed_courses": 3,
+              "name": "智慧計算",
+              "passed_courses": 0,
+              "program_id": "intelligent_computing",
+              "rule_set_id": "nutn-csie-115-integrated-v2",
+              "sources": [
+                {
+                  "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                  "id": "mvp_v1",
+                  "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                  "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+                },
+                {
+                  "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                  "id": "source_v1",
+                  "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                  "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+                },
+                {
+                  "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                  "id": "markdown",
+                  "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                  "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+                },
+                {
+                  "filename": "資工系115大學部課程架構表.pdf",
+                  "id": "curriculum_115",
+                  "role": "原文件引用的課程架構來源",
+                  "verification_status": "referenced_by_input_documents_not_reverified"
+                },
+                {
+                  "filename": "114 學年度大學部課程規劃地圖.pdf",
+                  "id": "program_map_114",
+                  "role": "舊版引用的學程清單來源",
+                  "verification_status": "referenced_by_mvp_not_reverified"
+                },
+                {
+                  "file": "docs/decisions/CHANGE_DECISIONS.md",
+                  "id": "user_decisions",
+                  "role": "本次使用者逐項確認的團隊政策",
+                  "section": "GR-001～GR-015"
+                }
+              ],
+              "status": "needs_confirmation",
+              "unmapped_course_names": [
+                "人工智慧",
+                "機器學習",
+                "軟式計算",
+                "計算理論",
+                "深度學習",
+                "資訊擷取",
+                "圖形識別",
+                "計算機圖學",
+                "資料探勘",
+                "智慧型機器人"
+              ]
+            },
+            {
+              "course_ids": [],
+              "data_status": "needs_confirmation",
+              "list_year": 114,
+              "minimum_passed_courses": 3,
+              "name": "應用資訊",
+              "passed_courses": 0,
+              "program_id": "applied_information",
+              "rule_set_id": "nutn-csie-115-integrated-v2",
+              "sources": [
+                {
+                  "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                  "id": "mvp_v1",
+                  "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                  "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+                },
+                {
+                  "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                  "id": "source_v1",
+                  "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                  "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+                },
+                {
+                  "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                  "id": "markdown",
+                  "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                  "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+                },
+                {
+                  "filename": "資工系115大學部課程架構表.pdf",
+                  "id": "curriculum_115",
+                  "role": "原文件引用的課程架構來源",
+                  "verification_status": "referenced_by_input_documents_not_reverified"
+                },
+                {
+                  "filename": "114 學年度大學部課程規劃地圖.pdf",
+                  "id": "program_map_114",
+                  "role": "舊版引用的學程清單來源",
+                  "verification_status": "referenced_by_mvp_not_reverified"
+                },
+                {
+                  "file": "docs/decisions/CHANGE_DECISIONS.md",
+                  "id": "user_decisions",
+                  "role": "本次使用者逐項確認的團隊政策",
+                  "section": "GR-001～GR-015"
+                }
+              ],
+              "status": "needs_confirmation",
+              "unmapped_course_names": [
+                "生物資訊學",
+                "電腦對局",
+                "軟體工程",
+                "影像處理",
+                "訊號與系統",
+                "數位訊號處理",
+                "電子自動化設計",
+                "計算機結構",
+                "嵌入式系統",
+                "量子計算"
+              ]
+            }
+          ],
+          "rule_set_id": "nutn-csie-115-integrated-v2",
+          "user_id": "user-demo-001",
+          "verification_scope": "依專案文件與團隊決策整合，未重新核對校方原始PDF；非校方正式認證"
+        },
+        "workflow": {
+          "attempts": [
+            {
+              "draft": {
+                "earned_credits": 0,
+                "items": [
+                  {
+                    "action": "review_requirement",
+                    "actual_value": 0,
+                    "check_id": "total_credits",
+                    "remaining_value": 133,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:total_credits"
+                    ],
+                    "status": "not_met"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_core",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_core"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_domain",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_domain"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "college_required",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:college_required"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "department_required",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:department_required"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "department_elective",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:department_elective"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "free_elective",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:free_elective"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_elective",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_elective"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_domains",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_domains"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_core_0",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_core_0"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_core_1",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_core_1"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_core_2",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_core_2"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "general_core_3",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:general_core_3"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "college_course_0",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:college_course_0"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "required_courses",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:required_courses"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "programs",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:programs"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "provide_evidence",
+                    "actual_value": null,
+                    "check_id": "lecture_general",
+                    "remaining_value": null,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:lecture_general"
+                    ],
+                    "status": "needs_confirmation"
+                  },
+                  {
+                    "action": "keep_record",
+                    "actual_value": 10,
+                    "check_id": "lecture_professional",
+                    "remaining_value": 0,
+                    "source_ids": [
+                      "nutn-csie-115-integrated-v2:lecture_professional"
+                    ],
+                    "status": "met"
+                  }
+                ],
+                "overall_status": "not_met",
+                "rule_set_id": "nutn-csie-115-integrated-v2",
+                "scope": "project_rules_only"
+              },
+              "errors": [],
+              "label": "A",
+              "metrics": {
+                "actual_call": {
+                  "endpoint": "https://api.openai.com/v1/responses",
+                  "method": "POST",
+                  "request_sha256": "a856ff34e544660487aaab045e6abe99c8d58b2a378e1901299d77f67eb18606",
+                  "tool_result_delivery": "graduation_progress aggregate in input"
+                },
+                "latency_ms": 19197,
+                "model": "gpt-5-mini",
+                "provider": "openai",
+                "usage": {
+                  "input_tokens": 1901,
+                  "output_tokens": 1194,
+                  "total_tokens": 3095
+                }
+              },
+              "passed": true
+            }
+          ],
+          "evaluated_at": "2026-11-04T00:13:24.047589+08:00",
+          "evidence": {
+            "checks": [
+              {
+                "actual_value": 0,
+                "check_id": "total_credits",
+                "name": "總學分",
+                "remaining_value": 133,
+                "required_value": 133,
+                "status": "not_met",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_core",
+                "name": "general_core",
+                "remaining_value": null,
+                "required_value": 12,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_domain",
+                "name": "general_domain",
+                "remaining_value": null,
+                "required_value": 12,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "college_required",
+                "name": "college_required",
+                "remaining_value": null,
+                "required_value": 2,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "department_required",
+                "name": "department_required",
+                "remaining_value": null,
+                "required_value": 69,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "department_elective",
+                "name": "department_elective",
+                "remaining_value": null,
+                "required_value": 12,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "free_elective",
+                "name": "free_elective",
+                "remaining_value": null,
+                "required_value": 20,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_elective",
+                "name": "通識選修",
+                "remaining_value": null,
+                "required_value": 18,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_domains",
+                "name": "通識領域數",
+                "remaining_value": null,
+                "required_value": 3,
+                "status": "needs_confirmation",
+                "unit": "domains"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_core_0",
+                "name": "中文閱讀與書寫",
+                "remaining_value": null,
+                "required_value": 4,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_core_1",
+                "name": "英文",
+                "remaining_value": null,
+                "required_value": 4,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_core_2",
+                "name": "體育",
+                "remaining_value": null,
+                "required_value": 2,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "general_core_3",
+                "name": "運算思維與AI賦能程式設計",
+                "remaining_value": null,
+                "required_value": 2,
+                "status": "needs_confirmation",
+                "unit": "credits"
+              },
+              {
+                "actual_value": null,
+                "check_id": "college_course_0",
+                "name": "科技法律",
+                "remaining_value": null,
+                "required_value": 1,
+                "status": "needs_confirmation",
+                "unit": "courses"
+              },
+              {
+                "actual_value": null,
+                "check_id": "required_courses",
+                "name": "指定必修",
+                "remaining_value": null,
+                "required_value": 25,
+                "status": "needs_confirmation",
+                "unit": "courses"
+              },
+              {
+                "actual_value": null,
+                "check_id": "programs",
+                "name": "完成學程",
+                "remaining_value": null,
+                "required_value": 2,
+                "status": "needs_confirmation",
+                "unit": "programs"
+              },
+              {
+                "actual_value": null,
+                "check_id": "lecture_general",
+                "name": "一般講座",
+                "remaining_value": null,
+                "required_value": 12,
+                "status": "needs_confirmation",
+                "unit": "lectures"
+              },
+              {
+                "actual_value": 10,
+                "check_id": "lecture_professional",
+                "name": "專業講座",
+                "remaining_value": 0,
+                "required_value": 10,
+                "status": "met",
+                "unit": "lectures"
+              }
+            ],
+            "earned_credits": 0,
+            "overall_status": "not_met",
+            "rule_set_id": "nutn-csie-115-integrated-v2",
+            "scope": "project_rules_only"
+          },
+          "evidence_sha256": "e06bec1f54f480059261516a20e0491bfe612b396a6f12cacc5b9ccef518002e",
+          "explanation": [
+            {
+              "check_id": "total_credits",
+              "name": "總學分",
+              "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:total_credits"
+              ],
+              "text": "未達標：已採計 0／要求 133，尚缺 133（學分）。"
+            },
+            {
+              "check_id": "general_core",
+              "name": "通識核心",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_core"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_domain",
+              "name": "通識領域學分",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_domain"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "college_required",
+              "name": "院核心",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:college_required"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "department_required",
+              "name": "專業必修學分",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:department_required"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "department_elective",
+              "name": "專業選修",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:department_elective"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "free_elective",
+              "name": "自由選修",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:free_elective"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_elective",
+              "name": "通識選修",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_elective"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_domains",
+              "name": "通識領域數",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_domains"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_core_0",
+              "name": "中文閱讀與書寫",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_core_0"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_core_1",
+              "name": "英文",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_core_1"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_core_2",
+              "name": "體育",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_core_2"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "general_core_3",
+              "name": "運算思維與AI賦能程式設計",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:general_core_3"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "college_course_0",
+              "name": "科技法律",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:college_course_0"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "required_courses",
+              "name": "指定必修",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:required_courses"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "programs",
+              "name": "完成學程",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:programs"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "lecture_general",
+              "name": "一般講座",
+              "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:lecture_general"
+              ],
+              "text": "待確認：資料未知，不能當作零或已達標。"
+            },
+            {
+              "check_id": "lecture_professional",
+              "name": "專業講座",
+              "next_step": "保留通過與認列紀錄。",
+              "source_ids": [
+                "nutn-csie-115-integrated-v2:lecture_professional"
+              ],
+              "text": "已達標：已採計 10／要求 10，尚缺 0（場）。"
+            }
+          ],
+          "latency_ms": 19200,
+          "model_calls": 1,
+          "rubric": "graduation-explanation-v1",
+          "run_id": "431410ad-5d8b-4a6e-a5c1-8e35b7996ebe",
+          "scope_text": "符合本次啟用的專案規則不等於校方畢業認證；規劃中或修習中課程不算已取得學分。",
+          "status": "verified",
+          "stop_reason": "RUBRIC_PASS",
+          "tool": "graduation_progress",
+          "tool_calls": 1,
+          "validity": {
+            "execution_mode": "standard",
+            "expires_at_ms": 1793722704047,
+            "issued_at_ms": 1793722404047,
+            "scope_id": "62bb6dab-5912-48f7-8b45-b01ae1cfcce2",
+            "server_now_ms": 1793722404047,
+            "source_sha256": "19e12342e60a7eff156287a41a8956a6458e3ae1cb866c0adcd29e23fdb19e85",
+            "ttl_seconds": 300
+          }
+        }
+      }
+    }
+  },
   "invalid_input": {
     "expected": "422, zero provider calls",
     "actual": {
       "http_status": 422,
-      "latency_ms": 0,
+      "latency_ms": 1,
       "response": {
         "error": {
           "code": "VALIDATION_ERROR",
@@ -590,17 +1777,17 @@
     "expected": "one call, bounded fallback",
     "actual": {
       "http_status": 200,
-      "latency_ms": 7,
+      "latency_ms": 12,
       "response": {
         "data": {
           "progress": {
             "checks": [
               {
-                "actual_value": 3.0,
+                "actual_value": 0,
                 "check_id": "total_credits",
-                "message": "尚缺 130 credits",
+                "message": "尚缺 133 credits",
                 "name": "總學分",
-                "remaining_value": 130.0,
+                "remaining_value": 133,
                 "required_value": 133,
                 "status": "not_met",
                 "unit": "credits"
@@ -756,16 +1943,6 @@
                 "unit": "programs"
               },
               {
-                "actual_value": 10,
-                "check_id": "lecture_professional",
-                "message": "已達第一版門檻",
-                "name": "專業講座",
-                "remaining_value": 0,
-                "required_value": 10,
-                "status": "met",
-                "unit": "lectures"
-              },
-              {
                 "actual_value": null,
                 "check_id": "lecture_general",
                 "message": "資料待確認",
@@ -773,6 +1950,16 @@
                 "remaining_value": null,
                 "required_value": 12,
                 "status": "needs_confirmation",
+                "unit": "lectures"
+              },
+              {
+                "actual_value": 10,
+                "check_id": "lecture_professional",
+                "message": "已達第一版門檻",
+                "name": "專業講座",
+                "remaining_value": 0,
+                "required_value": 10,
+                "status": "met",
                 "unit": "lectures"
               }
             ],
@@ -782,12 +1969,13 @@
                 "category": null,
                 "course_id": "course-demo-001",
                 "credits": 3.0,
-                "enrollment_id": "41162434-03ce-476d-abab-d226d8f57bb9"
+                "enrollment_id": "8a1bba79-3bf8-4d21-a16c-a5181d638c72",
+                "recognition_status": "pending_confirmation"
               }
             ],
             "data_errors": [
               {
-                "code": "CLASSIFICATION_UNKNOWN",
+                "code": "RECOGNITION_PENDING",
                 "course_id": "course-demo-001"
               },
               {
@@ -946,12 +2134,12 @@
                 ]
               }
             ],
-            "earned_credits": 3.0,
-            "evaluated_at": "2026-10-21T11:17:16.744331+08:00",
+            "earned_credits": 0,
+            "evaluated_at": "2026-11-04T00:13:43.262008+08:00",
             "lecture_progress": {
               "general_count": null,
               "professional_count": 10,
-              "updated_at": "2026-10-21T11:17:15.485587+08:00",
+              "updated_at": "2026-11-04T00:13:23.591340+08:00",
               "user_id": "user-demo-001"
             },
             "missing_required_courses": [],
@@ -965,24 +2153,43 @@
                 "name": "雲端網路",
                 "passed_courses": 0,
                 "program_id": "cloud_network",
-                "rule_set_id": "nutn-csie-115-mvp-v1",
+                "rule_set_id": "nutn-csie-115-integrated-v2",
                 "sources": [
+                  {
+                    "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                    "id": "mvp_v1",
+                    "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                    "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+                  },
+                  {
+                    "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                    "id": "source_v1",
+                    "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                    "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+                  },
+                  {
+                    "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                    "id": "markdown",
+                    "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                    "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+                  },
                   {
                     "filename": "資工系115大學部課程架構表.pdf",
                     "id": "curriculum_115",
-                    "type": "provided_pdf",
-                    "usage": "學分要求、必修清單、專業講座及學程門檻"
+                    "role": "原文件引用的課程架構來源",
+                    "verification_status": "referenced_by_input_documents_not_reverified"
                   },
                   {
                     "filename": "114 學年度大學部課程規劃地圖.pdf",
                     "id": "program_map_114",
-                    "type": "provided_pdf",
-                    "usage": "三個學程的採計課程清單"
+                    "role": "舊版引用的學程清單來源",
+                    "verification_status": "referenced_by_mvp_not_reverified"
                   },
                   {
+                    "file": "docs/decisions/CHANGE_DECISIONS.md",
                     "id": "user_decisions",
-                    "type": "conversation",
-                    "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                    "role": "本次使用者逐項確認的團隊政策",
+                    "section": "GR-001～GR-015"
                   }
                 ],
                 "status": "needs_confirmation",
@@ -1008,24 +2215,43 @@
                 "name": "智慧計算",
                 "passed_courses": 0,
                 "program_id": "intelligent_computing",
-                "rule_set_id": "nutn-csie-115-mvp-v1",
+                "rule_set_id": "nutn-csie-115-integrated-v2",
                 "sources": [
+                  {
+                    "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                    "id": "mvp_v1",
+                    "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                    "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+                  },
+                  {
+                    "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                    "id": "source_v1",
+                    "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                    "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+                  },
+                  {
+                    "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                    "id": "markdown",
+                    "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                    "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+                  },
                   {
                     "filename": "資工系115大學部課程架構表.pdf",
                     "id": "curriculum_115",
-                    "type": "provided_pdf",
-                    "usage": "學分要求、必修清單、專業講座及學程門檻"
+                    "role": "原文件引用的課程架構來源",
+                    "verification_status": "referenced_by_input_documents_not_reverified"
                   },
                   {
                     "filename": "114 學年度大學部課程規劃地圖.pdf",
                     "id": "program_map_114",
-                    "type": "provided_pdf",
-                    "usage": "三個學程的採計課程清單"
+                    "role": "舊版引用的學程清單來源",
+                    "verification_status": "referenced_by_mvp_not_reverified"
                   },
                   {
+                    "file": "docs/decisions/CHANGE_DECISIONS.md",
                     "id": "user_decisions",
-                    "type": "conversation",
-                    "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                    "role": "本次使用者逐項確認的團隊政策",
+                    "section": "GR-001～GR-015"
                   }
                 ],
                 "status": "needs_confirmation",
@@ -1050,24 +2276,43 @@
                 "name": "應用資訊",
                 "passed_courses": 0,
                 "program_id": "applied_information",
-                "rule_set_id": "nutn-csie-115-mvp-v1",
+                "rule_set_id": "nutn-csie-115-integrated-v2",
                 "sources": [
+                  {
+                    "git_ref": "4b13948a7c2451159a3055bf8d0024bc36b48dc4:nutn_csie_115_graduation_rules_v1.json",
+                    "id": "mvp_v1",
+                    "role": "舊版門檻、必修、114學程清單與累計講座格式",
+                    "sha256": "fda2f45323ac42abf586da99509d80c6f64ee4fb5e01c5b517238399dbffecce"
+                  },
+                  {
+                    "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:nutn_csie_115_graduation_rules.json",
+                    "id": "source_v1",
+                    "role": "新版選修目錄、自由選修來源、通識細節與認列區分",
+                    "sha256": "53be06f917abef519294be2dce77c3cf88dd8fd0b53dac2755fefe6d05ef7a79"
+                  },
+                  {
+                    "git_ref": "058e83791c8886a17286b223d26a2e800ac76adc:GRADUATION_PROGRESS_115.md",
+                    "id": "markdown",
+                    "role": "新版JSON引用的說明文件；其校方來源聲明未在本次重新核實",
+                    "sha256": "705977447f97baa05d4af2ab5c3b054efe8cd8bfb3d3315b680b512c50972bc6"
+                  },
                   {
                     "filename": "資工系115大學部課程架構表.pdf",
                     "id": "curriculum_115",
-                    "type": "provided_pdf",
-                    "usage": "學分要求、必修清單、專業講座及學程門檻"
+                    "role": "原文件引用的課程架構來源",
+                    "verification_status": "referenced_by_input_documents_not_reverified"
                   },
                   {
                     "filename": "114 學年度大學部課程規劃地圖.pdf",
                     "id": "program_map_114",
-                    "type": "provided_pdf",
-                    "usage": "三個學程的採計課程清單"
+                    "role": "舊版引用的學程清單來源",
+                    "verification_status": "referenced_by_mvp_not_reverified"
                   },
                   {
+                    "file": "docs/decisions/CHANGE_DECISIONS.md",
                     "id": "user_decisions",
-                    "type": "conversation",
-                    "usage": "115採用114學程清單、一般講座12場、兩類講座分開、自由選修可含本系、第一版簡化範圍"
+                    "role": "本次使用者逐項確認的團隊政策",
+                    "section": "GR-001～GR-015"
                   }
                 ],
                 "status": "needs_confirmation",
@@ -1085,20 +2330,20 @@
                 ]
               }
             ],
-            "rule_set_id": "nutn-csie-115-mvp-v1",
+            "rule_set_id": "nutn-csie-115-integrated-v2",
             "user_id": "user-demo-001",
-            "verification_scope": "依提供文件及使用者決策整理的第一版規則，非校方正式畢業資格認證"
+            "verification_scope": "依專案文件與團隊決策整合，未重新核對校方原始PDF；非校方正式認證"
           },
           "workflow": {
             "attempts": [],
-            "evaluated_at": "2026-10-21T11:17:16.747330+08:00",
+            "evaluated_at": "2026-11-04T00:13:43.266465+08:00",
             "evidence": {
               "checks": [
                 {
-                  "actual_value": 3.0,
+                  "actual_value": 0,
                   "check_id": "total_credits",
                   "name": "總學分",
-                  "remaining_value": 130.0,
+                  "remaining_value": 133,
                   "required_value": 133,
                   "status": "not_met",
                   "unit": "credits"
@@ -1239,15 +2484,6 @@
                   "unit": "programs"
                 },
                 {
-                  "actual_value": 10,
-                  "check_id": "lecture_professional",
-                  "name": "專業講座",
-                  "remaining_value": 0,
-                  "required_value": 10,
-                  "status": "met",
-                  "unit": "lectures"
-                },
-                {
                   "actual_value": null,
                   "check_id": "lecture_general",
                   "name": "一般講座",
@@ -1255,30 +2491,39 @@
                   "required_value": 12,
                   "status": "needs_confirmation",
                   "unit": "lectures"
+                },
+                {
+                  "actual_value": 10,
+                  "check_id": "lecture_professional",
+                  "name": "專業講座",
+                  "remaining_value": 0,
+                  "required_value": 10,
+                  "status": "met",
+                  "unit": "lectures"
                 }
               ],
-              "earned_credits": 3.0,
+              "earned_credits": 0,
               "overall_status": "not_met",
-              "rule_set_id": "nutn-csie-115-mvp-v1",
+              "rule_set_id": "nutn-csie-115-integrated-v2",
               "scope": "project_rules_only"
             },
-            "evidence_sha256": "eb0226c76c524434a308c10a01e71bcfd0617d8e6fdd196c9460f8d55ea35b24",
+            "evidence_sha256": "e06bec1f54f480059261516a20e0491bfe612b396a6f12cacc5b9ccef518002e",
             "explanation": [
               {
                 "check_id": "total_credits",
                 "name": "總學分",
                 "next_step": "查看此項要求，確認補修或補足方式；開課資訊需另行查證。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:total_credits"
+                  "nutn-csie-115-integrated-v2:total_credits"
                 ],
-                "text": "未達標：已採計 3／要求 133，尚缺 130（學分）。"
+                "text": "未達標：已採計 0／要求 133，尚缺 133（學分）。"
               },
               {
                 "check_id": "general_core",
                 "name": "通識核心",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_core"
+                  "nutn-csie-115-integrated-v2:general_core"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1287,7 +2532,7 @@
                 "name": "通識領域學分",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_domain"
+                  "nutn-csie-115-integrated-v2:general_domain"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1296,7 +2541,7 @@
                 "name": "院核心",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:college_required"
+                  "nutn-csie-115-integrated-v2:college_required"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1305,7 +2550,7 @@
                 "name": "專業必修學分",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:department_required"
+                  "nutn-csie-115-integrated-v2:department_required"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1314,7 +2559,7 @@
                 "name": "專業選修",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:department_elective"
+                  "nutn-csie-115-integrated-v2:department_elective"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1323,7 +2568,7 @@
                 "name": "自由選修",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:free_elective"
+                  "nutn-csie-115-integrated-v2:free_elective"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1332,7 +2577,7 @@
                 "name": "通識選修",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_elective"
+                  "nutn-csie-115-integrated-v2:general_elective"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1341,7 +2586,7 @@
                 "name": "通識領域數",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_domains"
+                  "nutn-csie-115-integrated-v2:general_domains"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1350,7 +2595,7 @@
                 "name": "中文閱讀與書寫",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_core_0"
+                  "nutn-csie-115-integrated-v2:general_core_0"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1359,7 +2604,7 @@
                 "name": "英文",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_core_1"
+                  "nutn-csie-115-integrated-v2:general_core_1"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1368,7 +2613,7 @@
                 "name": "體育",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_core_2"
+                  "nutn-csie-115-integrated-v2:general_core_2"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1377,7 +2622,7 @@
                 "name": "運算思維與AI賦能程式設計",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:general_core_3"
+                  "nutn-csie-115-integrated-v2:general_core_3"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1386,7 +2631,7 @@
                 "name": "科技法律",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:college_course_0"
+                  "nutn-csie-115-integrated-v2:college_course_0"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1395,7 +2640,7 @@
                 "name": "指定必修",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:required_courses"
+                  "nutn-csie-115-integrated-v2:required_courses"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1404,7 +2649,16 @@
                 "name": "完成學程",
                 "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:programs"
+                  "nutn-csie-115-integrated-v2:programs"
+                ],
+                "text": "待確認：資料未知，不能當作零或已達標。"
+              },
+              {
+                "check_id": "lecture_general",
+                "name": "一般講座",
+                "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
+                "source_ids": [
+                  "nutn-csie-115-integrated-v2:lecture_general"
                 ],
                 "text": "待確認：資料未知，不能當作零或已達標。"
               },
@@ -1413,29 +2667,29 @@
                 "name": "專業講座",
                 "next_step": "保留通過與認列紀錄。",
                 "source_ids": [
-                  "nutn-csie-115-mvp-v1:lecture_professional"
+                  "nutn-csie-115-integrated-v2:lecture_professional"
                 ],
                 "text": "已達標：已採計 10／要求 10，尚缺 0（場）。"
-              },
-              {
-                "check_id": "lecture_general",
-                "name": "一般講座",
-                "next_step": "補齊通過、分類或認列等證據，再重新檢查。",
-                "source_ids": [
-                  "nutn-csie-115-mvp-v1:lecture_general"
-                ],
-                "text": "待確認：資料未知，不能當作零或已達標。"
               }
             ],
             "latency_ms": 0,
             "model_calls": 1,
             "rubric": "graduation-explanation-v1",
-            "run_id": "ab96d1fa-dcf5-4bc3-a66b-9274660e8867",
+            "run_id": "60262d3a-fee3-4c79-b31d-48da75c60032",
             "scope_text": "符合本次啟用的專案規則不等於校方畢業認證；規劃中或修習中課程不算已取得學分。",
             "status": "fallback",
             "stop_reason": "PROVIDER_UNAVAILABLE",
             "tool": "graduation_progress",
-            "tool_calls": 1
+            "tool_calls": 1,
+            "validity": {
+              "execution_mode": "standard",
+              "expires_at_ms": 1793722723266,
+              "issued_at_ms": 1793722423266,
+              "scope_id": "62bb6dab-5912-48f7-8b45-b01ae1cfcce2",
+              "server_now_ms": 1793722423266,
+              "source_sha256": "19e12342e60a7eff156287a41a8956a6458e3ae1cb866c0adcd29e23fdb19e85",
+              "ttl_seconds": 300
+            }
           }
         }
       }

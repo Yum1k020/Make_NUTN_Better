@@ -479,7 +479,8 @@ export default function StudyPlanner({
               <p className="agent-disclosure">
                 按下後會將合成課名、日期、可用時段與私人行程送至 Flask
                 後端，再由後端設定的模型供應者選用工具；課堂示範預設使用 Google
-                Cloud ADC／Gemini，亦可切換 OpenAI。確定性排程仍由規則工具完成。
+                OpenAI Responses API。確定性排程仍由規則工具完成，API key 僅存在
+                Flask 後端。
               </p>
             </form>
           </section>

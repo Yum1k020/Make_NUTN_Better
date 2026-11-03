@@ -22,6 +22,6 @@
 | 工作階段範圍 | 重新整理時清空 | 另有 scope 與非同步世代防護 |
 | 正常模型呼叫 | fixture 1 次 | fixture 1 次，來源檢查不增加模型呼叫 |
 | 讀取成本 | 無週期重查 | 每 15 秒一次唯讀檢查，另有初始與生成前後檢查 |
-| 正式驗收 | 不適用 | 真實 Gemini `LIVE_NOT_RUN`；正式跨 user `NOT_RUN` |
+| 正式驗收 | 不適用 | 真實 OpenAI 依最新 evidence 判定；正式跨 user `NOT_RUN` |
 
 匯入分支的單次 fixture 延遲只證明本機控制流程，不能推論真實模型變快或省錢。詳細內容見 `docs/week07/evidence/comparison.json`、`baseline.json` 與 `candidate.json`。

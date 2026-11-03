@@ -29,7 +29,7 @@
 | 請求與固定輸入 | `acceptance.json.inputs`、`exact-comparison.json.same_inputs` |
 | 原工具結果 | `baseline.response.data`、`candidate.response.data.progress` |
 | 模型 actual call | live 成功時 `workflow.attempts[].metrics.actual_call`，含 method、endpoint、request hash；目前 live 未執行，不能拿 fixture 填入 |
-| 工具回送至模型 | 接頭將去識別的 progress 彙整放入 `contents` 的 evidence；不是聲稱 Gemini 發起 function call |
+| 工具回送至模型 | 接頭將去識別的 progress 彙整放入 Responses API input；不是聲稱 OpenAI 發起畢業規則工具呼叫 |
 | 草稿 A／B | `workflow.attempts[].draft`、`label` |
 | 檢查／回饋 | 同一 `rubric` 下的 `errors`、`passed`；修正收到 previous draft 與具體錯誤 |
 | 結果／停止 | `status`、`stop_reason`、`model_calls`、`latency_ms` |
@@ -42,9 +42,9 @@
 
 ## 預期與實際分開
 
-1. **真實正常流程**：預期 Gemini 可回傳正確說明與用量；實際 `live.json` 為 **LIVE_NOT_RUN**。補驗證：設定伺服器端金鑰與可用模型，執行 `backend/week06_acceptance.py --live`，核對 live_status 及來源後再提交新的證據。
+1. **真實正常流程**：預期 OpenAI 可回傳正確說明與用量；歷史 `live.json` 為 **LIVE_NOT_RUN**。補驗證：設定伺服器端金鑰與可用模型，執行 `backend/week06_acceptance.py --live`，核對 live_status 及來源後再提交新的證據。
 2. **非法輸入**：預期拒絕與零次 provider；實際 fixture HTTP 與測試通過，沒有寫入。
-3. **服務／工具失敗**：預期有限停止與真實錯誤；實際 timeout、503、checksum 損壞皆為明示注入測試，通過；不宣稱遇到真實 Gemini 事故。
+3. **服務／工具失敗**：預期有限停止與真實錯誤；實際 timeout、503、checksum 損壞皆為明示注入測試，通過；不宣稱遇到真實 OpenAI 事故。
 4. **workflow 邊界**：預期 A 錯誤會拒絕，B 同規準；實際注入 A 錯學分及缺來源，B 修正後通過；另測 B 仍錯為 REVISION_LIMIT。畫面圖為 fixture，並非 live。
 
 ## 回歸與分支整合

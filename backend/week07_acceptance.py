@@ -30,7 +30,7 @@ def run(root, live=False):
     client=app.test_client()
     app.config['GRADUATION_CLOCK']=lambda:1000.0
     def fixture(c,p,f):return valid_draft(c),{'provider':'fixture','usage':{},'latency_ms':0}
-    configured=bool(os.environ.get('GEMINI_API_KEY') and os.environ.get('GEMINI_MODEL'))
+    configured=bool(os.environ.get('OPENAI_API_KEY'))
     if not live:app.config['GRADUATION_EXPLANATION_PROVIDER']=fixture
     before=snapshot(app)
     started=perf_counter()
@@ -60,8 +60,8 @@ def run(root, live=False):
     return {'run_id':run_id,'root_kind':'candidate' if root==ROOT else 'exact_integrated_baseline',
             'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),
             'source_sha256':{p:sha256((root/p).read_bytes()).hexdigest() for p in paths if (root/p).exists()},
-            'data_kind':'synthetic','inputs':inputs,'normal_kind':'gemini' if live and configured else 'NOT_RUN' if live else 'fixture',
-            'live_status':('LIVE_PASS' if w and w['status']=='verified' and all(a['metrics'].get('provider')=='gemini' for a in w['attempts']) else 'LIVE_FAIL') if live and configured else 'LIVE_NOT_RUN',
+            'data_kind':'synthetic','inputs':inputs,'normal_kind':'openai' if live and configured else 'NOT_RUN' if live else 'fixture',
+            'live_status':('LIVE_PASS' if w and w['status']=='verified' and all(a['metrics'].get('provider')=='openai' for a in w['attempts']) else 'LIVE_FAIL') if live and configured else 'LIVE_NOT_RUN',
             'normal':normal.json if normal else None,'normal_latency_ms':elapsed if normal else None,
             'normal_database_unchanged':normal_readonly,
             'before_context':{'status':first_context.status_code,'body':first_context.json},
@@ -89,7 +89,7 @@ def main():
         app.config['GRADUATION_FIXTURE_ONLY']=True
         app.config['GRADUATION_EXPLANATION_PROVIDER']=lambda c,p,f:(valid_draft(c),{'provider':'fixture','usage':{}})
         os.environ['GRADUATION_ALLOWED_ORIGINS']='http://127.0.0.1:5173,http://localhost:5173'
-        print('SYNTHETIC FIXTURE ONLY; not Gemini live evidence',flush=True)
+        print('SYNTHETIC FIXTURE ONLY; not OpenAI live evidence',flush=True)
         app.run(host='127.0.0.1',port=5000,debug=False)
         return
     if args.compare:

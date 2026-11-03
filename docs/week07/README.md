@@ -37,4 +37,4 @@
 - 畢業說明到期只停止新使用，不保證刪除截圖、第三方日誌或備份。
 - 兩條流程都保留原本規則計算與失敗 fallback。
 - 匯入的畢業說明 live evidence 為 `LIVE_NOT_RUN`，正式跨 user 案例為 `NOT_RUN`。
-- 沒有私人 provider 憑證時不得宣稱 live pass，也不得提交 `.env`、token、ADC JSON 或真實個資。
+- 沒有私人 provider 憑證時不得宣稱 live pass，也不得提交 `.env`、token 或真實個資。

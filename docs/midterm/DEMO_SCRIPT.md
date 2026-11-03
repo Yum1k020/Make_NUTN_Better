@@ -7,7 +7,7 @@
 
 ## 1:30–3:30 架構與工具
 
-- 指出 React、Flask、Vertex AI Gemini、ADC、規則工具、記憶與 SQLite。
+- 指出 React、Flask、OpenAI Responses API、伺服器端金鑰邊界、規則工具、記憶與 SQLite。
 - 說明唯讀工具不需確認；寫入工具必須確認與 request ID。
 
 ## 3:30–8:00 正常流程
@@ -16,10 +16,10 @@
 2. 輸入資料結構、9/24、6 小時、每次 2 小時、下午與晚上。
 3. 按「用 Agent 產生學習計畫」。
 4. 指出三個不衝突時段與 360 分鐘／尚缺 0。
-5. 指出 workflow：需求驗證、Gemini 工具選擇、參數 Gate、工具執行、functionResponse。
+5. 指出 workflow：需求驗證、OpenAI 工具選擇、參數 Gate、工具執行、`function_call_output`。
 6. 指出模型、工具與 citations；排程仍由規則引擎決定。
 
-如果 live evidence 仍是 `LIVE_NOT_RUN`，不可把此段說成真實 Gemini；改播明示日期與版本的備用錄影，或只展示離線 fixture 並標示。
+如果 live evidence 仍是 `LIVE_NOT_RUN`，不可把此段說成真實 OpenAI；改播明示日期與版本的備用錄影，或只展示離線 fixture 並標示。
 
 ## 8:00–10:30 失敗案例
 
@@ -36,9 +36,9 @@
 ## 12:30–14:00 測試與限制
 
 - Python 356 passed、5 skipped、1 xfailed；前端 38/38；build／format PASS。
-- 真實 Gemini 與正式跨 user 若未完成，明確標示狀態與補驗證計畫。
+- 真實 OpenAI 畢業說明與正式跨 user 若未完成，明確標示狀態與補驗證計畫；同時揭露 OpenAI-only 與教師 Gemini／ADC 要求不一致。
 
 ## 14:00–15:00 分工與下一步
 
 - 每位組員一句話說明自己完成的模組與可回答問題。
-- 期末優先做 ADC live、正式登入隔離、寫入工具接入主 Agent 與校務資料版本。
+- 期末優先取得供應者變更確認、完成兩條 OpenAI live、正式登入隔離、寫入工具接入主 Agent 與校務資料版本。

@@ -154,7 +154,7 @@ def main() -> None:
             "offline_all_pass": all(checks.values()),
             "live_status": "LIVE_NOT_RUN",
             "live_note": (
-                "Week 07 requires current-version real Gemini evidence. "
+                "Week 07 requires current-version real OpenAI evidence. "
                 "CI has no private API key, so offline evidence does not claim LIVE_PASS."
             ),
         }

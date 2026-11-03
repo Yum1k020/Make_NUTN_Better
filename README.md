@@ -35,12 +35,12 @@
 
 目前有兩條受限 Agent 子流程：
 
-1. **智慧學習主示範：** 前端將需求送到 Flask 後端；後端先驗證 schema，再透過 Google Cloud Application Default Credentials 呼叫 Vertex AI Gemini。Gemini 必須產生 `get_validated_study_plan` function call，程式驗證參數與原需求一致後才執行確定性排程，最後把工具結果回送 Gemini 整理說明。後端另保留 `STUDY_AGENT_PROVIDER=openai` 的 Responses API 介面供後續切換，但不取代課堂規定的 Gemini／ADC 主證據。
-2. **畢業缺項說明：** 一般程式先計算學分與缺項；Gemini 只取得去識別彙整，輸出會經固定規準評估，最多修正一次。說明具有 300 秒 TTL 與來源重驗證，失效時回退基本進度。
+1. **智慧學習主示範：** 前端將需求送到 Flask 後端；後端先驗證 schema，再以伺服器端金鑰呼叫 OpenAI Responses API。模型必須產生 `get_validated_study_plan` function call，程式驗證參數與原需求一致後才執行確定性排程，最後把工具結果回送模型整理說明。
+2. **畢業缺項說明：** 一般程式先計算學分與缺項；OpenAI 只取得去識別彙整，輸出會經固定規準評估，最多修正一次。說明具有 300 秒 TTL 與來源重驗證，失效時回退基本進度。
 
 模型不決定正式學分、衝突、權限或寫入結果。規則引擎、Gate、版本檢查、到期、撤回與冪等都由一般程式處理。provider 失敗時，畫面仍保留安全的規則結果。
 
-目前沒有正式登入、課表自動匯入或校務系統連線；課表與畢業條件使用本機示範／測試資料。沒有 ADC 或 Google Cloud project 時，真實主流程必須標示 `LIVE_NOT_RUN`，不得以 fixture 冒充。
+目前沒有正式登入、課表自動匯入或校務系統連線；課表與畢業條件使用本機示範／測試資料。沒有後端 `OPENAI_API_KEY` 或未完成真實呼叫時，主流程必須標示 `LIVE_NOT_RUN`，不得以 fixture 冒充。
 
 Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`docs/week06/README.md`](docs/week06/README.md) 與 [`docs/week07/README.md`](docs/week07/README.md)。
 
@@ -51,7 +51,7 @@ Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`do
 - GitHub 分支盤點與整合判定：[`docs/midterm/BRANCH_INTEGRATION.md`](docs/midterm/BRANCH_INTEGRATION.md)。
 - 主示範工具：`get_validated_study_plan`，唯讀預覽；模型參數必須通過後端驗證。
 - 寫入工具：`save_study_plan`，必須 `confirmed=true` 並以 `request_id` 防止重複寫入。
-- 真實 Gemini／ADC 證據：`docs/midterm/evidence/study-agent-live.json`。
+- 真實 OpenAI 證據：`docs/midterm/evidence/study-agent-openai-live.json`。
 
 ## Acceptance Criteria（驗收條件）
 
@@ -102,7 +102,7 @@ npm run dev
 
 網站課程規劃與畢業門檻以「115 學年度」清楚標示，執行規則為 [`nutn-csie-115-integrated-v2`](nutn_csie_115_graduation_rules.json)。共同認列範圍仍為 `null`，所以已通過課程會保存為已修紀錄，但在認列前不會冒充已取得畢業學分。
 
-本機 ADC 設定使用 `gcloud auth application-default login`；專案只讀取 `GOOGLE_CLOUD_PROJECT`、`GOOGLE_CLOUD_LOCATION` 與 `GOOGLE_CLOUD_GEMINI_MODEL`，不得提交 ADC JSON。
+模型設定只由 Flask 後端讀取 `OPENAI_API_KEY` 與 `OPENAI_MODEL`；不得使用 `VITE_OPENAI_API_KEY`，也不得提交金鑰或 `.env.local`。
 
 ## 先前提案
 
@@ -151,4 +151,4 @@ Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重�
 
 ## Week 07：畢業說明記憶範圍（C 路線）
 
-[作業說明、程式差異、測試與證據索引](docs/week07/README.md)。本週對既有畢業缺項說明加入五分鐘 TTL、來源重查與工作階段清除；不改畢業判定。離線證據已提供；真實 Gemini 為 LIVE_NOT_RUN，正式跨 user 驗收為 NOT_RUN，完成提交不代表所有功能驗收通過。
+[作業說明、程式差異、測試與證據索引](docs/week07/README.md)。本週對既有畢業缺項說明加入五分鐘 TTL、來源重查與工作階段清除；不改畢業判定。歷史離線證據已提供；目前執行路徑已統一為 OpenAI，正式跨 user 驗收仍為 NOT_RUN，完成提交不代表所有功能驗收通過。

@@ -10,7 +10,7 @@
 
 ## 決策二：畢業說明採 300 秒 TTL 與來源重驗證
 
-狀態：Conditional adoption for local prototype。真實 Gemini 與正式跨 user 驗收仍未完成。
+狀態：Conditional adoption for local prototype。真實 OpenAI 與正式跨 user 驗收仍需依最新證據確認。
 
 衍生說明不是正式學籍資料。系統將說明限制在一個瀏覽器工作階段 scope，保存來源指紋、產生時間與到期時間；顯示前及生成後重新核對來源。來源更新、到期或重查失敗時立即停止使用說明。
 
@@ -21,4 +21,4 @@
 - 明確區分正式資料、使用者偏好與模型衍生說明。
 - 記憶不能取代目前資料、規則計算或使用者當次選擇。
 - 撤回或到期停止後續使用，但完整實體刪除需另定備份與稽核政策。
-- trace 與公開證據不得包含 API key、token、ADC JSON、真實個資或模型內部推理。
+- trace 與公開證據不得包含 API key、token、真實個資或模型內部推理。

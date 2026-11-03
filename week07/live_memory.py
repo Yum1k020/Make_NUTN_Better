@@ -4,7 +4,8 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib import error, request
+
+import requests
 
 from backend.week07_memory import preview_with_memory, save_confirmed_preference
 
@@ -15,33 +16,48 @@ STORE = RUNTIME_DIR / "memory.json"
 FIXTURE = ROOT / "tests" / "fixtures" / "week04_plan.json"
 
 
-def call_gemini(api_key: str, model: str, body: dict) -> dict:
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    req = request.Request(
-        url,
-        data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
-        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
-        method="POST",
-    )
+def call_openai(api_key: str, model: str, prompt: str, response_format=None) -> dict:
+    body = {
+        "model": model,
+        "input": [{"role": "user", "content": [{"type": "input_text", "text": prompt}]}],
+        "store": False,
+    }
+    if response_format:
+        body["text"] = {"format": response_format}
     try:
-        with request.urlopen(req, timeout=45) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Gemini HTTP {exc.code}: {detail}") from exc
+        response = requests.post(
+            "https://api.openai.com/v1/responses",
+            json=body,
+            timeout=45,
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.HTTPError as exc:
+        status = getattr(exc.response, "status_code", "unknown")
+        raise RuntimeError(f"OpenAI HTTP {status}") from None
+    except requests.RequestException:
+        raise RuntimeError("OpenAI connection error") from None
 
 
 def response_text(payload: dict) -> str:
-    parts = payload["candidates"][0]["content"]["parts"]
-    text = "\n".join(part.get("text", "") for part in parts if part.get("text")).strip()
+    text = "\n".join(
+        part["text"]
+        for item in payload.get("output", [])
+        if isinstance(item, dict) and item.get("type") == "message"
+        for part in item.get("content", [])
+        if isinstance(part, dict)
+        and part.get("type") == "output_text"
+        and isinstance(part.get("text"), str)
+    ).strip()
     if not text:
-        raise RuntimeError("Gemini response did not contain text")
+        raise RuntimeError("OpenAI response did not contain text")
     return text
 
 
 def main() -> None:
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    model = os.getenv("GEMINI_MODEL", "").strip()
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    model = os.getenv("OPENAI_MODEL", "gpt-5-mini").strip()
     run_id = datetime.now(timezone.utc).strftime("W07-LIVE-%Y%m%dT%H%M%SZ")
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
@@ -55,10 +71,10 @@ def main() -> None:
     }
 
     if not api_key or not model:
-        trace["reason"] = "missing GEMINI_API_KEY or GEMINI_MODEL"
+        trace["reason"] = "missing OPENAI_API_KEY or OPENAI_MODEL"
         out = EVIDENCE_DIR / f"{run_id}.json"
         out.write_text(json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")
-        print("LIVE_NOT_RUN: set GEMINI_API_KEY and GEMINI_MODEL.")
+        print("LIVE_NOT_RUN: set OPENAI_API_KEY and OPENAI_MODEL.")
         print(f"Evidence saved: {out}")
         return
 
@@ -69,25 +85,36 @@ def main() -> None:
             "只允許 preference_type=study_session_minutes，value 必須是整數分鐘。"
             "若沒有明確值不要猜。只輸出 JSON。\nUser: " + user_text
         )
-        first = call_gemini(
+        first = call_openai(
             api_key,
             model,
+            extract_prompt,
             {
-                "contents": [{"role": "user", "parts": [{"text": extract_prompt}]}],
-                "generationConfig": {
-                    "temperature": 0,
-                    "responseMimeType": "application/json",
+                "type": "json_schema",
+                "name": "study_preference",
+                "strict": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "preference_type": {
+                            "type": "string",
+                            "enum": ["study_session_minutes"],
+                        },
+                        "value": {"type": "integer"},
+                    },
+                    "required": ["preference_type", "value"],
+                    "additionalProperties": False,
                 },
             },
         )
         proposal = json.loads(response_text(first))
-        trace["events"].append({"type": "gemini_proposal", "proposal": proposal})
+        trace["events"].append({"type": "openai_proposal", "proposal": proposal})
 
         if proposal.get("preference_type") != "study_session_minutes":
             raise RuntimeError("unexpected preference_type")
         value = proposal.get("value")
         if isinstance(value, bool) or not isinstance(value, int):
-            raise RuntimeError("Gemini proposal value must be an integer")
+            raise RuntimeError("OpenAI proposal value must be an integer")
 
         print(json.dumps(proposal, ensure_ascii=False, indent=2))
         decision = input("確認保存這項偏好？只有輸入 YES 才寫入：").strip()
@@ -128,16 +155,9 @@ def main() -> None:
                 "不要補猜；並說明偏好只用於排程設定。\n"
                 + json.dumps(new_session, ensure_ascii=False)
             )
-            second = call_gemini(
-                api_key,
-                model,
-                {
-                    "contents": [{"role": "user", "parts": [{"text": summary_prompt}]}],
-                    "generationConfig": {"temperature": 0},
-                },
-            )
+            second = call_openai(api_key, model, summary_prompt)
             summary = response_text(second)
-            trace["events"].append({"type": "gemini_summary", "text": summary})
+            trace["events"].append({"type": "openai_summary", "text": summary})
             trace["live_status"] = "LIVE_PASS"
             print(summary)
 

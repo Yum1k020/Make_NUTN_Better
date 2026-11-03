@@ -8,7 +8,7 @@ from app.study_agent_api import (
     get_validated_study_plan,
     normalize_request,
 )
-from app.study_agent_vertex import TOOL_NAME
+from app.study_agent_contract import TOOL_NAME
 
 
 def request_payload(**overrides):
@@ -43,16 +43,20 @@ def request_payload(**overrides):
 
 
 class FakeProvider:
+    provider_name = "OpenAI Responses API"
+    authentication = "Server-side API key"
+    framework = "OpenAI Responses API"
+
     def __init__(self, *, mutate=None):
-        self.config = SimpleNamespace(model="gemini-test")
+        self.config = SimpleNamespace(model="openai-test")
         self.mutate = mutate
 
     def choose_tool(self, data):
         args = self.mutate(dict(data)) if self.mutate else data
         return (
             {"name": TOOL_NAME, "args": args},
-            [{"role": "user", "parts": [{"text": "synthetic"}]}],
-            {"usage": {"promptTokenCount": 10}},
+            [{"role": "user", "content": [{"type": "input_text", "text": "synthetic"}]}],
+            {"usage": {"input_tokens": 10}},
         )
 
     def summarize(self, history, plan):
@@ -68,7 +72,7 @@ class FakeProvider:
                 ],
                 "refused": False,
             },
-            {"usage": {"candidatesTokenCount": 20}},
+            {"usage": {"output_tokens": 20}},
         )
 
 
@@ -95,7 +99,7 @@ def test_main_flow_records_function_call_validation_and_response():
         "execute-tool",
         "return-tool-result",
     ]
-    assert result["agent"]["framework"] == "Google Cloud Vertex AI / ADC"
+    assert result["agent"]["framework"] == "OpenAI Responses API"
     assert result["agent"]["tool"] == TOOL_NAME
 
 
@@ -129,7 +133,7 @@ def test_http_main_flow_and_invalid_boundary(tmp_path):
     client = app.test_client()
     response = client.post("/api/v1/study-agent/run", json=request_payload())
     assert response.status_code == 200
-    assert response.get_json()["agent"]["model"] == "gemini-test"
+    assert response.get_json()["agent"]["model"] == "openai-test"
 
     invalid = client.post(
         "/api/v1/study-agent/run",
@@ -139,7 +143,8 @@ def test_http_main_flow_and_invalid_boundary(tmp_path):
     assert invalid.get_json()["code"] == "INVALID_REQUEST"
 
 
-def test_health_does_not_claim_live_provider(tmp_path):
+def test_health_does_not_claim_live_provider(monkeypatch, tmp_path):
+    monkeypatch.setenv("OPENAI_API_KEY", "health-test-secret")
     app = create_app(
         {
             "TESTING": True,
@@ -148,5 +153,6 @@ def test_health_does_not_claim_live_provider(tmp_path):
     )
     response = app.test_client().get("/api/v1/study-agent/health")
     assert response.status_code == 200
-    assert response.get_json()["authentication"] == "Application Default Credentials"
+    assert response.get_json()["authentication"] == "Server-side API key"
     assert response.get_json()["liveChecked"] is False
+    assert "health-test-secret" not in response.get_data(as_text=True)

@@ -1,6 +1,6 @@
 # 後端開發環境
 
-目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供課程、學生安排、已確認偏好、畢業規則與 `POST /api/v1/study-agent/run`。React 已透過 `/api/v1` 儲存待辦、私人行程、讀書時段、規劃課程與偏好記憶；智慧學習 Agent 透過 Google Cloud ADC 呼叫 Vertex AI Gemini。尚未建立正式登入，資料仍是本機合成示範內容。
+目前提供 Flask、Swagger UI、OpenAPI、環境驗證測試，以及固定測試使用者＋SQLite 的 `GET /api/v1/me`、`PATCH /api/v1/me`。另提供課程、學生安排、已確認偏好、畢業規則與 `POST /api/v1/study-agent/run`。React 已透過 `/api/v1` 儲存待辦、私人行程、讀書時段、規劃課程與偏好記憶；智慧學習與畢業缺項說明統一由 Flask 後端呼叫 OpenAI Responses API。尚未建立正式登入，資料仍是本機合成示範內容。
 
 ## 位置與分支
 
@@ -19,7 +19,6 @@
 - flask-smorest、Marshmallow：輸入驗證、OpenAPI 文件
 - swagger-ui-bundle：本機文件網頁資源，不依賴外部 CDN
 - pytest：開發測試
-- google-auth：只在後端透過 ADC 取得短期 access token
 - requests：從後端呼叫 OpenAI Responses API；瀏覽器不接觸 API key
 - LangGraph：畢業進度唯讀工作流；由 framework lock 一併安裝
 
@@ -54,36 +53,21 @@
 
 四類個人安排與偏好都使用 `ME_DATABASE` 指定的同一個 SQLite 檔。前端成功遷移舊版 `localStorage` 後會移除四組舊 key；之後瀏覽器不再是主要資料來源。
 
-## Gemini／ADC 設定
+## OpenAI 後端設定
 
-主示範不使用 API key，後端依 Google Cloud Application Default Credentials 的標準順序尋找憑證。非敏感設定如下：
-
-```sh
-export GOOGLE_CLOUD_PROJECT="你的 Google Cloud project ID"
-export GOOGLE_CLOUD_LOCATION="global"
-export GOOGLE_CLOUD_GEMINI_MODEL="gemini-2.5-flash"
-```
-
-本機可使用 `gcloud auth application-default login` 建立 ADC。正式 Google Cloud 環境應使用綁定服務帳號與最小權限。不得將 ADC JSON、access token、API key 或 `.env` 放入 repository。
-
-- 健康檢查：`GET /api/v1/study-agent/health`。此端點只回報設定提示，`liveChecked=false`，不會假裝已完成真實模型呼叫。
-- 主流程：`POST /api/v1/study-agent/run`。只接受固定規劃 schema；Gemini 工具參數若與使用者需求不一致，工具呼叫會在執行前停止。
-- 唯讀工具：`get_validated_study_plan`。寫入工具 `save_study_plan` 仍要求明確確認與 `request_id` 冪等，未放入主示範的自動工具清單。
-
-## 選用 OpenAI 後端介面
-
-課堂主流程仍以 `STUDY_AGENT_PROVIDER=vertex` 為預設，符合 Gemini／ADC 驗收要求。若後續要改用 OpenAI，將真實金鑰只放在根目錄、已被 Git 忽略的 `.env.local`：
+所有模型流程統一使用 OpenAI Responses API。將設定放在根目錄、已被 Git 忽略的 `.env.local`：
 
 ```sh
+STUDY_AGENT_PROVIDER=openai
 OPENAI_API_KEY=你的金鑰
 OPENAI_MODEL=gpt-5-mini
 ```
 
-啟動時指定供應者；`run-backend.sh` 會讀取本機 `.env.local`，但不會輸出其中內容：
+`run-backend.sh` 會讀取本機 `.env.local`，但不會輸出其中內容。不得將 API key、access token、`.env` 或 `.env.local` 放入 repository；也不得使用會被打包到瀏覽器的 `VITE_OPENAI_API_KEY`。
 
-```sh
-STUDY_AGENT_PROVIDER=openai ./scripts/run-backend.sh
-```
+- 健康檢查：`GET /api/v1/study-agent/health`。此端點只回報設定提示，`liveChecked=false`，不會假裝已完成真實模型呼叫。
+- 主流程：`POST /api/v1/study-agent/run`。只接受固定規劃 schema；OpenAI 工具參數若與使用者需求不一致，工具呼叫會在執行前停止。
+- 唯讀工具：`get_validated_study_plan`。寫入工具 `save_study_plan` 仍要求明確確認與 `request_id` 冪等，未放入主示範的自動工具清單。
 
 OpenAI 路徑使用 Responses API 的 strict function tool，仍依序執行「需求驗證 → 模型工具呼叫 → 參數一致性 Gate → 確定性工具 → 工具結果回送模型」。不得使用 `VITE_OPENAI_API_KEY`，因為 `VITE_*` 會被包入瀏覽器程式。`GET /api/v1/study-agent/health` 只回報是否已設定，不會回傳金鑰，也不會執行付費呼叫。
 

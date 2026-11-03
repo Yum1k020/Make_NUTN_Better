@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_MODULES = (
     "flask",
     "fastapi",
-    "google.auth",
+    "requests",
     "langgraph",
     "langgraph.checkpoint.sqlite",
 )
@@ -54,7 +54,7 @@ def main() -> int:
             print(f"ERROR: {problem}", file=sys.stderr)
         return 1
 
-    print("整合環境已就緒：Python 3.12、Flask、FastAPI、LangGraph、ADC 套件與 SQLite 可用。")
+    print("整合環境已就緒：Python 3.12、Flask、FastAPI、LangGraph、OpenAI HTTP 依賴與 SQLite 可用。")
     return 0
 
 

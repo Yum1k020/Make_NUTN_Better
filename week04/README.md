@@ -23,19 +23,19 @@ py week04\mcp_check.py
 會透過 stdio MCP 做 tools/list 與 tools/call，讀取 DATA_GUIDE.md，產生：
 `week04/evidence/mcp_read_trace.json`
 
-## 真實 Gemini → tool → Gemini
+## 真實 OpenAI → tool → OpenAI
 金鑰不要寫進 repo：
 
 ```powershell
-$env:GEMINI_API_KEY="你的金鑰"
-$env:GEMINI_MODEL="你的帳戶可用模型"
-py week04\live_gemini.py
+$env:OPENAI_API_KEY="你的金鑰"
+$env:OPENAI_MODEL="gpt-5-mini"
+py week04\live_openai.py
 ```
 
 沒有成功時不要改成 PASS：
 - 沒 key：LIVE_NOT_RUN
 - 真實呼叫失敗：LIVE_FAIL
-- functionCall → tool → functionResponse → Gemini 摘要成功：LIVE_PASS
+- function call → tool → function_call_output → OpenAI 摘要成功：LIVE_PASS
 
 ## WRITE 人工確認
 ```powershell
@@ -49,4 +49,4 @@ py week04\write_demo.py
 - 時間不足：回 remaining_minutes。
 - 未確認：不寫入。
 - request_id 重送：不重複寫入。
-- Gemini 429 / timeout / 5xx：記錄 provider 失敗，不用假答案補成功。
+- OpenAI 429 / timeout / 5xx：記錄 provider 失敗，不用假答案補成功。

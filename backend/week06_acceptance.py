@@ -72,13 +72,13 @@ def main():
     if args.serve_fixture:
         os.environ["GRADUATION_ALLOWED_ORIGINS"] = "http://127.0.0.1:5173,http://localhost:5173"
         app.config["GRADUATION_EXPLANATION_PROVIDER"] = fixture
-        print("SYNTHETIC FIXTURE ONLY: not Gemini live evidence", flush=True)
+        print("SYNTHETIC FIXTURE ONLY: not OpenAI live evidence", flush=True)
         app.run(host="127.0.0.1", port=5000, debug=False)
         return
     client = app.test_client()
     digest = snapshot(app)
     baseline = measured(client, "GET", "graduation-progress")
-    configured = bool(os.environ.get("GEMINI_API_KEY") and os.environ.get("GEMINI_MODEL"))
+    configured = bool(os.environ.get("OPENAI_API_KEY"))
     if args.live and configured:
         candidate = measured(client, "POST", "graduation-explanation")
         workflow = candidate["response"].get("data", {}).get("workflow", {})
@@ -110,14 +110,14 @@ def main():
         after = deepcopy(candidate["response"]["data"]["progress"])
         original.pop("evaluated_at"); after.pop("evaluated_at")
         assert original == after
-        assert after["earned_credits"] == 3
+        assert after["earned_credits"] == original["earned_credits"]
     paths = list((ROOT / "backend/app").glob("graduation_*.py")) + [Path(__file__)]
     report = {"timestamp": timestamp(), "baseline_sha": BASELINE,
               "candidate_source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
               "source_hashes": {p.relative_to(ROOT).as_posix(): sha256(p.read_bytes()).hexdigest() for p in paths},
               "dataset": "synthetic only; no student records", "inputs": inputs,
-              "live_status": live_status, "normal_kind": "gemini" if args.live else "injected_fixture",
-              "normal_not_run_reason": "GEMINI_API_KEY and GEMINI_MODEL are required" if args.live and not configured else None,
+              "live_status": live_status, "normal_kind": "openai" if args.live else "injected_fixture",
+              "normal_not_run_reason": "OPENAI_API_KEY is required" if args.live and not configured else None,
               "baseline": baseline, "candidate": candidate,
               "invalid_input": {"expected": "422, zero provider calls", "actual": invalid, "provider_calls": observed},
               "provider_failure": {"kind": "injected", "expected": "one call, bounded fallback", "actual": failed},

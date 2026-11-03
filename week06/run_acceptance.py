@@ -102,8 +102,8 @@ def main() -> None:
         "checks": checks,
         "offline_all_pass": all(checks.values()),
         "live_note": (
-            "The lecture requires the normal main-flow case to use a real Gemini request. "
-            "CI has no private Gemini key, so offline fixtures do not claim LIVE_PASS."
+            "The current normal main-flow case uses a real OpenAI request. "
+            "CI has no private OpenAI key, so offline fixtures do not claim LIVE_PASS."
         ),
     }
 

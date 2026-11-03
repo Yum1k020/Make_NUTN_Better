@@ -7,7 +7,7 @@ from flask import Blueprint, current_app, jsonify, request, session
 
 from .db import get_db
 from .graduation_explanation_core import explain
-from .graduation_gemini import generate
+from .graduation_openai import generate
 from .planner_core import Problem, invalid, query
 from .planner_graduation import progress
 from .graduation_validity import context, lease, current_rule_digest

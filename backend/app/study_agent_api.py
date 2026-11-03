@@ -1,4 +1,4 @@
-"""Provider-selectable backend tool loop for the study-planning demo."""
+"""OpenAI-backed tool loop for the study-planning demo."""
 
 from __future__ import annotations
 
@@ -12,7 +12,6 @@ from flask_smorest import Blueprint
 
 from .study_agent_contract import TOOL_NAME, StudyAgentProviderError
 from .study_agent_openai import DEFAULT_OPENAI_MODEL, OpenAIResponsesClient
-from .study_agent_vertex import VertexGeminiADCClient
 
 
 routes = Blueprint(
@@ -387,11 +386,9 @@ class StudyAgentService:
         )
 
         provider = self.provider_factory()
-        provider_name = getattr(provider, "provider_name", "Google Cloud Vertex AI")
-        authentication = getattr(
-            provider, "authentication", "Application Default Credentials"
-        )
-        framework = getattr(provider, "framework", "Google Cloud Vertex AI / ADC")
+        provider_name = getattr(provider, "provider_name", "OpenAI Responses API")
+        authentication = getattr(provider, "authentication", "Server-side API key")
+        framework = getattr(provider, "framework", "OpenAI Responses API")
         function_call, history, selection_meta = provider.choose_tool(normalized)
         if function_call.get("name") != TOOL_NAME:
             workflow["stages"].append(
@@ -502,46 +499,34 @@ def _service() -> StudyAgentService:
 
 
 def _selected_provider() -> str:
-    provider = (os.getenv("STUDY_AGENT_PROVIDER") or "vertex").strip().lower()
-    if provider not in {"vertex", "openai"}:
+    provider = (os.getenv("STUDY_AGENT_PROVIDER") or "openai").strip().lower()
+    if provider != "openai":
         raise StudyAgentProviderError("INVALID_STUDY_AGENT_PROVIDER")
     return provider
 
 
 def _create_provider() -> Any:
-    if _selected_provider() == "openai":
-        return OpenAIResponsesClient()
-    return VertexGeminiADCClient()
+    _selected_provider()
+    return OpenAIResponsesClient()
 
 
 @routes.get("/health")
 def health():
     try:
-        provider = _selected_provider()
+        _selected_provider()
     except StudyAgentProviderError as error:
         return {
             "ok": False,
             "code": error.code,
             "liveChecked": False,
         }, 503
-    if provider == "openai":
-        return {
-            "ok": True,
-            "provider": "OpenAI Responses API",
-            "authentication": "Server-side API key",
-            "keyConfigured": bool(os.getenv("OPENAI_API_KEY")),
-            "model": (os.getenv("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL).strip(),
-            "modelConfigured": True,
-            "liveChecked": False,
-        }
     return {
         "ok": True,
-        "provider": "Google Cloud Vertex AI Gemini",
-        "authentication": "Application Default Credentials",
-        "projectConfigured": bool(os.getenv("GOOGLE_CLOUD_PROJECT")),
-        "modelConfigured": bool(
-            os.getenv("GOOGLE_CLOUD_GEMINI_MODEL") or os.getenv("GEMINI_MODEL")
-        ),
+        "provider": "OpenAI Responses API",
+        "authentication": "Server-side API key",
+        "keyConfigured": bool(os.getenv("OPENAI_API_KEY")),
+        "model": (os.getenv("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL).strip(),
+        "modelConfigured": True,
         "liveChecked": False,
     }
 

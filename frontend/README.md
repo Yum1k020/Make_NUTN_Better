@@ -50,39 +50,28 @@ BACKEND_PROXY_TARGET=http://127.0.0.1:5051 npm run dev
 - 資料證據：整理 Week 03 gate 的 proposal、source cards、3 個 fixed queries、top-k trace、generator comparison JSON 與 failure observation；目前使用學生系統 fixture 驗證，不把羽球場 baseline 範例當成產品需求。
 - 校區地圖：府城校區總覽、府城教室配置與榮譽教學中心配置；點選課表中的課程地點可開啟對應地圖，並能縮放及查看原圖。
 
-## Google Cloud／ADC Gemini 主流程
+## OpenAI 主流程
 
-前端只呼叫同源 `/api/v1/study-agent/run`，不保存 Google 憑證、access token 或模型 key。Flask 後端使用 Google Cloud Application Default Credentials 呼叫 Vertex AI Gemini。
-
-本機開發需在私有環境設定 ADC 與非敏感設定：
-
-```bash
-gcloud auth application-default login
-export GOOGLE_CLOUD_PROJECT="你的 Google Cloud project ID"
-export GOOGLE_CLOUD_LOCATION="global"
-export GOOGLE_CLOUD_GEMINI_MODEL="gemini-2.5-flash"
-```
-
-不得把 ADC JSON、token 或 `.env` 提交到 Git。主流程：
+前端只呼叫同源 `/api/v1/study-agent/run`，不保存 API key 或 access token。Flask 後端以伺服器端 `OPENAI_API_KEY` 呼叫 OpenAI Responses API。不得把 API key、token 或 `.env.local` 提交到 Git。主流程：
 
 ```text
 前端需求
   -> Flask schema 驗證
-  -> Gemini function call
+  -> OpenAI function call
   -> 工具參數與原需求一致性檢查
   -> get_validated_study_plan
-  -> functionResponse 回送 Gemini
+  -> function_call_output 回送 OpenAI
   -> 結構化說明與前端規則結果比對
 ```
 
 主要程式碼入口：
 
 - `../backend/app/study_agent_api.py`：後端輸入驗證、確定性工具、Gate 與 HTTP API。
-- `../backend/app/study_agent_vertex.py`：ADC、Vertex AI REST function calling 與 `functionResponse`。
+- `../backend/app/study_agent_openai.py`：OpenAI Responses API function calling 與 strict structured output。
 - `src/lib/studyAgentClient.js`：前端只送規劃資料，不包含憑證。
 - `src/lib/planner.js`：前端保留相同規則結果，作為 UI fallback 與結果一致性檢查。
 
-進入「智慧學習」按下「用 Agent 產生學習計畫」後，畫面會先保留規則排程，再顯示 Gemini 工具流程。若 ADC、權限、網路或模型失敗，前端不採用未驗證的模型結果。
+進入「智慧學習」按下「用 Agent 產生學習計畫」後，畫面會先保留規則排程，再顯示 OpenAI 工具流程。若金鑰、網路或模型失敗，前端不採用未驗證的模型結果。
 
 `server/studyAgent.js` 與 `server/studyAgentMiddleware.js` 保留為 Week 04 的歷史 OpenAI Agents SDK 比較實作，但不再是主網站的預設路徑。
 

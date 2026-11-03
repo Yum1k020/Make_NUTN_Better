@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from backend.week06_chaining import run_study_plan_chaining
-from week06.gemini_client import GeminiChainingClient
+from week06.openai_client import OpenAIChainingClient
 
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE_DIR = ROOT / "week06" / "evidence"
@@ -22,8 +22,8 @@ USER_TEXT = (
 
 
 def main() -> None:
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    model = os.getenv("GEMINI_MODEL", "").strip()
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    model = os.getenv("OPENAI_MODEL", "gpt-5-mini").strip()
     run_id = datetime.now(timezone.utc).strftime("W06-LIVE-%Y%m%dT%H%M%SZ")
 
     trace: dict = {
@@ -37,14 +37,14 @@ def main() -> None:
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
 
     if not api_key or not model:
-        trace["reason"] = "missing GEMINI_API_KEY or GEMINI_MODEL"
+        trace["reason"] = "missing OPENAI_API_KEY or OPENAI_MODEL"
         out = EVIDENCE_DIR / f"{run_id}.json"
         out.write_text(json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")
-        print("LIVE_NOT_RUN: set GEMINI_API_KEY and GEMINI_MODEL in your private environment.")
+        print("LIVE_NOT_RUN: set OPENAI_API_KEY and OPENAI_MODEL in your private environment.")
         print(f"Evidence saved: {out}")
         return
 
-    client = GeminiChainingClient(api_key=api_key, model=model)
+    client = OpenAIChainingClient(api_key=api_key, model=model)
     result = run_study_plan_chaining(
         user_text=USER_TEXT,
         extractor=client.extract_study_plan_request,

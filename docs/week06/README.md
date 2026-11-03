@@ -21,14 +21,14 @@
 - `PLAN_GATE_REJECTED`：Gate 拒絕，模型呼叫數必須為 0。
 - `AGENT_STAGE_FAILED`：模型說明失敗，仍保留規則排程。
 
-Python 課堂驗收使用 Gemini；網站整合沿用伺服器端 OpenAI Agents SDK。兩者都以規則排程為唯一時段結果來源。詳見 [`adr-001-study-plan-prompt-chaining.md`](adr-001-study-plan-prompt-chaining.md)、[`COMPARISON.md`](COMPARISON.md) 與 [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md)。
+Python 課堂驗收與網站整合目前都使用伺服器端 OpenAI。兩者都以規則排程為唯一時段結果來源。詳見 [`adr-001-study-plan-prompt-chaining.md`](adr-001-study-plan-prompt-chaining.md)、[`COMPARISON.md`](COMPARISON.md) 與 [`EVIDENCE_INDEX.md`](EVIDENCE_INDEX.md)。
 
 ## 畢業缺項 Evaluator–optimizer
 
 ```text
 讀取目前使用者與規則
   -> 一般程式計算畢業進度
-  -> Gemini 產生結構化說明 A
+  -> OpenAI 產生結構化說明 A
   -> 固定規準評估
   -> 未通過時產生 B，使用同一規準重評
   -> 通過則顯示；否則回退基本進度
@@ -36,7 +36,7 @@ Python 課堂驗收使用 Gemini；網站整合沿用伺服器端 OpenAI Agents 
 
 模型只取得去識別的彙整檢查，不取得姓名、學號、逐筆成績、登入憑證或寫入工具。每次操作最多兩次模型請求，provider 失敗或第二稿仍不合格時有限停止。`GET /api/v1/graduation-progress` 保持零模型呼叫；使用者明確按下按鈕才呼叫 `POST /api/v1/graduation-explanation`。
 
-完整契約、執行方式與限制見 [`GRADUATION_EXPLANATION.md`](GRADUATION_EXPLANATION.md)、[`contract.md`](contract.md) 與 [`comparison.md`](comparison.md)。匯入分支中的 `evidence/live.json` 為 `LIVE_NOT_RUN`，不可把 fixture 當成真實 Gemini。
+完整契約、執行方式與限制見 [`GRADUATION_EXPLANATION.md`](GRADUATION_EXPLANATION.md)、[`contract.md`](contract.md) 與 [`comparison.md`](comparison.md)。歷史 `evidence/live.json` 為 `LIVE_NOT_RUN`，不可把 fixture 當成真實 OpenAI。
 
 ## 本機驗證
 
@@ -50,4 +50,4 @@ npm run build
 npm run format:check
 ```
 
-需要真實 provider 的測試必須另行執行並標示 `LIVE_NOT_RUN`、`LIVE_FAIL` 或 `LIVE_PASS`。不得提交 `.env`、API key、ADC JSON、token 或個人資料。
+需要真實 provider 的測試必須另行執行並標示 `LIVE_NOT_RUN`、`LIVE_FAIL` 或 `LIVE_PASS`。不得提交 `.env`、API key、token 或個人資料。

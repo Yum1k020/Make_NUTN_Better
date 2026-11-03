@@ -271,8 +271,8 @@ export default function GraduationProgress({
             <h2>缺項說明與下一步</h2>
             <p>
               {fixtureMode
-                ? "合成測試模式：使用虛構資料與固定測試回應，不連線 Gemini，不傳送學業資料。"
-                : "按下後會將去識別的規則版本、學分／場次及達標狀態送至 Google Gemini，不傳姓名、學號或成績明細。"}
+                ? "合成測試模式：使用虛構資料與固定測試回應，不連線 OpenAI，不傳送學業資料。"
+                : "按下後會將去識別的規則版本、學分／場次及達標狀態由後端送至 OpenAI，不傳姓名、學號或成績明細。"}
             </p>
             <button
               className="primary-button"

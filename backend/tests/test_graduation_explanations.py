@@ -1,4 +1,4 @@
-"""Week 06: injected failures are explicitly distinct from Gemini live evidence."""
+"""Week 06: injected failures are explicitly distinct from OpenAI live evidence."""
 
 from copy import deepcopy
 import sqlite3
@@ -168,47 +168,76 @@ def test_source_projection_excludes_identity(result):
 
 
 def test_provider_missing_config_zero_requests(result, monkeypatch):
-    from app import graduation_gemini
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    monkeypatch.setattr(graduation_gemini, "urlopen", lambda *a, **k: pytest.fail("missing config made request"))
-    output = explain(result, graduation_gemini.generate)
+    from app import graduation_openai
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr(
+        graduation_openai.requests,
+        "Session",
+        lambda: pytest.fail("missing config made request"),
+    )
+    output = explain(result, graduation_openai.generate)
     assert output["stop_reason"] == "PROVIDER_NOT_CONFIGURED" and output["model_calls"] == 0
 
 
 def test_provider_request_and_thought_filter(result, monkeypatch):
     import json
-    from app import graduation_gemini
+    from app import graduation_openai
     context = evidence_context(result)
-    monkeypatch.setenv("GEMINI_API_KEY", "test-key-not-real")
-    monkeypatch.setenv("GEMINI_MODEL", "test-model")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key-not-real")
+    monkeypatch.setenv("OPENAI_MODEL", "test-model")
+
     class Response:
-        def __enter__(self): return self
-        def __exit__(self, *args): pass
-        def read(self, limit):
-            return json.dumps({"candidates": [{"finishReason": "STOP", "content": {"parts": [
-                {"thought": True, "text": "not output"}, {"text": json.dumps(valid_draft(context))}]}}],
-                "usageMetadata": {"promptTokenCount": 17}}).encode()
-    def fake_open(req, timeout):
-        assert timeout == 25 and req.full_url.endswith("test-model:generateContent")
-        assert "test-key-not-real" not in req.full_url
-        payload = json.loads(req.data)
-        assert payload["generationConfig"]["responseMimeType"] == "application/json"
-        assert "user_id" not in str(payload)
-        return Response()
-    monkeypatch.setattr(graduation_gemini, "urlopen", fake_open)
-    output = explain(result, graduation_gemini.generate)
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [
+                            {
+                                "type": "output_text",
+                                "text": json.dumps(valid_draft(context)),
+                            }
+                        ],
+                    }
+                ],
+                "usage": {"input_tokens": 17},
+            }
+
+    class Session:
+        def post(self, url, **kwargs):
+            assert url == graduation_openai.OPENAI_RESPONSES_ENDPOINT
+            assert kwargs["timeout"] == 45
+            assert "test-key-not-real" not in url
+            assert kwargs["headers"]["Authorization"] == "Bearer test-key-not-real"
+            payload = kwargs["json"]
+            assert payload["text"]["format"]["strict"] is True
+            assert payload["store"] is False
+            assert "user_id" not in str(payload)
+            return Response()
+
+    monkeypatch.setattr(graduation_openai.requests, "Session", Session)
+    output = explain(result, graduation_openai.generate)
     assert output["status"] == "verified"
-    assert output["attempts"][0]["metrics"]["usage"]["promptTokenCount"] == 17
-    assert "not output" not in str(output)
+    assert output["attempts"][0]["metrics"]["usage"]["input_tokens"] == 17
+    assert output["attempts"][0]["metrics"]["provider"] == "openai"
 
 
 def test_provider_timeout_is_sanitized(result, monkeypatch):
-    from app import graduation_gemini
-    monkeypatch.setenv("GEMINI_API_KEY", "test-key-not-real")
-    monkeypatch.setenv("GEMINI_MODEL", "test-model")
-    def fail(*a, **k): raise TimeoutError("must not leak test-key-not-real")
-    monkeypatch.setattr(graduation_gemini, "urlopen", fail)
-    output = explain(result, graduation_gemini.generate)
+    from app import graduation_openai
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key-not-real")
+    monkeypatch.setenv("OPENAI_MODEL", "test-model")
+
+    class Session:
+        def post(self, *args, **kwargs):
+            raise graduation_openai.requests.Timeout(
+                "must not leak test-key-not-real"
+            )
+
+    monkeypatch.setattr(graduation_openai.requests, "Session", Session)
+    output = explain(result, graduation_openai.generate)
     assert output["stop_reason"] == "PROVIDER_UNAVAILABLE"
     assert output["model_calls"] == 1 and "test-key-not-real" not in str(output)
 

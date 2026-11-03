@@ -37,7 +37,7 @@
 flowchart LR
   U[React 使用者介面] -->|規劃需求| B[Flask API]
   B --> V[Request schema 與權限邊界]
-  V --> G[Vertex AI Gemini\nGoogle Cloud ADC]
+  V --> G[OpenAI Responses API\n伺服器端 API key]
   G -->|functionCall| A[工具參數 Gate]
   A -->|通過| T[get_validated_study_plan]
   T --> R[確定性排程結果]
@@ -52,9 +52,9 @@ flowchart LR
 
 設計選擇：
 
-- 主流程使用 Google Cloud Vertex AI Gemini，後端透過 ADC 取得短期憑證。瀏覽器不持有金鑰或 token。
-- 後端另提供可切換的 OpenAI Responses API 介面，API key 只存在伺服器端；此選用流程已有 `LIVE_PASS`，但不取代課程指定的 Gemini／ADC 驗證。
-- 規則排程是唯一時段結果來源。Gemini 工具參數若與已驗證需求不一致，工具執行次數為 0。
+- 主流程統一使用 OpenAI Responses API，API key 只存在 Flask 後端；瀏覽器不持有金鑰或 token。
+- 規則排程是唯一時段結果來源。OpenAI 工具參數若與已驗證需求不一致，工具執行次數為 0。
+- 老師公告指定 Google Cloud／ADC／Gemini；本版本依團隊決定改為 OpenAI-only，因此必須在報告中揭露差異，不能宣稱已符合該供應者要求。
 - 唯讀預覽不需人工確認；寫入 `save_study_plan` 必須 `confirmed=true`，並以 `request_id` 保證重送不重複寫入。
 - 沒有外部校務知識，因此主排程不使用 RAG。畢業規則使用版本化本機規則快照與來源 ID，未知值保持 `null`。
 - 模型、工具或來源驗證失敗時有限停止，保留規則排程或基本畢業進度，再交由使用者決定是否重試。
@@ -71,9 +71,9 @@ flowchart LR
 1. 進入「智慧學習」，確認固定課表與私人行程。
 2. 輸入考試日期、6 小時、每次 2 小時、下午與晚上。
 3. 前端先顯示確定性排程 fallback。
-4. Flask 驗證需求後，Gemini 產生 `get_validated_study_plan` function call。
+4. Flask 驗證需求後，OpenAI 產生 `get_validated_study_plan` function call。
 5. 後端驗證參數與原需求完全一致，執行排程與衝突 Gate。
-6. 工具結果用 `functionResponse` 回送 Gemini。
+6. 工具結果用 `function_call_output` 回送 OpenAI。
 7. 前端顯示結構化說明、來源、模型、工具與 workflow stage。
 8. 若 provider 不可用，畫面保留規則排程並顯示失敗原因。
 
@@ -83,8 +83,8 @@ flowchart LR
 
 | 狀態 | 功能 |
 | --- | --- |
-| 已完成並驗證 | 課表／待辦／私人行程 UI、確定性複習排程、兩個工具契約、Prompt Chaining Gate、偏好保存／更正／到期／撤回／冪等、畢業進度與說明有效性、前後端測試與 production build；選用 OpenAI 後端為 LIVE_PASS |
-| 已實作但尚未完成真實驗證 | Google Cloud ADC Gemini 正常主流程；目前環境沒有 ADC、project 與模型設定，證據為 `LIVE_NOT_RUN` |
+| 已完成並驗證 | 課表／待辦／私人行程 UI、確定性複習排程、兩個工具契約、Prompt Chaining Gate、偏好保存／更正／到期／撤回／冪等、畢業進度與說明有效性、前後端測試與 production build；OpenAI 智慧學習與畢業缺項說明皆為 `LIVE_PASS` |
+| 已實作但尚未完成真實驗證 | 正式跨 user 隔離與寫入工具接入主 Agent |
 | 規劃中 | 正式登入與多使用者授權、校務資料匯入、寫入工具接入主 Agent、正式多實例資料庫、部署與大量並行測試 |
 
 ## 6. 測試、失敗案例與限制
@@ -95,21 +95,22 @@ flowchart LR
 - Frontend：38/38 passed。
 - Vite production build：通過。
 - Prettier：通過。
-- Google Cloud／ADC live：`LIVE_NOT_RUN`，原因是本機沒有 ADC、project 與模型設定。
-- OpenAI Responses API live：`LIVE_PASS`，使用合成資料完成 function call、參數 Gate、工具執行與結構化摘要；此結果不取代 Gemini 主流程要求。
+- OpenAI 智慧學習 live：`LIVE_PASS`，使用合成資料完成 function call、參數 Gate、工具執行與結構化摘要。
+- OpenAI 畢業缺項說明 live：`LIVE_PASS`，使用合成彙整完成結構化草稿、固定規準驗證與唯讀檢查。
+- 供應者符合性：專案目前為 OpenAI-only，與公告指定的 Gemini／ADC 不一致，需先取得教師同意或接受此項扣分風險。
 
 失敗／邊界案例：
 
 | 案例 | 預期 | 實際 |
 | --- | --- | --- |
-| Gemini 改寫工具參數 | Gate 拒絕，工具 0 次 | contract test 通過，`TOOL_ARGUMENT_MISMATCH` |
+| OpenAI 改寫工具參數 | Gate 拒絕，工具 0 次 | contract test 通過，`TOOL_ARGUMENT_MISMATCH` |
 | 非法考試日期 | 模型與工具都不執行 | HTTP 422，`INVALID_REQUEST` |
-| Provider／ADC 不可用 | 不冒充成功，保留前端規則排程 | HTTP 503 或 502；live evidence `LIVE_NOT_RUN` |
+| Provider／金鑰不可用 | 不冒充成功，保留前端規則排程 | HTTP 503 或 502；不把 health check 冒充 live |
 | 重複寫入 | 同 request ID 不新增第二批資料 | `replayed=true`，測試通過 |
 | 記憶過期或撤回 | 新 session 不再回填 | 測試通過 |
 | 畢業說明來源更新 | 清除舊說明 | `SOURCE_CHANGED` 控制測試通過 |
 
-主要限制：固定示範 user 不是正式登入；課表與規則不是即時校務資料；SQLite 仍是單機開發資料庫；真實 Gemini 與正式跨 user 仍需補驗證。
+主要限制：固定示範 user 不是正式登入；課表與規則不是即時校務資料；SQLite 仍是單機開發資料庫；正式跨 user 仍需補 live 驗證；供應者不符合公告指定的 Gemini／ADC。
 
 ## 7. 團隊分工與後續計畫
 
@@ -117,7 +118,7 @@ Git 歷史沒有可靠記錄四位組員各自完成的檔案，不能自動推�
 
 期末前優先順序：
 
-1. 完成 ADC 登入與真實 Gemini E2E，驗收 `LIVE_PASS`、run ID、usage 與畫面截圖。
+1. 取得教師對 OpenAI-only 的確認，並補齊兩條 OpenAI E2E 畫面截圖與備用錄影。
 2. 加入正式登入與 server-side user ID，完成兩位真實 session 的隔離測試。
 3. 將已具確認與冪等保護的寫入工具接入主 Agent，保留人工確認 Gate。
 4. 與校方規則／課務來源確認資料版本，完成正式引用與版本遷移。
@@ -128,6 +129,6 @@ Git 歷史沒有可靠記錄四位組員各自完成的檔案，不能自動推�
 - Repository：[Yum1k020/Make_NUTN_Better](https://github.com/Yum1k020/Make_NUTN_Better)
 - 報告分支：`codex/backend-persistence`
 - 報告程式基線 commit：以本次推送後的分支 HEAD 為準；PPTX／PDF 頁尾與證據 JSON 會同步標示。
-- 示範只使用合成資料；不提交或展示 ADC JSON、API key、access token、`.env` 或真實個資。
+- 示範只使用合成資料；不提交或展示 API key、access token、`.env.local` 或真實個資。
 
-Google Cloud 技術依據：[Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc)、[Vertex AI function calling](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/function-calling)。
+OpenAI 技術依據：[Responses API](https://platform.openai.com/docs/api-reference/responses)、[Function calling](https://platform.openai.com/docs/guides/function-calling)。

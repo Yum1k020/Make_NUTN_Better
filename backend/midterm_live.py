@@ -1,4 +1,4 @@
-"""Write sanitized live status for the midterm Gemini/ADC main flow."""
+"""Write sanitized live status for the OpenAI study-agent main flow."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from app.study_agent_api import StudyAgentService
-from app.study_agent_vertex import VertexProviderError
+from app.study_agent_openai import DEFAULT_OPENAI_MODEL, OpenAIProviderError
 
 
 TAIPEI = ZoneInfo("Asia/Taipei")
@@ -46,25 +46,30 @@ def source_version(repo: Path) -> str:
         capture_output=True,
         text=True,
     )
-    return result.stdout.strip()
+    version = result.stdout.strip()
+    dirty = subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=no"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return version + ("+working-tree" if dirty.stdout.strip() else "")
 
 
 def run() -> dict:
     repo = Path(__file__).resolve().parents[1]
     configured = {
-        "project": bool(os.getenv("GOOGLE_CLOUD_PROJECT")),
-        "location": bool(os.getenv("GOOGLE_CLOUD_LOCATION")),
-        "model": bool(
-            os.getenv("GOOGLE_CLOUD_GEMINI_MODEL") or os.getenv("GEMINI_MODEL")
-        ),
+        "api_key": bool(os.getenv("OPENAI_API_KEY")),
+        "model": bool(os.getenv("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL),
     }
     evidence = {
         "schema_version": "midterm-live-v1",
         "executed_at": datetime.now(TAIPEI).isoformat(timespec="seconds"),
         "source_version": source_version(repo),
-        "flow": "user request -> Gemini function call -> parameter validation -> deterministic tool -> functionResponse -> Gemini summary",
-        "provider": "Google Cloud Vertex AI Gemini",
-        "authentication": "Application Default Credentials",
+        "flow": "user request -> OpenAI function call -> parameter validation -> deterministic tool -> function_call_output -> OpenAI summary",
+        "provider": "OpenAI Responses API",
+        "authentication": "Server-side API key",
         "input_kind": "synthetic",
         "configured": configured,
         "live_status": "LIVE_NOT_RUN",
@@ -77,8 +82,8 @@ def run() -> dict:
             "personal_data_recorded": False,
         },
     }
-    if not configured["project"] or not configured["model"]:
-        evidence["reason_code"] = "GOOGLE_CLOUD_PROJECT_OR_MODEL_NOT_CONFIGURED"
+    if not configured["api_key"] or not configured["model"]:
+        evidence["reason_code"] = "OPENAI_API_KEY_OR_MODEL_NOT_CONFIGURED"
         return evidence
     try:
         result = StudyAgentService().run(synthetic_request())
@@ -87,7 +92,7 @@ def run() -> dict:
             "completed": True,
             "model": result["agent"]["model"],
             "tool": result["agent"]["tool"],
-            "authentication": "ADC",
+            "authentication": "Server-side API key",
         }
         evidence["result"] = {
             "workflow_status": result["workflow"]["status"],
@@ -96,7 +101,7 @@ def run() -> dict:
             "session_count": len(result["plan"]["sessions"]),
             "citation_count": len(result["agent"]["citations"]),
         }
-    except VertexProviderError as error:
+    except OpenAIProviderError as error:
         evidence["live_status"] = "LIVE_FAIL" if error.attempted else "LIVE_NOT_RUN"
         evidence["reason_code"] = error.code
         evidence["actual_call"] = {"attempted": error.attempted}
@@ -111,7 +116,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--output",
-        default="docs/midterm/evidence/study-agent-live.json",
+        default="docs/midterm/evidence/study-agent-openai-live.json",
     )
     args = parser.parse_args()
     repo = Path(__file__).resolve().parents[1]

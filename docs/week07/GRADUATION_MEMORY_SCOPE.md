@@ -8,7 +8,7 @@
 
 - 說明自伺服器讀取來源開始最多有效 300 秒，重查不延長期限。
 - 來源指紋包含畢業進度與規則 digest，排除每次變動的 `evaluated_at`。
-- Gemini I/O 前後都比對來源；來源改變或生成期間到期時回傳 stale 並移除說明。
+- OpenAI I/O 前後都比對來源；來源改變或生成期間到期時回傳 stale 並移除說明。
 - 前端每 15 秒及 focus/visibility 恢復時重查；重查中先隱藏舊說明，失敗時清除。
 - 新工作階段、離開頁面或重新整理會清除頁面記憶；較早的非同步結果不得復原已清除內容。
 - `scope_id` 存在 Flask 簽章的 HttpOnly、SameSite=Strict session cookie，不包含姓名、學號或成績。

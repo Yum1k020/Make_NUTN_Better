@@ -83,7 +83,7 @@ WRITE save_study_plan
 
 - MCP read-only tool
 - tools/list + tools/call trace
-- Gemini → tool → functionResponse → Gemini runner
+- OpenAI → tool → function_call_output → OpenAI runner
 - Action Readiness
 - Self Check
 

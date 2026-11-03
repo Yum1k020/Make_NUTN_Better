@@ -9,7 +9,7 @@
 | 業務終點 | read-only study-plan preview | 相同 |
 | scheduler | scheduler_v1 | 相同 |
 | 固定 fixture preview | 180 分鐘、remaining 0、3 sessions | PASS，與 baseline 完全相同 |
-| Case 1 真實 Gemini | 本週未另做 baseline live | LIVE_NOT_RUN |
+| Case 1 真實 OpenAI | 本週未另做 baseline live | 依最新 OpenAI evidence 判定 |
 | Case 2 非法輸入 | 無本週 chaining precheck | PASS；model/tool/summary 都 0 次 |
 | Case 3 provider failure | 非本週控制 | PASS_INJECTED；stop_reason=provider_failure，tool 0 次 |
 | Case 4 workflow 邊界 | 無本週 Gate 斷言 | PASS；Gate reject 後 tool=0、summary=0 |
@@ -29,4 +29,4 @@
 
 ## 結論
 
-已證明候選保留原本的 preview 業務結果，並新增可拒絕 Gate、明確停止原因與下游零呼叫斷言。尚未證明的是 Case 1 的本週真實 Gemini 正常主流程；依課堂規則保持 LIVE_NOT_RUN，不用 fixture 或歷史結果冒充。
+已證明候選保留原本的 preview 業務結果，並新增可拒絕 Gate、明確停止原因與下游零呼叫斷言。真實 OpenAI 正常主流程必須依當次 live evidence 判定，不用 fixture 或歷史結果冒充。

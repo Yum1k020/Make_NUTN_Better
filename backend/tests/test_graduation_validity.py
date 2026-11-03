@@ -1,4 +1,4 @@
-"""C-route HTTP tests; synthetic data and injected provider, not Gemini live."""
+"""C-route HTTP tests; synthetic data and injected provider, not OpenAI live."""
 from copy import deepcopy
 from hashlib import sha256
 import json
