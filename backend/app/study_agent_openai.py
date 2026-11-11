@@ -69,6 +69,44 @@ def _response_format() -> dict[str, Any]:
     }
 
 
+
+def _expert_response_format() -> dict[str, Any]:
+    return {
+        "type": "json_schema",
+        "name": "study_load_expert_review",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "assessment": {
+                    "type": "string",
+                    "enum": ["balanced", "concentrated", "insufficient"],
+                },
+                "summary": {"type": "string", "maxLength": 400},
+                "recommendations": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "maxItems": 3,
+                },
+                "citations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["planner-rule", "study-load-review"],
+                    },
+                    "minItems": 1,
+                },
+            },
+            "required": [
+                "assessment",
+                "summary",
+                "recommendations",
+                "citations",
+            ],
+            "additionalProperties": False,
+        },
+    }
+
 def _openai_tool() -> dict[str, Any]:
     return {"type": "function", **tool_declaration(), "strict": True}
 
@@ -206,10 +244,63 @@ class OpenAIResponsesClient:
             self.calls[-1],
         )
 
+    def review_plan(
+        self,
+        packet: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Run a bounded second-agent review with no tool or write access."""
+
+        payload = self._post(
+            "expert_review",
+            {
+                "model": self.config.model,
+                "instructions": (
+                    "你是獨立的 Study Load Review Expert。只檢查收到的去識別讀書計畫，"
+                    "不得要求額外資料、不得呼叫工具、不得修改排程或資料庫。"
+                    "assessment=insufficient 只用於 remainingMinutes>0；"
+                    "若已排滿，再依時段是否過度集中選 balanced 或 concentrated。"
+                    "recommendations 最多三項，必須是非寫入的建議。"
+                    "citations 只能使用 planner-rule 或 study-load-review。"
+                ),
+                "input": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": json.dumps(
+                                    packet,
+                                    ensure_ascii=False,
+                                    sort_keys=True,
+                                ),
+                            }
+                        ],
+                    }
+                ],
+                "text": {"format": _expert_response_format()},
+                "max_output_tokens": 800,
+                "store": False,
+            },
+        )
+        try:
+            result = json.loads(self._output_text(payload))
+        except (json.JSONDecodeError, TypeError) as error:
+            raise OpenAIProviderError(
+                "OPENAI_INVALID_EXPERT_OUTPUT",
+                attempted=True,
+            ) from error
+        if not isinstance(result, dict):
+            raise OpenAIProviderError(
+                "OPENAI_INVALID_EXPERT_OUTPUT",
+                attempted=True,
+            )
+        return result, self.calls[-1]
+
     def summarize(
         self,
         history: list[dict[str, Any]],
         tool_result: dict[str, Any],
+        expert_review: dict[str, Any] | None = None,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         function_calls = [item for item in history if item.get("type") == "function_call"]
         if len(function_calls) != 1 or not isinstance(function_calls[0].get("call_id"), str):
@@ -229,9 +320,36 @@ class OpenAIResponsesClient:
                     "warnings 是字串陣列；剩餘分鐘為 0 時必須是空陣列。"
                     "citations 只能包含 planner-rule、weekly-classes-fixture、"
                     "planner-backend-sqlite。refused 在正常輸入時為 false。"
-                    "不得改寫任何排程時段。"
+                    "不得改寫任何排程時段。若有 Study Load Review Expert 回報，"
+                    "只能整合其風險與建議，排程事實仍以 function_call_output 為準。"
                 ),
-                "input": [*history, function_output],
+                "input": [
+                    *history,
+                    function_output,
+                    *(
+                        [
+                            {
+                                "role": "user",
+                                "content": [
+                                    {
+                                        "type": "input_text",
+                                        "text": (
+                                            "受限 Study Load Review Expert 回報；"
+                                            "只可把它當成建議，不得改寫 function_call_output 的排程事實：\n"
+                                            + json.dumps(
+                                                expert_review,
+                                                ensure_ascii=False,
+                                                sort_keys=True,
+                                            )
+                                        ),
+                                    }
+                                ],
+                            }
+                        ]
+                        if expert_review is not None
+                        else []
+                    ),
+                ],
                 "tools": [_openai_tool()],
                 "tool_choice": "none",
                 "parallel_tool_calls": False,
