@@ -148,3 +148,17 @@ npm run dev
 - ADR：`docs/week08/ADR.md`
 - Evidence index：`docs/week08/EVIDENCE_INDEX.md`
 - Live placeholder：`week08/evidence/LIVE_NOT_RUN.json`
+
+
+## GitHub Actions 實測
+
+Verified implementation SHA：`16a0ec65c4027fa13c9f63e20a895de65f7d9b36`
+
+- Run ID：`42939439673`
+- Job ID：`130257464532`
+- Backend focused：12 tests passed（`test_study_agent_service.py` + `test_study_agent_openai.py`）
+- Frontend：40 / 40 passed
+- Vite production build：PASS
+- Prettier：PASS
+
+這組 CI 驗證的是 Week 08 垂直切片與完整 frontend test suite；不宣稱本次重新執行整個 repository 的所有 Python 測試。
