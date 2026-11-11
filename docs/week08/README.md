@@ -152,10 +152,10 @@ npm run dev
 
 ## GitHub Actions 實測
 
-Verified implementation SHA：`16a0ec65c4027fa13c9f63e20a895de65f7d9b36`
+Verified implementation SHA：`4205678a89b684eefa7cddf56f8fe2af68360831`
 
-- Run ID：`42939439673`
-- Job ID：`130257464532`
+- Run ID：`42939717922`
+- Job ID：`130258360188`
 - Backend focused：12 tests passed（`test_study_agent_service.py` + `test_study_agent_openai.py`）
 - Frontend：40 / 40 passed
 - Vite production build：PASS
