@@ -114,6 +114,7 @@ def test_main_flow_records_function_call_validation_and_response():
     service = StudyAgentService(provider_factory=FakeProvider)
     result = service.run(request_payload())
     assert result["workflow"]["status"] == "completed"
+    assert result["workflow"]["runId"].startswith("week08-")
     assert [stage["id"] for stage in result["workflow"]["stages"]] == [
         "validate-request",
         "model-tool-call",
@@ -201,7 +202,10 @@ def test_http_main_flow_and_invalid_boundary(tmp_path):
     client = app.test_client()
     response = client.post("/api/v1/study-agent/run", json=request_payload())
     assert response.status_code == 200
-    assert response.get_json()["agent"]["model"] == "openai-test"
+    body = response.get_json()
+    assert body["agent"]["model"] == "openai-test"
+    assert body["multiAgent"]["pattern"] == "bounded-specialist"
+    assert body["workflow"]["runId"].startswith("week08-")
 
     invalid = client.post(
         "/api/v1/study-agent/run",
