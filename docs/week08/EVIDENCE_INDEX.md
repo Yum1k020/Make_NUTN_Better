@@ -2,7 +2,7 @@
 
 Baseline SHA：`16c23e237ec091468e03a9461ec740e2ba06e74f`
 
-Verified implementation SHA：`16a0ec65c4027fa13c9f63e20a895de65f7d9b36`。
+Verified implementation SHA：`4205678a89b684eefa7cddf56f8fe2af68360831`。
 
 | ID | 類型 | 證據 | 初始狀態 |
 | --- | --- | --- | --- |
@@ -43,8 +43,8 @@ Evidence 不得含 API key、token、.env、真實私人行程或真實學生資
 
 ## CI run
 
-- Run：`42939439673`
-- Job：`130257464532`
+- Run：`42939717922`
+- Job：`130258360188`
 - Backend focused：12 passed
 - Frontend：40 / 40 passed
 - Production build：PASS
