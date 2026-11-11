@@ -68,6 +68,31 @@ def test_openai_two_turn_tool_loop_uses_server_key_and_strict_schemas():
                                 "type": "output_text",
                                 "text": json.dumps(
                                     {
+                                        "assessment": "insufficient",
+                                        "summary": "仍有 120 分鐘未排入。",
+                                        "recommendations": ["增加可安排時段。"],
+                                        "citations": [
+                                            "planner-rule",
+                                            "study-load-review",
+                                        ],
+                                    },
+                                    ensure_ascii=False,
+                                ),
+                            }
+                        ],
+                    }
+                ],
+                "usage": {"input_tokens": 12, "output_tokens": 8},
+            },
+            {
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [
+                            {
+                                "type": "output_text",
+                                "text": json.dumps(
+                                    {
                                         "summary": "已完成安全排程。",
                                         "warnings": [],
                                         "citations": ["planner-rule"],
@@ -90,9 +115,28 @@ def test_openai_two_turn_tool_loop_uses_server_key_and_strict_schemas():
     )
 
     function_call, history, selection_meta = client.choose_tool(data)
+    expert_review, expert_meta = client.review_plan(
+        {
+            "task": {
+                "courseName": "資料結構",
+                "startDate": "2026-09-17",
+                "examDate": "2026-09-24",
+                "hours": 2,
+                "sessionHours": 1,
+                "allowedPeriods": ["evening"],
+            },
+            "plan": {
+                "sessions": [],
+                "scheduledMinutes": 0,
+                "remainingMinutes": 120,
+            },
+            "deterministicChecks": {"issueCount": 0, "source": "planner-rule"},
+        }
+    )
     explanation, summary_meta = client.summarize(
         history,
         {"sessions": [], "scheduledMinutes": 0, "remainingMinutes": 120},
+        expert_review,
     )
 
     assert function_call == {
@@ -102,8 +146,10 @@ def test_openai_two_turn_tool_loop_uses_server_key_and_strict_schemas():
     }
     assert explanation["summary"] == "已完成安全排程。"
     assert selection_meta["usage"]["input_tokens"] == 20
+    assert expert_meta["usage"]["output_tokens"] == 8
+    assert expert_review["assessment"] == "insufficient"
     assert summary_meta["usage"]["output_tokens"] == 10
-    assert len(session.requests) == 2
+    assert len(session.requests) == 3
     assert session.requests[0]["headers"]["Authorization"] == (
         "Bearer test-server-only-key"
     )
@@ -114,10 +160,15 @@ def test_openai_two_turn_tool_loop_uses_server_key_and_strict_schemas():
         ]
         is False
     )
-    assert session.requests[1]["json"]["input"][-1]["type"] == (
+    assert "tools" not in session.requests[1]["json"]
+    assert (
+        session.requests[1]["json"]["text"]["format"]["name"]
+        == "study_load_expert_review"
+    )
+    assert session.requests[2]["json"]["input"][-2]["type"] == (
         "function_call_output"
     )
-    assert session.requests[1]["json"]["text"]["format"]["strict"] is True
+    assert session.requests[2]["json"]["text"]["format"]["strict"] is True
     assert "test-server-only-key" not in repr(client.config)
 
 
