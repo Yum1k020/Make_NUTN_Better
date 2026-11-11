@@ -537,8 +537,9 @@ export default function StudyPlanner({
               <p className="agent-disclosure">
                 按下後會將合成課名、日期、可用時段與私人行程送至 Flask
                 後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
-                Study Load Review Expert 檢查，最後由 Coordinator 整合回答。專家沒有
-                Tool 或資料庫寫入權限；API key 僅存在 Flask 後端。
+                Study Load Review Expert 檢查，最後由 Coordinator
+                整合回答。專家沒有 Tool 或資料庫寫入權限；API key 僅存在 Flask
+                後端。
               </p>
             </form>
           </section>
