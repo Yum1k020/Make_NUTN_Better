@@ -58,6 +58,14 @@ function formatStageEvidence(stage) {
   if (stage.id === "return-tool-result") {
     return `${evidence.functionResponseCount} 筆工具結果・${evidence.citationCount} 個來源`;
   }
+  if (stage.id === "delegate-study-load-expert") {
+    return stage.status === "completed"
+      ? `${evidence.role}・tool ${evidence.toolCalls} 次・${evidence.assessment}`
+      : `${evidence.role}・tool ${evidence.toolCalls} 次`;
+  }
+  if (stage.id === "integrate-expert-review") {
+    return `${evidence.returnedBy} → ${evidence.caller}・${evidence.recommendationCount} 項建議`;
+  }
   return stage.status === "completed"
     ? `${evidence.provider}・${evidence.citationCount} 個來源・嘗試 ${evidence.attemptCount} 次`
     : `${evidence.errorSource}・嘗試 ${evidence.attemptCount} 次`;
@@ -100,6 +108,54 @@ function WorkflowTrace({ workflow }) {
   );
 }
 
+function MultiAgentTrace({ multiAgent }) {
+  if (!multiAgent) return null;
+  const expert = multiAgent.expertReview;
+  return (
+    <div className="workflow-trace" aria-label="多代理協作軌跡">
+      <div className="workflow-trace-heading">
+        <strong>Multi-Agent Route A</strong>
+        <span className="workflow-state is-completed">2 個角色</span>
+      </div>
+      <ol>
+        {multiAgent.roles.map((role) => (
+          <li className="is-completed" key={role.id}>
+            <span className="workflow-step-marker" aria-hidden="true" />
+            <div>
+              <strong>{role.label}</strong>
+              <small>
+                {role.id === "study-coordinator"
+                  ? `保留主控制權・tool：${role.tools.join("、")}`
+                  : "受限專家・無 Tool／無資料庫寫入權限"}
+              </small>
+            </div>
+            <span className="workflow-step-status">完成</span>
+          </li>
+        ))}
+      </ol>
+      {expert && (
+        <div className="agent-result">
+          <div className="agent-result-tags">
+            <span>專家評估：{expert.assessment}</span>
+            <span>最小共享 context</span>
+          </div>
+          <p>{expert.summary}</p>
+          {expert.recommendations.length > 0 && (
+            <ul>
+              {expert.recommendations.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <small className="workflow-run-id">
+        Coordinator → Study Load Review Expert → Coordinator
+      </small>
+    </div>
+  );
+}
+
 function AgentExplanationPanel({ result, error, isLoading, workflow }) {
   return (
     <section className="panel agent-explanation-panel">
@@ -127,7 +183,7 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
         <div className="agent-result">
           <div className="agent-result-tags">
             <span>function tool</span>
-            <span>structured output</span>
+            <span>2-Agent Route A</span>
             <span>規則結果一致</span>
           </div>
           <p>{result.summary}</p>
@@ -146,6 +202,7 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
           <small>
             tool：{result.tool}・model：{result.model}・排程規則未交由 LLM
           </small>
+          <MultiAgentTrace multiAgent={result.multiAgent} />
         </div>
       ) : (
         <p className="empty-state">
@@ -305,6 +362,7 @@ export default function StudyPlanner({
       setAgentResult({
         ...response.agent,
         comparison: response.comparison,
+        multiAgent: response.multiAgent,
       });
       setAgentWorkflow(response.workflow);
       setPlanMessage(
@@ -478,9 +536,10 @@ export default function StudyPlanner({
               </button>
               <p className="agent-disclosure">
                 按下後會將合成課名、日期、可用時段與私人行程送至 Flask
-                後端，再由後端設定的模型供應者選用工具；課堂示範預設使用 Google
-                OpenAI Responses API。確定性排程仍由規則工具完成，API key 僅存在
-                Flask 後端。
+                後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
+                Study Load Review Expert 檢查，最後由 Coordinator
+                整合回答。專家沒有 Tool 或資料庫寫入權限；API key 僅存在 Flask
+                後端。
               </p>
             </form>
           </section>

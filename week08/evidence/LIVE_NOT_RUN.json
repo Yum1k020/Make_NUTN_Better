@@ -1,0 +1,14 @@
+{
+  "schema_version": "week08-live-v1",
+  "route": "A_bounded_specialist",
+  "flow": "Study Coordinator -> deterministic tool -> Study Load Review Expert -> Study Coordinator",
+  "provider": "OpenAI Responses API",
+  "input_kind": "synthetic",
+  "live_status": "LIVE_NOT_RUN",
+  "reason": "GitHub CI does not contain the user's private OPENAI_API_KEY. Week 08 adds a new expert model call, so older live evidence is not reused.",
+  "security": {
+    "credentials_recorded": false,
+    "tokens_recorded": false,
+    "personal_data_recorded": false
+  }
+}

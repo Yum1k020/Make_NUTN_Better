@@ -47,9 +47,11 @@ class FakeProvider:
     authentication = "Server-side API key"
     framework = "OpenAI Responses API"
 
-    def __init__(self, *, mutate=None):
+    def __init__(self, *, mutate=None, expert_error=None):
         self.config = SimpleNamespace(model="openai-test")
         self.mutate = mutate
+        self.expert_error = expert_error
+        self.expert_packets = []
 
     def choose_tool(self, data):
         args = self.mutate(dict(data)) if self.mutate else data
@@ -59,11 +61,31 @@ class FakeProvider:
             {"usage": {"input_tokens": 10}},
         )
 
-    def summarize(self, history, plan):
-        assert history
+    def review_plan(self, packet):
+        self.expert_packets.append(packet)
+        if self.expert_error is not None:
+            raise self.expert_error
+        assessment = (
+            "insufficient"
+            if packet["plan"]["remainingMinutes"] > 0
+            else "balanced"
+        )
         return (
             {
-                "summary": "已依規則安排三個複習時段。",
+                "assessment": assessment,
+                "summary": "時段已通過受限專家檢查。",
+                "recommendations": [],
+                "citations": ["planner-rule", "study-load-review"],
+            },
+            {"usage": {"input_tokens": 8, "output_tokens": 6}},
+        )
+
+    def summarize(self, history, plan, expert_review=None):
+        assert history
+        assert expert_review is not None
+        return (
+            {
+                "summary": "已依規則安排三個複習時段，並整合專家檢查。",
                 "warnings": [],
                 "citations": [
                     "planner-rule",
@@ -92,15 +114,62 @@ def test_main_flow_records_function_call_validation_and_response():
     service = StudyAgentService(provider_factory=FakeProvider)
     result = service.run(request_payload())
     assert result["workflow"]["status"] == "completed"
+    assert result["workflow"]["runId"].startswith("week08-")
     assert [stage["id"] for stage in result["workflow"]["stages"]] == [
         "validate-request",
         "model-tool-call",
         "validate-tool-args",
         "execute-tool",
+        "delegate-study-load-expert",
+        "integrate-expert-review",
         "return-tool-result",
     ]
     assert result["agent"]["framework"] == "OpenAI Responses API"
     assert result["agent"]["tool"] == TOOL_NAME
+    assert result["comparison"]["agentCount"] == 2
+    assert result["multiAgent"]["pattern"] == "bounded-specialist"
+    assert result["multiAgent"]["roles"][1]["tools"] == []
+
+
+def test_expert_receives_minimum_context_without_private_event_details():
+    provider = FakeProvider()
+    service = StudyAgentService(provider_factory=lambda: provider)
+
+    result = service.run(request_payload())
+
+    packet = provider.expert_packets[0]
+    serialized = repr(packet)
+    assert "personalEvents" not in packet
+    assert "社團會議" not in serialized
+    assert "活動中心 3 樓" not in serialized
+    assert packet["task"]["courseName"] == "資料結構"
+    assert packet["plan"]["scheduledMinutes"] == 360
+    assert result["multiAgent"]["sharedContext"]["personalEventDetailsShared"] is False
+
+
+def test_invalid_expert_output_stops_before_final_coordinator_summary():
+    class InvalidExpertProvider(FakeProvider):
+        def review_plan(self, packet):
+            self.expert_packets.append(packet)
+            return (
+                {
+                    "assessment": "insufficient",
+                    "summary": "錯誤地把已排滿計畫判成不足。",
+                    "recommendations": [],
+                    "citations": ["planner-rule"],
+                },
+                {"usage": {}},
+            )
+
+        def summarize(self, history, plan, expert_review=None):
+            raise AssertionError("Coordinator summary must not run after invalid expert output")
+
+    service = StudyAgentService(provider_factory=InvalidExpertProvider)
+    with pytest.raises(Exception) as error:
+        service.run(request_payload())
+
+    assert getattr(error.value, "code", None) == "EXPERT_OUTPUT_INVALID"
+    assert error.value.workflow["stopReason"] == "EXPERT_OUTPUT_INVALID"
 
 
 def test_changed_model_arguments_stop_before_tool_execution():
@@ -133,7 +202,10 @@ def test_http_main_flow_and_invalid_boundary(tmp_path):
     client = app.test_client()
     response = client.post("/api/v1/study-agent/run", json=request_payload())
     assert response.status_code == 200
-    assert response.get_json()["agent"]["model"] == "openai-test"
+    body = response.get_json()
+    assert body["agent"]["model"] == "openai-test"
+    assert body["multiAgent"]["pattern"] == "bounded-specialist"
+    assert body["workflow"]["runId"].startswith("week08-")
 
     invalid = client.post(
         "/api/v1/study-agent/run",
