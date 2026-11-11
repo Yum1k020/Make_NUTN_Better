@@ -340,6 +340,86 @@ def _validate_explanation(value: Any, remaining: int) -> dict[str, Any]:
     }
 
 
+
+def _build_expert_packet(
+    request_data: dict[str, Any],
+    plan: dict[str, Any],
+) -> dict[str, Any]:
+    """Share only the fields needed by the bounded study-load expert."""
+
+    return {
+        "task": {
+            "courseName": request_data["courseName"],
+            "startDate": request_data["startDate"],
+            "examDate": request_data["examDate"],
+            "hours": request_data["hours"],
+            "sessionHours": request_data["sessionHours"],
+            "allowedPeriods": request_data["allowedPeriods"],
+        },
+        "plan": {
+            "sessions": [
+                {
+                    "date": session["date"],
+                    "start": session["start"],
+                    "end": session["end"],
+                }
+                for session in plan["sessions"]
+            ],
+            "scheduledMinutes": plan["scheduledMinutes"],
+            "remainingMinutes": plan["remainingMinutes"],
+        },
+        "deterministicChecks": {
+            "issueCount": len(verify_plan(request_data, plan)),
+            "source": "planner-rule",
+        },
+    }
+
+
+def _validate_expert_review(
+    value: Any,
+    plan: dict[str, Any],
+) -> dict[str, Any]:
+    if not isinstance(value, dict) or set(value) != {
+        "assessment",
+        "summary",
+        "recommendations",
+        "citations",
+    }:
+        raise ValueError("專家輸出欄位不完整。")
+
+    assessment = value["assessment"]
+    summary = value["summary"]
+    recommendations = value["recommendations"]
+    citations = value["citations"]
+
+    if assessment not in {"balanced", "concentrated", "insufficient"}:
+        raise ValueError("專家 assessment 不合法。")
+    if not isinstance(summary, str) or not summary.strip() or len(summary) > 400:
+        raise ValueError("專家 summary 不合法。")
+    if (
+        not isinstance(recommendations, list)
+        or len(recommendations) > 3
+        or any(not isinstance(item, str) or not item.strip() for item in recommendations)
+    ):
+        raise ValueError("專家 recommendations 不合法。")
+    if (
+        not isinstance(citations, list)
+        or not citations
+        or any(item not in {"planner-rule", "study-load-review"} for item in citations)
+    ):
+        raise ValueError("專家 citations 不合法。")
+    if plan["remainingMinutes"] > 0 and assessment != "insufficient":
+        raise ValueError("仍有未排分鐘時，專家必須標示 insufficient。")
+    if plan["remainingMinutes"] == 0 and assessment == "insufficient":
+        raise ValueError("已排滿時，專家不可標示 insufficient。")
+
+    return {
+        "assessment": assessment,
+        "summary": summary.strip(),
+        "recommendations": recommendations,
+        "citations": citations,
+    }
+
 def _stage(identifier: str, label: str, status: str, **evidence: Any) -> dict[str, Any]:
     return {"id": identifier, "label": label, "status": status, "evidence": evidence}
 
@@ -356,8 +436,8 @@ class StudyAgentService:
 
     def run(self, payload: Any) -> dict[str, Any]:
         workflow = {
-            "name": "study-plan-function-calling",
-            "version": "midterm-v1",
+            "name": "study-plan-multi-agent",
+            "version": "week08-route-a-v1",
             "status": "running",
             "stopReason": None,
             "stages": [],
@@ -459,8 +539,82 @@ class StudyAgentService:
                 remainingMinutes=plan["remainingMinutes"],
             )
         )
-        raw_explanation, summary_meta = provider.summarize(history, plan)
+
+        expert_packet = _build_expert_packet(normalized, plan)
+        try:
+            raw_expert_review, expert_meta = provider.review_plan(expert_packet)
+            expert_review = _validate_expert_review(raw_expert_review, plan)
+        except StudyAgentProviderError as error:
+            workflow["stages"].append(
+                _stage(
+                    "delegate-study-load-expert",
+                    "委派讀書負荷專家",
+                    "failed",
+                    role="study-load-reviewer",
+                    toolCalls=0,
+                )
+            )
+            workflow.update(status="stopped", stopReason="EXPERT_AGENT_FAILED")
+            raise StudyAgentError(
+                "EXPERT_AGENT_FAILED",
+                "讀書負荷專家無法完成檢查；原本規則排程仍可使用。",
+                502,
+                workflow=workflow,
+            ) from error
+        except (ValueError, TypeError, KeyError) as error:
+            workflow["stages"].append(
+                _stage(
+                    "delegate-study-load-expert",
+                    "委派讀書負荷專家",
+                    "rejected",
+                    role="study-load-reviewer",
+                    toolCalls=0,
+                )
+            )
+            workflow.update(status="stopped", stopReason="EXPERT_OUTPUT_INVALID")
+            raise StudyAgentError(
+                "EXPERT_OUTPUT_INVALID",
+                str(error),
+                502,
+                workflow=workflow,
+            ) from error
+
+        workflow["stages"].append(
+            _stage(
+                "delegate-study-load-expert",
+                "委派讀書負荷專家",
+                "completed",
+                role="study-load-reviewer",
+                sharedFields=[
+                    "courseName",
+                    "dateRange",
+                    "hours",
+                    "sessionHours",
+                    "allowedPeriods",
+                    "sanitizedSessions",
+                    "remainingMinutes",
+                ],
+                toolCalls=0,
+                assessment=expert_review["assessment"],
+            )
+        )
+
+        raw_explanation, summary_meta = provider.summarize(
+            history,
+            plan,
+            expert_review,
+        )
         explanation = _validate_explanation(raw_explanation, plan["remainingMinutes"])
+        workflow["stages"].append(
+            _stage(
+                "integrate-expert-review",
+                "Coordinator 整合專家回報",
+                "completed",
+                caller="study-coordinator",
+                returnedBy="study-load-reviewer",
+                recommendationCount=len(expert_review["recommendations"]),
+            )
+        )
         workflow["stages"].append(
             _stage(
                 "return-tool-result",
@@ -480,7 +634,50 @@ class StudyAgentService:
                 "model": provider.config.model,
                 "usage": {
                     "toolSelection": selection_meta.get("usage", {}),
+                    "expertReview": expert_meta.get("usage", {}),
                     "finalSummary": summary_meta.get("usage", {}),
+                },
+            },
+            "multiAgent": {
+                "route": "A",
+                "pattern": "bounded-specialist",
+                "status": "completed",
+                "owner": "study-coordinator",
+                "roles": [
+                    {
+                        "id": "study-coordinator",
+                        "label": "Study Coordinator",
+                        "control": "caller-retains-control",
+                        "tools": [TOOL_NAME],
+                    },
+                    {
+                        "id": "study-load-reviewer",
+                        "label": "Study Load Review Expert",
+                        "control": "returns-to-caller",
+                        "tools": [],
+                        "writeAccess": False,
+                    },
+                ],
+                "events": [
+                    {
+                        "from": "study-coordinator",
+                        "to": "study-load-reviewer",
+                        "type": "delegate",
+                        "status": "completed",
+                    },
+                    {
+                        "from": "study-load-reviewer",
+                        "to": "study-coordinator",
+                        "type": "return",
+                        "status": "completed",
+                        "assessment": expert_review["assessment"],
+                    },
+                ],
+                "expertReview": expert_review,
+                "sharedContext": {
+                    "personalEventDetailsShared": False,
+                    "databaseWriteAccess": False,
+                    "packetVersion": "week08-a-v1",
                 },
             },
             "comparison": {
@@ -488,6 +685,7 @@ class StudyAgentService:
                 "scheduledMinutes": plan["scheduledMinutes"],
                 "remainingMinutes": plan["remainingMinutes"],
                 "sessionCount": len(plan["sessions"]),
+                "agentCount": 2,
             },
             "workflow": workflow,
         }
