@@ -148,6 +148,10 @@ Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重�
 - [115畢業規則整合說明](GRADUATION_PROGRESS_115.md) 與 [唯一整合JSON](nutn_csie_115_graduation_rules.json)。
 - 115 整合規則是目前網站執行規格，最低 133 學分；舊 `nutn-csie-115-mvp-v1` 與 113 規則只保留為版本化歷史／回歸資料。合成修課紀錄仍不可當作真實學生畢業資格。
 
+## Week 08：智慧學習 Multi-Agent
+
+智慧學習新增 Route A「一位受限專家」：原 Study Coordinator 保留主控制權與 `get_validated_study_plan`，確定性排程完成後只把去識別的讀書時段封包交給 Study Load Review Expert。專家沒有 Tool／資料庫寫入權限，結果回到 Coordinator 後才產生最後回答。React 會直接顯示兩角色與協作 trace；完整契約、測試與證據見 [`docs/week08/README.md`](docs/week08/README.md)。
+
 ## Week 07：畢業說明記憶範圍（C 路線）
 
 [作業說明、程式差異、測試與證據索引](docs/week07/README.md)。本週對既有畢業缺項說明加入五分鐘 TTL、來源重查與工作階段清除；不改畢業判定。歷史離線證據已提供；目前執行路徑已統一為 OpenAI，正式跨 user 驗收仍為 NOT_RUN，完成提交不代表所有功能驗收通過。
