@@ -6,6 +6,7 @@ import os
 import re
 from datetime import date, datetime, timedelta
 from typing import Any, Callable
+from uuid import uuid4
 
 from flask import current_app, jsonify, request
 from flask_smorest import Blueprint
@@ -438,6 +439,7 @@ class StudyAgentService:
         workflow = {
             "name": "study-plan-multi-agent",
             "version": "week08-route-a-v1",
+            "runId": f"week08-{uuid4()}",
             "status": "running",
             "stopReason": None,
             "stages": [],
