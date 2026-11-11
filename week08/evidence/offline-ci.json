@@ -2,10 +2,10 @@
   "schema_version": "week08-offline-ci-v1",
   "route": "A_bounded_specialist",
   "baseline_sha": "16c23e237ec091468e03a9461ec740e2ba06e74f",
-  "verified_implementation_sha": "16a0ec65c4027fa13c9f63e20a895de65f7d9b36",
+  "verified_implementation_sha": "4205678a89b684eefa7cddf56f8fe2af68360831",
   "github_actions": {
-    "run_id": 42939439673,
-    "job_id": 130257464532,
+    "run_id": 42939717922,
+    "job_id": 130258360188,
     "conclusion": "success"
   },
   "checks": {
