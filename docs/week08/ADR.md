@@ -2,7 +2,7 @@
 
 ## Status
 
-Candidate / offline validation required / Week 08 Live initially LIVE_NOT_RUN.
+ADOPT_OFFLINE / LIVE_NOT_RUN. Verified implementation SHA `16a0ec65c4027fa13c9f63e20a895de65f7d9b36`; CI run `42939439673` passed focused backend tests, 40/40 frontend tests, production build and formatting.
 
 ## Context
 
