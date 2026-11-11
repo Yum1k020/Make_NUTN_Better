@@ -1,0 +1,1121 @@
+{
+  "tested_at": "2026-11-11T15:20:12.559706+08:00",
+  "transport": "real HTTP / loopback",
+  "isolated_database": "backend/instance/agent-lab.sqlite3",
+  "live_model_calls": 0,
+  "planner_writes": 0,
+  "checks": [
+    {
+      "path": "/agent-lab",
+      "status": 200
+    },
+    {
+      "path": "/agent-lab/assets/app.js",
+      "status": 200
+    },
+    {
+      "path": "/agent-lab/assets/style.css",
+      "status": 200
+    },
+    {
+      "path": "/openapi.json",
+      "status": 200
+    },
+    {
+      "example": "normal",
+      "run": {
+        "commit": null,
+        "course": {
+          "course_id": "course-demo-001",
+          "credits": 3.0,
+          "name": "資料結構",
+          "version_basis": "sha256:39fcc5770e98456071632ac1e4b8b4013ac387b31a2419177c5a88ada23e8209"
+        },
+        "created_at": "2026-11-11T15:20:12.531643+08:00",
+        "engine_version": "study-agents-v1",
+        "events": [
+          {
+            "allowed_tools": [
+              "delegate_scheduler",
+              "finish"
+            ],
+            "at": "2026-11-11T15:20:12.531658+08:00",
+            "role": "assistant",
+            "seq": 1,
+            "task_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6:assistant",
+            "type": "role_started"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531671+08:00",
+            "role": "assistant",
+            "seq": 2,
+            "turn": 1,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531683+08:00",
+            "permission": "READ_ONLY",
+            "role": "assistant",
+            "seq": 3,
+            "tool": "delegate_scheduler",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531684+08:00",
+            "context": {
+              "course": {
+                "course_id": "course-demo-001",
+                "credits": 3.0,
+                "name": "資料結構",
+                "version_basis": "sha256:39fcc5770e98456071632ac1e4b8b4013ac387b31a2419177c5a88ada23e8209"
+              },
+              "permission": "READ_ONLY",
+              "plan": {
+                "allowed_windows": [
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 1
+                  },
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 2
+                  },
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 3
+                  },
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 4
+                  }
+                ],
+                "course_id": "course-demo-001",
+                "exam_date": "2026-11-20",
+                "session_minutes": 60,
+                "start_date": "2026-11-16",
+                "target_minutes": 360
+              },
+              "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+              "task_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6:assistant",
+              "timezone": "Asia/Taipei"
+            },
+            "role": "assistant",
+            "seq": 4,
+            "to": "scheduler",
+            "type": "delegation"
+          },
+          {
+            "allowed_tools": [
+              "get_availability",
+              "generate_schedule",
+              "finish"
+            ],
+            "at": "2026-11-11T15:20:12.531686+08:00",
+            "role": "scheduler",
+            "seq": 5,
+            "task_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6:scheduler",
+            "type": "role_started"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531694+08:00",
+            "role": "scheduler",
+            "seq": 6,
+            "turn": 1,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531700+08:00",
+            "permission": "READ_ONLY",
+            "role": "scheduler",
+            "seq": 7,
+            "tool": "get_availability",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531702+08:00",
+            "result": {
+              "check_complete": true,
+              "free_slots": [
+                {
+                  "duration_minutes": 120,
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00"
+                },
+                {
+                  "duration_minutes": 120,
+                  "ends_at": "2026-11-17T21:00:00+08:00",
+                  "starts_at": "2026-11-17T19:00:00+08:00"
+                },
+                {
+                  "duration_minutes": 120,
+                  "ends_at": "2026-11-18T21:00:00+08:00",
+                  "starts_at": "2026-11-18T19:00:00+08:00"
+                },
+                {
+                  "duration_minutes": 120,
+                  "ends_at": "2026-11-19T21:00:00+08:00",
+                  "starts_at": "2026-11-19T19:00:00+08:00"
+                }
+              ],
+              "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+              "source_ids": [
+                "AVAILABILITY-01"
+              ],
+              "total_free_minutes": 480,
+              "warnings": []
+            },
+            "role": "scheduler",
+            "seq": 8,
+            "tool": "get_availability",
+            "type": "tool_result"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531709+08:00",
+            "role": "scheduler",
+            "seq": 9,
+            "turn": 2,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531713+08:00",
+            "permission": "READ_ONLY",
+            "role": "scheduler",
+            "seq": 10,
+            "tool": "generate_schedule",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531716+08:00",
+            "result": {
+              "candidates": [
+                {
+                  "ends_at": "2026-11-16T20:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-17T20:00:00+08:00",
+                  "starts_at": "2026-11-17T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-17T21:00:00+08:00",
+                  "starts_at": "2026-11-17T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-18T20:00:00+08:00",
+                  "starts_at": "2026-11-18T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-18T21:00:00+08:00",
+                  "starts_at": "2026-11-18T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                }
+              ],
+              "generation_status": "complete",
+              "plan_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6",
+              "plan_version": 1,
+              "remaining_minutes": 0,
+              "scheduled_minutes": 360,
+              "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ],
+              "warnings": []
+            },
+            "role": "scheduler",
+            "seq": 11,
+            "tool": "generate_schedule",
+            "type": "tool_result"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531724+08:00",
+            "role": "scheduler",
+            "seq": 12,
+            "turn": 3,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531733+08:00",
+            "permission": "READ_ONLY",
+            "role": "scheduler",
+            "seq": 13,
+            "tool": "finish",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531738+08:00",
+            "result": {
+              "explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "remaining_minutes": 0,
+              "scheduled_minutes": 360,
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ]
+            },
+            "role": "scheduler",
+            "seq": 14,
+            "type": "role_completed"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531741+08:00",
+            "result": {
+              "candidates": [
+                {
+                  "ends_at": "2026-11-16T20:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-17T20:00:00+08:00",
+                  "starts_at": "2026-11-17T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-17T21:00:00+08:00",
+                  "starts_at": "2026-11-17T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-18T20:00:00+08:00",
+                  "starts_at": "2026-11-18T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-18T21:00:00+08:00",
+                  "starts_at": "2026-11-18T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                }
+              ],
+              "generation_status": "complete",
+              "plan_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6",
+              "plan_version": 1,
+              "remaining_minutes": 0,
+              "scheduled_minutes": 360,
+              "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ],
+              "specialist_explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "warnings": []
+            },
+            "role": "assistant",
+            "seq": 15,
+            "tool": "delegate_scheduler",
+            "type": "tool_result"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531748+08:00",
+            "role": "assistant",
+            "seq": 16,
+            "turn": 2,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531754+08:00",
+            "permission": "READ_ONLY",
+            "role": "assistant",
+            "seq": 17,
+            "tool": "finish",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.531757+08:00",
+            "result": {
+              "explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "remaining_minutes": 0,
+              "scheduled_minutes": 360,
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ]
+            },
+            "role": "assistant",
+            "seq": 18,
+            "type": "role_completed"
+          }
+        ],
+        "final_role": "assistant",
+        "ledger": [
+          {
+            "owner": "assistant",
+            "status": "completed",
+            "task_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6:assistant",
+            "version": 2
+          },
+          {
+            "owner": "scheduler",
+            "status": "completed",
+            "task_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6:scheduler",
+            "version": 2
+          }
+        ],
+        "messages": [
+          {
+            "from": "scheduler",
+            "result": {
+              "candidates": [
+                {
+                  "ends_at": "2026-11-16T20:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-17T20:00:00+08:00",
+                  "starts_at": "2026-11-17T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-17T21:00:00+08:00",
+                  "starts_at": "2026-11-17T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-18T20:00:00+08:00",
+                  "starts_at": "2026-11-18T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-18T21:00:00+08:00",
+                  "starts_at": "2026-11-18T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                }
+              ],
+              "generation_status": "complete",
+              "plan_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6",
+              "plan_version": 1,
+              "remaining_minutes": 0,
+              "scheduled_minutes": 360,
+              "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ],
+              "specialist_explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "warnings": []
+            },
+            "task_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6:assistant",
+            "to": "assistant",
+            "version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435"
+          }
+        ],
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 0,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "simulated_turns": 5,
+          "usage_complete": true
+        },
+        "narration": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+        "narration_verified": false,
+        "provider": {
+          "model": null,
+          "name": "offline"
+        },
+        "request": {
+          "architecture": "multi",
+          "plan": {
+            "allowed_windows": [
+              {
+                "end_time": "21:00",
+                "start_time": "19:00",
+                "weekday": 1
+              },
+              {
+                "end_time": "21:00",
+                "start_time": "19:00",
+                "weekday": 2
+              },
+              {
+                "end_time": "21:00",
+                "start_time": "19:00",
+                "weekday": 3
+              },
+              {
+                "end_time": "21:00",
+                "start_time": "19:00",
+                "weekday": 4
+              }
+            ],
+            "course_id": "course-demo-001",
+            "exam_date": "2026-11-20",
+            "session_minutes": 60,
+            "start_date": "2026-11-16",
+            "target_minutes": 360
+          },
+          "provider": "offline"
+        },
+        "result": {
+          "candidates": [
+            {
+              "ends_at": "2026-11-16T20:00:00+08:00",
+              "starts_at": "2026-11-16T19:00:00+08:00",
+              "title": "複習：資料結構"
+            },
+            {
+              "ends_at": "2026-11-16T21:00:00+08:00",
+              "starts_at": "2026-11-16T20:00:00+08:00",
+              "title": "複習：資料結構"
+            },
+            {
+              "ends_at": "2026-11-17T20:00:00+08:00",
+              "starts_at": "2026-11-17T19:00:00+08:00",
+              "title": "複習：資料結構"
+            },
+            {
+              "ends_at": "2026-11-17T21:00:00+08:00",
+              "starts_at": "2026-11-17T20:00:00+08:00",
+              "title": "複習：資料結構"
+            },
+            {
+              "ends_at": "2026-11-18T20:00:00+08:00",
+              "starts_at": "2026-11-18T19:00:00+08:00",
+              "title": "複習：資料結構"
+            },
+            {
+              "ends_at": "2026-11-18T21:00:00+08:00",
+              "starts_at": "2026-11-18T20:00:00+08:00",
+              "title": "複習：資料結構"
+            }
+          ],
+          "generation_status": "complete",
+          "plan_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6",
+          "plan_version": 1,
+          "remaining_minutes": 0,
+          "scheduled_minutes": 360,
+          "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+          "source_ids": [
+            "AVAILABILITY-01",
+            "SCHEDULE-01"
+          ],
+          "warnings": []
+        },
+        "run_id": "7ab846f2-38c5-4ab1-a866-2a60d547ece6",
+        "snapshot_version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435",
+        "sources": [
+          {
+            "data": {
+              "events": [],
+              "plan": {
+                "allowed_windows": [
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 1
+                  },
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 2
+                  },
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 3
+                  },
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 4
+                  }
+                ],
+                "course_id": "course-demo-001",
+                "exam_date": "2026-11-20",
+                "session_minutes": 60,
+                "start_date": "2026-11-16",
+                "target_minutes": 360
+              },
+              "warnings": []
+            },
+            "kind": "planner_snapshot",
+            "source_id": "AVAILABILITY-01",
+            "version": "sha256:b211e693b08c5f67c83e7166ab19076f9f8a514d50f953e89409766c03d9b435"
+          },
+          {
+            "kind": "planner_logic.generate",
+            "source_id": "SCHEDULE-01",
+            "version": "study-agents-v1"
+          }
+        ],
+        "status": "completed",
+        "verification": {
+          "checked_at": "2026-11-11T15:20:12.531975+08:00",
+          "checks": [
+            {
+              "detail": "角色已交付可驗證結果；partial 代表時數不足",
+              "id": "run_completed",
+              "passed": true
+            },
+            {
+              "detail": "目前課程、忙碌時段與原始快照一致",
+              "id": "snapshot_current",
+              "passed": true
+            },
+            {
+              "detail": "課表時間完整，沒有未解析的上課時段",
+              "id": "schedule_complete",
+              "passed": true
+            },
+            {
+              "detail": "時段均在考試日前、允許視窗內，且不與目前行程或彼此重疊",
+              "id": "time_constraints",
+              "passed": true
+            },
+            {
+              "detail": "時段加總等於已安排分鐘；已安排加尚缺等於目標",
+              "id": "minute_accounting",
+              "passed": true
+            },
+            {
+              "detail": "結果與 generate_schedule 工具紀錄一致，保留來源及快照版本",
+              "id": "source_grounding",
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "scope": "程式驗證時段、分鐘、來源及目前資料；不驗證模型自由文字的所有語意"
+        }
+      },
+      "current_verification": {
+        "checked_at": "2026-11-11T15:20:12.534141+08:00",
+        "checks": [
+          {
+            "detail": "角色已交付可驗證結果；partial 代表時數不足",
+            "id": "run_completed",
+            "passed": true
+          },
+          {
+            "detail": "目前課程、忙碌時段與原始快照一致",
+            "id": "snapshot_current",
+            "passed": true
+          },
+          {
+            "detail": "課表時間完整，沒有未解析的上課時段",
+            "id": "schedule_complete",
+            "passed": true
+          },
+          {
+            "detail": "時段均在考試日前、允許視窗內，且不與目前行程或彼此重疊",
+            "id": "time_constraints",
+            "passed": true
+          },
+          {
+            "detail": "時段加總等於已安排分鐘；已安排加尚缺等於目標",
+            "id": "minute_accounting",
+            "passed": true
+          },
+          {
+            "detail": "結果與 generate_schedule 工具紀錄一致，保留來源及快照版本",
+            "id": "source_grounding",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "scope": "程式驗證時段、分鐘、來源及目前資料；不驗證模型自由文字的所有語意"
+      }
+    },
+    {
+      "example": "shortage",
+      "run": {
+        "commit": null,
+        "course": {
+          "course_id": "course-demo-001",
+          "credits": 3.0,
+          "name": "資料結構",
+          "version_basis": "sha256:39fcc5770e98456071632ac1e4b8b4013ac387b31a2419177c5a88ada23e8209"
+        },
+        "created_at": "2026-11-11T15:20:12.542117+08:00",
+        "engine_version": "study-agents-v1",
+        "events": [
+          {
+            "allowed_tools": [
+              "delegate_scheduler",
+              "finish"
+            ],
+            "at": "2026-11-11T15:20:12.542128+08:00",
+            "role": "assistant",
+            "seq": 1,
+            "task_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d:assistant",
+            "type": "role_started"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542141+08:00",
+            "role": "assistant",
+            "seq": 2,
+            "turn": 1,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542162+08:00",
+            "permission": "READ_ONLY",
+            "role": "assistant",
+            "seq": 3,
+            "tool": "delegate_scheduler",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542181+08:00",
+            "context": {
+              "course": {
+                "course_id": "course-demo-001",
+                "credits": 3.0,
+                "name": "資料結構",
+                "version_basis": "sha256:39fcc5770e98456071632ac1e4b8b4013ac387b31a2419177c5a88ada23e8209"
+              },
+              "permission": "READ_ONLY",
+              "plan": {
+                "allowed_windows": [
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 1
+                  }
+                ],
+                "course_id": "course-demo-001",
+                "exam_date": "2026-11-20",
+                "session_minutes": 60,
+                "start_date": "2026-11-16",
+                "target_minutes": 360
+              },
+              "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+              "task_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d:assistant",
+              "timezone": "Asia/Taipei"
+            },
+            "role": "assistant",
+            "seq": 4,
+            "to": "scheduler",
+            "type": "delegation"
+          },
+          {
+            "allowed_tools": [
+              "get_availability",
+              "generate_schedule",
+              "finish"
+            ],
+            "at": "2026-11-11T15:20:12.542184+08:00",
+            "role": "scheduler",
+            "seq": 5,
+            "task_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d:scheduler",
+            "type": "role_started"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542191+08:00",
+            "role": "scheduler",
+            "seq": 6,
+            "turn": 1,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542196+08:00",
+            "permission": "READ_ONLY",
+            "role": "scheduler",
+            "seq": 7,
+            "tool": "get_availability",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542198+08:00",
+            "result": {
+              "check_complete": true,
+              "free_slots": [
+                {
+                  "duration_minutes": 120,
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00"
+                }
+              ],
+              "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+              "source_ids": [
+                "AVAILABILITY-01"
+              ],
+              "total_free_minutes": 120,
+              "warnings": []
+            },
+            "role": "scheduler",
+            "seq": 8,
+            "tool": "get_availability",
+            "type": "tool_result"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542203+08:00",
+            "role": "scheduler",
+            "seq": 9,
+            "turn": 2,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542207+08:00",
+            "permission": "READ_ONLY",
+            "role": "scheduler",
+            "seq": 10,
+            "tool": "generate_schedule",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542209+08:00",
+            "result": {
+              "candidates": [
+                {
+                  "ends_at": "2026-11-16T20:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                }
+              ],
+              "generation_status": "partial",
+              "plan_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d",
+              "plan_version": 1,
+              "remaining_minutes": 240,
+              "scheduled_minutes": 120,
+              "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ],
+              "warnings": []
+            },
+            "role": "scheduler",
+            "seq": 11,
+            "tool": "generate_schedule",
+            "type": "tool_result"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542216+08:00",
+            "role": "scheduler",
+            "seq": 12,
+            "turn": 3,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542225+08:00",
+            "permission": "READ_ONLY",
+            "role": "scheduler",
+            "seq": 13,
+            "tool": "finish",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542231+08:00",
+            "result": {
+              "explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "remaining_minutes": 240,
+              "scheduled_minutes": 120,
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ]
+            },
+            "role": "scheduler",
+            "seq": 14,
+            "type": "role_completed"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542234+08:00",
+            "result": {
+              "candidates": [
+                {
+                  "ends_at": "2026-11-16T20:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                }
+              ],
+              "generation_status": "partial",
+              "plan_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d",
+              "plan_version": 1,
+              "remaining_minutes": 240,
+              "scheduled_minutes": 120,
+              "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ],
+              "specialist_explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "warnings": []
+            },
+            "role": "assistant",
+            "seq": 15,
+            "tool": "delegate_scheduler",
+            "type": "tool_result"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542275+08:00",
+            "role": "assistant",
+            "seq": 16,
+            "turn": 2,
+            "type": "offline_step"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542308+08:00",
+            "permission": "READ_ONLY",
+            "role": "assistant",
+            "seq": 17,
+            "tool": "finish",
+            "type": "tool_validated"
+          },
+          {
+            "at": "2026-11-11T15:20:12.542319+08:00",
+            "result": {
+              "explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "remaining_minutes": 240,
+              "scheduled_minutes": 120,
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ]
+            },
+            "role": "assistant",
+            "seq": 18,
+            "type": "role_completed"
+          }
+        ],
+        "final_role": "assistant",
+        "ledger": [
+          {
+            "owner": "assistant",
+            "status": "completed",
+            "task_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d:assistant",
+            "version": 2
+          },
+          {
+            "owner": "scheduler",
+            "status": "completed",
+            "task_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d:scheduler",
+            "version": 2
+          }
+        ],
+        "messages": [
+          {
+            "from": "scheduler",
+            "result": {
+              "candidates": [
+                {
+                  "ends_at": "2026-11-16T20:00:00+08:00",
+                  "starts_at": "2026-11-16T19:00:00+08:00",
+                  "title": "複習：資料結構"
+                },
+                {
+                  "ends_at": "2026-11-16T21:00:00+08:00",
+                  "starts_at": "2026-11-16T20:00:00+08:00",
+                  "title": "複習：資料結構"
+                }
+              ],
+              "generation_status": "partial",
+              "plan_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d",
+              "plan_version": 1,
+              "remaining_minutes": 240,
+              "scheduled_minutes": 120,
+              "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+              "source_ids": [
+                "AVAILABILITY-01",
+                "SCHEDULE-01"
+              ],
+              "specialist_explanation": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+              "warnings": []
+            },
+            "task_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d:assistant",
+            "to": "assistant",
+            "version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c"
+          }
+        ],
+        "metrics": {
+          "input_tokens": 0,
+          "latency_ms": 0,
+          "model_calls": 0,
+          "output_tokens": 0,
+          "simulated_turns": 5,
+          "usage_complete": true
+        },
+        "narration": "離線固定流程：依後端工具結果整理，未執行模型推論。",
+        "narration_verified": false,
+        "provider": {
+          "model": null,
+          "name": "offline"
+        },
+        "request": {
+          "architecture": "multi",
+          "plan": {
+            "allowed_windows": [
+              {
+                "end_time": "21:00",
+                "start_time": "19:00",
+                "weekday": 1
+              }
+            ],
+            "course_id": "course-demo-001",
+            "exam_date": "2026-11-20",
+            "session_minutes": 60,
+            "start_date": "2026-11-16",
+            "target_minutes": 360
+          },
+          "provider": "offline"
+        },
+        "result": {
+          "candidates": [
+            {
+              "ends_at": "2026-11-16T20:00:00+08:00",
+              "starts_at": "2026-11-16T19:00:00+08:00",
+              "title": "複習：資料結構"
+            },
+            {
+              "ends_at": "2026-11-16T21:00:00+08:00",
+              "starts_at": "2026-11-16T20:00:00+08:00",
+              "title": "複習：資料結構"
+            }
+          ],
+          "generation_status": "partial",
+          "plan_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d",
+          "plan_version": 1,
+          "remaining_minutes": 240,
+          "scheduled_minutes": 120,
+          "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+          "source_ids": [
+            "AVAILABILITY-01",
+            "SCHEDULE-01"
+          ],
+          "warnings": []
+        },
+        "run_id": "aec6c83a-eced-41e2-a584-bb48bd3bb90d",
+        "snapshot_version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c",
+        "sources": [
+          {
+            "data": {
+              "events": [],
+              "plan": {
+                "allowed_windows": [
+                  {
+                    "end_time": "21:00",
+                    "start_time": "19:00",
+                    "weekday": 1
+                  }
+                ],
+                "course_id": "course-demo-001",
+                "exam_date": "2026-11-20",
+                "session_minutes": 60,
+                "start_date": "2026-11-16",
+                "target_minutes": 360
+              },
+              "warnings": []
+            },
+            "kind": "planner_snapshot",
+            "source_id": "AVAILABILITY-01",
+            "version": "sha256:ff84fcddb3e314d102d06f055687ea2f9f349227cfe7052c6a815d757e6cd36c"
+          },
+          {
+            "kind": "planner_logic.generate",
+            "source_id": "SCHEDULE-01",
+            "version": "study-agents-v1"
+          }
+        ],
+        "status": "partial",
+        "verification": {
+          "checked_at": "2026-11-11T15:20:12.546581+08:00",
+          "checks": [
+            {
+              "detail": "角色已交付可驗證結果；partial 代表時數不足",
+              "id": "run_completed",
+              "passed": true
+            },
+            {
+              "detail": "目前課程、忙碌時段與原始快照一致",
+              "id": "snapshot_current",
+              "passed": true
+            },
+            {
+              "detail": "課表時間完整，沒有未解析的上課時段",
+              "id": "schedule_complete",
+              "passed": true
+            },
+            {
+              "detail": "時段均在考試日前、允許視窗內，且不與目前行程或彼此重疊",
+              "id": "time_constraints",
+              "passed": true
+            },
+            {
+              "detail": "時段加總等於已安排分鐘；已安排加尚缺等於目標",
+              "id": "minute_accounting",
+              "passed": true
+            },
+            {
+              "detail": "結果與 generate_schedule 工具紀錄一致，保留來源及快照版本",
+              "id": "source_grounding",
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "scope": "程式驗證時段、分鐘、來源及目前資料；不驗證模型自由文字的所有語意"
+        }
+      },
+      "current_verification": {
+        "checked_at": "2026-11-11T15:20:12.553135+08:00",
+        "checks": [
+          {
+            "detail": "角色已交付可驗證結果；partial 代表時數不足",
+            "id": "run_completed",
+            "passed": true
+          },
+          {
+            "detail": "目前課程、忙碌時段與原始快照一致",
+            "id": "snapshot_current",
+            "passed": true
+          },
+          {
+            "detail": "課表時間完整，沒有未解析的上課時段",
+            "id": "schedule_complete",
+            "passed": true
+          },
+          {
+            "detail": "時段均在考試日前、允許視窗內，且不與目前行程或彼此重疊",
+            "id": "time_constraints",
+            "passed": true
+          },
+          {
+            "detail": "時段加總等於已安排分鐘；已安排加尚缺等於目標",
+            "id": "minute_accounting",
+            "passed": true
+          },
+          {
+            "detail": "結果與 generate_schedule 工具紀錄一致，保留來源及快照版本",
+            "id": "source_grounding",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "scope": "程式驗證時段、分鐘、來源及目前資料；不驗證模型自由文字的所有語意"
+      }
+    }
+  ]
+}

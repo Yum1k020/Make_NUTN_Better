@@ -71,6 +71,8 @@ def create_app(test_config=None):
     api.register_blueprint(catalog.routes)
     from . import planner
     planner.init_app(app, api)
+    from . import agent_api
+    agent_api.init_app(app, api)
 
     @app.get("/")
     def index():

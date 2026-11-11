@@ -1,0 +1,16 @@
+{
+  "provider": "offline",
+  "architecture": "multi",
+  "plan": {
+    "course_id": "course-demo-001",
+    "start_date": "2026-11-16",
+    "exam_date": "2026-11-20",
+    "target_minutes": 360,
+    "session_minutes": 60,
+    "allowed_windows": [
+      {"weekday": 1, "start_time": "19:00", "end_time": "21:00"},
+      {"weekday": 2, "start_time": "19:00", "end_time": "21:00"},
+      {"weekday": 3, "start_time": "19:00", "end_time": "21:00"}
+    ]
+  }
+}

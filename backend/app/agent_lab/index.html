@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>NUTN Agent Lab · 複習規劃驗證</title>
+    <link rel="stylesheet" href="/agent-lab/assets/style.css" />
+    <script defer src="/agent-lab/assets/app.js"></script>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/agent-lab"
+        ><span class="brand-mark">N</span> NUTN <span>Agent Lab</span></a
+      >
+      <nav>
+        <span class="local-dot"></span> 獨立驗證工作台
+        <a href="/docs" target="_blank" rel="noopener">API 文件 ↗</a>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <div class="eyebrow">STUDENT PLANNING / EXPERIMENT 08</div>
+          <h1>讓安排有依據，<br /><span>讓每一步都可查證。</span></h1>
+          <p>
+            學生助理委派排程專家，再帶回有來源的複習計畫。<br />從同一份需求，檢視結果、協作過程與驗證證據。
+          </p>
+        </div>
+        <aside class="flow-card">
+          <span class="small-label">這次如何完成</span>
+          <div class="flow">
+            <span>01<br /><b>學生助理</b></span
+            ><i>→</i><span>02<br /><b>排程專家</b></span
+            ><i>→</i><span>03<br /><b>結果查證</b></span>
+          </div>
+          <div class="flow-note">先產生候選 · 明確確認後才儲存</div>
+        </aside>
+      </section>
+      <div class="workspace">
+        <aside class="input-panel panel">
+          <div class="panel-title">
+            <span class="eyebrow">01 / REQUEST</span>
+            <h2>設定複習需求</h2>
+          </div>
+          <div class="presets">
+            <button type="button" data-example="normal">六小時範例</button
+            ><button type="button" data-example="shortage">時數不足範例</button>
+          </div>
+          <form id="request-form">
+            <label
+              >課程<select id="course" required>
+                <option value="">載入課程中…</option>
+              </select></label
+            >
+            <div class="field-row">
+              <label>開始日期<input id="start" type="date" required /></label
+              ><label>考試日期<input id="exam" type="date" required /></label>
+            </div>
+            <div class="field-row">
+              <label
+                >目標時數<input
+                  id="hours"
+                  type="number"
+                  min="0.25"
+                  max="240"
+                  step="0.25"
+                  value="6"
+                  required /></label
+              ><label
+                >每次分鐘<input
+                  id="session"
+                  type="number"
+                  min="15"
+                  max="240"
+                  step="1"
+                  value="60"
+                  required
+              /></label>
+            </div>
+            <fieldset>
+              <legend>每週可安排日</legend>
+              <div class="weekdays" id="weekdays"></div>
+            </fieldset>
+            <div class="field-row">
+              <label
+                >開始時間<input
+                  id="window-start"
+                  type="time"
+                  value="19:00"
+                  required /></label
+              ><label
+                >結束時間<input
+                  id="window-end"
+                  type="time"
+                  value="21:00"
+                  required
+              /></label>
+            </div>
+            <p class="hint">
+              時區
+              Asia/Taipei。僅安排在考試日前；自動避開後端課表、私人行程與已存複習。
+            </p>
+            <label
+              >執行方式<select id="provider">
+                <option value="offline">離線驗證 · 不呼叫模型</option>
+                <option value="openai">OpenAI · 真實模型執行</option>
+              </select></label
+            >
+            <p class="provider-note" id="provider-status">讀取模型設定…</p>
+            <label
+              >協作架構<select id="architecture">
+                <option value="multi">多 Agent · 助理 → 專家 → 助理</option>
+                <option value="single">單 Agent · 比較基線</option>
+              </select></label
+            >
+            <button class="primary" id="run-button" type="submit">
+              產生並驗證 <span>↗</span>
+            </button>
+          </form>
+          <div class="local-info">
+            本機測試使用者 · 課程目錄為測試資料<br />此工作台使用後端資料，與原前端示範畫面分開。
+          </div>
+        </aside>
+        <section class="results-area">
+          <div
+            id="message"
+            class="message"
+            role="status"
+            aria-live="polite"
+            hidden
+          ></div>
+          <div class="result-top">
+            <div>
+              <span class="eyebrow">02 / RESULT & EVIDENCE</span>
+              <h2>規劃結果</h2>
+            </div>
+            <span class="badge neutral" id="run-status">等待執行</span>
+          </div>
+          <div class="empty panel" id="empty">
+            <div class="empty-icon">↗</div>
+            <h3>你的第一份可查證計畫</h3>
+            <p>
+              選擇左側範例或輸入需求，產生候選複習時段。<br />完成後可逐步查看角色、工具與來源。
+            </p>
+            <div class="empty-pills">
+              <span>候選時段</span><span>角色軌跡</span><span>來源驗證</span>
+            </div>
+          </div>
+          <div id="result" hidden>
+            <div class="metrics">
+              <div><span>已安排</span><strong id="scheduled">—</strong></div>
+              <div><span>尚缺時數</span><strong id="remaining">—</strong></div>
+              <div><span>真實模型呼叫</span><strong id="calls">—</strong></div>
+              <div><span>總耗時</span><strong id="latency">—</strong></div>
+            </div>
+            <div class="run-meta" id="run-meta"></div>
+            <div class="tabs" role="tablist" aria-label="結果詳細資訊">
+              <button
+                role="tab"
+                aria-selected="true"
+                data-tab="plan"
+                id="tab-plan"
+                aria-controls="pane-plan"
+              >
+                複習安排</button
+              ><button
+                role="tab"
+                aria-selected="false"
+                data-tab="trace"
+                id="tab-trace"
+                aria-controls="pane-trace"
+              >
+                協作紀錄</button
+              ><button
+                role="tab"
+                aria-selected="false"
+                data-tab="verify"
+                id="tab-verify"
+                aria-controls="pane-verify"
+              >
+                驗證與來源</button
+              ><button
+                role="tab"
+                aria-selected="false"
+                data-tab="json"
+                id="tab-json"
+                aria-controls="pane-json"
+              >
+                API / JSON
+              </button>
+            </div>
+            <div class="panel result-body">
+              <section
+                id="pane-plan"
+                role="tabpanel"
+                aria-labelledby="tab-plan"
+              >
+                <div class="section-heading">
+                  <h3>候選複習時段</h3>
+                  <span id="session-count"></span>
+                </div>
+                <p class="hint" id="plan-note"></p>
+                <div id="sessions"></div>
+                <div class="narration">
+                  <span class="small-label"
+                    >助理說明 · 自由文字未作語意驗證</span
+                  >
+                  <p id="narration"></p>
+                </div>
+                <div class="save-row">
+                  <button id="commit" class="primary" type="button" disabled>
+                    確認儲存這份計畫</button
+                  ><span id="commit-status">尚未寫入行事曆</span>
+                </div>
+              </section>
+              <section
+                id="pane-trace"
+                role="tabpanel"
+                aria-labelledby="tab-trace"
+                hidden
+              >
+                <h3>誰做了什麼</h3>
+                <p class="hint">
+                  紀錄可觀察的呼叫與交付，不包含模型內部思考。離線步驟不是模型推論。
+                </p>
+                <div id="ledger" class="ledger"></div>
+                <div id="events" class="timeline"></div>
+              </section>
+              <section
+                id="pane-verify"
+                role="tabpanel"
+                aria-labelledby="tab-verify"
+                hidden
+              >
+                <div class="section-heading">
+                  <h3>對照現在的資料</h3>
+                  <button id="verify" class="secondary" type="button">
+                    重新查證 ↻
+                  </button>
+                </div>
+                <p class="hint" id="verified-at"></p>
+                <div id="checks"></div>
+                <h3 class="source-heading">工具事實與來源</h3>
+                <div id="sources"></div>
+              </section>
+              <section
+                id="pane-json"
+                role="tabpanel"
+                aria-labelledby="tab-json"
+                hidden
+              >
+                <div class="section-heading">
+                  <h3>可重用的 API</h3>
+                  <button id="export" class="secondary" type="button">
+                    下載證據 JSON ↓
+                  </button>
+                </div>
+                <p class="hint">
+                  POST /api/v1/agent/runs · application/json<br />201
+                  表示紀錄已建立，請再檢查 data.status 與 verification。
+                </p>
+                <details open>
+                  <summary>本次請求</summary>
+                  <pre id="request-json"></pre>
+                </details>
+                <details>
+                  <summary>完整結果與執行證據</summary>
+                  <pre id="result-json"></pre>
+                </details>
+              </section>
+            </div>
+          </div>
+          <section class="history panel">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">RECENT RUNS</span>
+                <h3>最近的執行</h3>
+              </div>
+              <button id="refresh" type="button" class="text-button">
+                重新整理 ↻
+              </button>
+            </div>
+            <p class="hint">
+              點選可重開完整證據。比較架構時，請保持需求、資料快照及模型相同。
+            </p>
+            <div id="history-list">尚無執行紀錄</div>
+          </section>
+        </section>
+      </div>
+      <footer>
+        MAKE NUTN BETTER
+        <span
+          >Study Agent API v1 · 獨立入口 /agent-lab ·
+          <a href="/openapi.json">OpenAPI JSON</a></span
+        >
+      </footer>
+    </main>
+  </body>
+</html>

@@ -59,6 +59,8 @@ def init_db():
         from .planner_graduation import init_graduation
         init_planner(db)
         init_graduation(db)
+        from .agent_api import init_db as init_agent_db
+        init_agent_db(db)
 
 
 def init_app(app):

@@ -117,3 +117,7 @@ Flask 與 API 測試網頁已建立於 `backend/`，啟動、測試、環境重�
 - [專案決策與變更紀錄](docs/decisions/CHANGE_DECISIONS.md)：逐項決定、新舊差異、影響分支與檔案，後續變更持續追加。
 - [115畢業規則整合說明](GRADUATION_PROGRESS_115.md) 與 [唯一整合JSON](nutn_csie_115_graduation_rules.json)。
 - 本次為文件與規則整合；後端仍使用mvp-v1快照，前端仍為示範資料。上方128學分驗收為早期示範，不是目前133學分整合規則。
+
+## 多 Agent 複習規劃 API 與獨立驗證介面
+
+執行 `./scripts/run-agent-lab.sh`，開啟 <http://127.0.0.1:5051/agent-lab>。新介面使用獨立展示資料庫，提供排程結果、角色紀錄、來源查證、JSON 匯出與確認儲存；原 React 前端保留。可重用的 `/api/v1/agent` 契約、OpenAI 設定與實測證據見 [Week 08 文件](docs/week08/README.md)。

@@ -99,3 +99,7 @@ PYTHON_BIN=/absolute/path/to/python3.12 ./scripts/setup-backend.sh
 
 根目錄的新 [整合規則](../nutn_csie_115_graduation_rules.json) 與 [決策紀錄](../docs/decisions/CHANGE_DECISIONS.md) 是目標規格。後端目前仍使用 `app/data/nutn_csie_115_graduation_rules_v1.json`，尚未實作共同認列範圍、證書推定狀態或可停用的60分政策。不要直接替換該快照；後續需完成程式與資料遷移。
 
+
+## 獨立 Agent API
+
+新增 `/api/v1/agent` 與 `/agent-lab`，支援離線驗證及 OpenAI Responses。可從根目錄執行 `./scripts/run-agent-lab.sh`，使用獨立展示資料庫及 5051 port；若沿用現有資料庫，先重跑 init-db 再使用原 run-backend 腳本。完整契約、來源查證、冪等儲存與驗證限制見 [Week 08 文件](../docs/week08/README.md)。
