@@ -9,6 +9,10 @@ from app.study_agent_api import (
     normalize_request,
 )
 from app.study_agent_contract import TOOL_NAME
+from app.study_agent_openai import (
+    EXPERT_CONTEXT_BASELINE,
+    EXPERT_CONTEXT_CANDIDATE,
+)
 
 
 def request_payload(**overrides):
@@ -52,6 +56,7 @@ class FakeProvider:
         self.mutate = mutate
         self.expert_error = expert_error
         self.expert_packets = []
+        self.expert_context_versions = []
 
     def choose_tool(self, data):
         args = self.mutate(dict(data)) if self.mutate else data
@@ -61,8 +66,9 @@ class FakeProvider:
             {"usage": {"input_tokens": 10}},
         )
 
-    def review_plan(self, packet):
+    def review_plan(self, packet, *, context_variant=EXPERT_CONTEXT_CANDIDATE):
         self.expert_packets.append(packet)
+        self.expert_context_versions.append(context_variant)
         if self.expert_error is not None:
             raise self.expert_error
         assessment = (
@@ -77,7 +83,10 @@ class FakeProvider:
                 "recommendations": [],
                 "citations": ["planner-rule", "study-load-review"],
             },
-            {"usage": {"input_tokens": 8, "output_tokens": 6}},
+            {
+                "usage": {"input_tokens": 8, "output_tokens": 6},
+                "contextVersion": context_variant,
+            },
         )
 
     def summarize(self, history, plan, expert_review=None):
@@ -114,7 +123,10 @@ def test_main_flow_records_function_call_validation_and_response():
     service = StudyAgentService(provider_factory=FakeProvider)
     result = service.run(request_payload())
     assert result["workflow"]["status"] == "completed"
-    assert result["workflow"]["runId"].startswith("week08-")
+    assert result["workflow"]["runId"].startswith("week09-")
+    assert result["workflow"]["version"] == EXPERT_CONTEXT_CANDIDATE
+    assert result["optimization"]["method"] == "few-shot prompting"
+    assert result["optimization"]["expectedAssessment"] == "balanced"
     assert [stage["id"] for stage in result["workflow"]["stages"]] == [
         "validate-request",
         "model-tool-call",
@@ -129,6 +141,7 @@ def test_main_flow_records_function_call_validation_and_response():
     assert result["comparison"]["agentCount"] == 2
     assert result["multiAgent"]["pattern"] == "bounded-specialist"
     assert result["multiAgent"]["roles"][1]["tools"] == []
+    assert result["multiAgent"]["expertReview"]["assessment"] == "balanced"
 
 
 def test_expert_receives_minimum_context_without_private_event_details():
@@ -149,8 +162,9 @@ def test_expert_receives_minimum_context_without_private_event_details():
 
 def test_invalid_expert_output_stops_before_final_coordinator_summary():
     class InvalidExpertProvider(FakeProvider):
-        def review_plan(self, packet):
+        def review_plan(self, packet, *, context_variant=EXPERT_CONTEXT_CANDIDATE):
             self.expert_packets.append(packet)
+            self.expert_context_versions.append(context_variant)
             return (
                 {
                     "assessment": "insufficient",
@@ -170,6 +184,82 @@ def test_invalid_expert_output_stops_before_final_coordinator_summary():
 
     assert getattr(error.value, "code", None) == "EXPERT_OUTPUT_INVALID"
     assert error.value.workflow["stopReason"] == "EXPERT_OUTPUT_INVALID"
+
+
+def test_week09_same_case_comparison_scores_baseline_and_candidate():
+    class ComparisonProvider(FakeProvider):
+        def review_plan(self, packet, *, context_variant=EXPERT_CONTEXT_CANDIDATE):
+            self.expert_packets.append(packet)
+            self.expert_context_versions.append(context_variant)
+            assessment = (
+                "concentrated"
+                if context_variant == EXPERT_CONTEXT_BASELINE
+                else "balanced"
+            )
+            return (
+                {
+                    "assessment": assessment,
+                    "summary": f"{context_variant} 測試輸出。",
+                    "recommendations": [],
+                    "citations": ["planner-rule", "study-load-review"],
+                },
+                {
+                    "usage": {"input_tokens": 8, "output_tokens": 6},
+                    "contextVersion": context_variant,
+                },
+            )
+
+    provider = ComparisonProvider()
+    service = StudyAgentService(provider_factory=lambda: provider)
+
+    result = service.compare_context(request_payload())
+
+    assert result["sameCase"] is True
+    assert result["expectedAssessment"] == "balanced"
+    assert provider.expert_context_versions == [
+        EXPERT_CONTEXT_BASELINE,
+        EXPERT_CONTEXT_CANDIDATE,
+    ]
+    assert provider.expert_packets[0] == provider.expert_packets[1]
+    assert result["versions"]["baseline"]["evaluation"]["pass"] is False
+    assert result["versions"]["candidate"]["evaluation"]["pass"] is True
+    assert "由未通過變為通過" in result["observation"]
+
+
+def test_week09_context_comparison_http_endpoint(tmp_path):
+    class ComparisonProvider(FakeProvider):
+        def review_plan(self, packet, *, context_variant=EXPERT_CONTEXT_CANDIDATE):
+            self.expert_packets.append(packet)
+            self.expert_context_versions.append(context_variant)
+            return (
+                {
+                    "assessment": "balanced",
+                    "summary": "固定案例輸出。",
+                    "recommendations": [],
+                    "citations": ["planner-rule"],
+                },
+                {"usage": {}, "contextVersion": context_variant},
+            )
+
+    provider = ComparisonProvider()
+    app = create_app(
+        {
+            "TESTING": True,
+            "DATABASE": str(tmp_path / "week09.sqlite3"),
+            "STUDY_AGENT_SERVICE_FACTORY": service_factory(provider),
+        }
+    )
+    response = app.test_client().post(
+        "/api/v1/study-agent/context-comparison",
+        json=request_payload(),
+    )
+    body = response.get_json()
+
+    assert response.status_code == 200
+    assert body["sameCase"] is True
+    assert body["versions"]["baseline"]["contextVersion"] == EXPERT_CONTEXT_BASELINE
+    assert body["versions"]["candidate"]["contextVersion"] == EXPERT_CONTEXT_CANDIDATE
+    assert body["sharedContext"]["sameDeterministicPlan"] is True
 
 
 def test_changed_model_arguments_stop_before_tool_execution():
@@ -205,7 +295,8 @@ def test_http_main_flow_and_invalid_boundary(tmp_path):
     body = response.get_json()
     assert body["agent"]["model"] == "openai-test"
     assert body["multiAgent"]["pattern"] == "bounded-specialist"
-    assert body["workflow"]["runId"].startswith("week08-")
+    assert body["workflow"]["runId"].startswith("week09-")
+    assert body["optimization"]["candidateContextVersion"] == EXPERT_CONTEXT_CANDIDATE
 
     invalid = client.post(
         "/api/v1/study-agent/run",
