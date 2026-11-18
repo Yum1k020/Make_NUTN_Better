@@ -1,5 +1,6 @@
 const DEFAULT_STUDY_AGENT_ENDPOINT = "/api/v1/study-agent/run";
-const DEFAULT_STUDY_CONTEXT_COMPARISON_ENDPOINT = "/api/v1/study-agent/context-comparison";
+const DEFAULT_STUDY_CONTEXT_COMPARISON_ENDPOINT =
+  "/api/v1/study-agent/context-comparison";
 
 export function getStudyAgentEndpoint(env = import.meta.env || {}) {
   return env.VITE_STUDY_AGENT_ENDPOINT?.trim() || DEFAULT_STUDY_AGENT_ENDPOINT;
@@ -87,4 +88,7 @@ export async function requestStudyContextComparison({
   return body;
 }
 
-export { DEFAULT_STUDY_AGENT_ENDPOINT, DEFAULT_STUDY_CONTEXT_COMPARISON_ENDPOINT };
+export {
+  DEFAULT_STUDY_AGENT_ENDPOINT,
+  DEFAULT_STUDY_CONTEXT_COMPARISON_ENDPOINT,
+};
