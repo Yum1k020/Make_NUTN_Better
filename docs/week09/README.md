@@ -162,3 +162,31 @@ GitHub CI 沒有私人 `OPENAI_API_KEY`，因此目前 Week 09 真實模型狀�
 - `week09/evidence/offline_comparison.json`（CI 產生）
 - `week09/evidence/LIVE_NOT_RUN.json`
 - `docs/week09/SHORT_RECORD.md`
+
+
+## GitHub Actions 實測
+
+Verified implementation SHA：`be1afdac6f61f6a1ec00c6890f75b0013bdba0b3`
+
+- Week 09 run：`44216456067`
+- Job：`134507385419`
+- Backend focused：15 passed
+- Offline comparison：`offline_all_pass=true`
+- Frontend：41 / 41 passed
+- Vite production build：PASS
+- Prettier：PASS
+- Artifact：`14388587457`
+
+同一 candidate 也重新跑 Week 08 regression workflow：
+
+- Run：`44216456091`
+- Job：`134507386238`
+- Result：PASS
+
+### 私有環境真實兩版比較
+
+```bash
+python -m week09.live_compare
+```
+
+需要 server-side `OPENAI_API_KEY`。Runner 不會把 key 寫入 evidence。
