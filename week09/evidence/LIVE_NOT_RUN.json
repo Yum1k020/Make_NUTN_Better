@@ -1,0 +1,10 @@
+{
+  "schema_version": "week09-live-v1",
+  "method": "few-shot prompting",
+  "target": "Study Load Review Expert context",
+  "baseline_context": "week08-instruction-v1",
+  "candidate_context": "week09-few-shot-v1",
+  "live_status": "LIVE_NOT_RUN",
+  "reason": "GitHub CI has no private OPENAI_API_KEY. The actual same-case baseline/candidate model comparison must be run in the private environment.",
+  "credentials_recorded": false
+}
