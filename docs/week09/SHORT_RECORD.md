@@ -13,6 +13,17 @@
 
 離線注入證據在 `week09/evidence/offline_comparison.json`；真實模型兩版結果需由私有環境操作 UI 產生，目前標示 `LIVE_NOT_RUN`。
 
+### 固定案例與可查閱的離線輸出
+
+資料結構考前複習共 6 小時，每次 2 小時。排程器安排 9/17 18:00–20:00、9/18 13:00–15:00、9/19 13:00–15:00，每天各 2 小時，固定評估規則預期為 `balanced`。
+
+| 比較項目 | 改前（Week 08） | 改後（Week 09） |
+| --- | --- | --- |
+| 離線測試注入的 assessment | `concentrated` | `balanced` |
+| 與固定評估規則一致 | 否 | 是 |
+
+[固定輸入、排程、兩版完整輸出與評估](../../week09/evidence/offline_comparison.json)
+
 ## 一到兩句觀察
 
 離線結果證明同一案例的兩版確實走同一 plan 與同一 evaluator，且 Candidate context 已接回原前後端入口；但離線注入不能證明模型品質真的提升。真實模型若 Baseline 與 Candidate 都通過，這一案例也只能說「沒有退步」，不足以宣稱整體優化成功。
