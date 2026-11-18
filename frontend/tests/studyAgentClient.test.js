@@ -149,7 +149,6 @@ test("week09 frontend calls same-case context comparison endpoint", async () => 
   assert.equal(result.versions.candidate.evaluation.pass, true);
 });
 
-
 test("week08 frontend still compares deterministic plan independent of key order", () => {
   const left = {
     sessions: [{ id: "s1", date: "2026-09-17", start: "18:00", end: "20:00" }],
