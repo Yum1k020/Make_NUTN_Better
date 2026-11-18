@@ -16,6 +16,8 @@ from .study_agent_contract import (
 
 OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses"
 DEFAULT_OPENAI_MODEL = "gpt-5-mini"
+EXPERT_CONTEXT_BASELINE = "week08-instruction-v1"
+EXPERT_CONTEXT_CANDIDATE = "week09-few-shot-v1"
 
 
 class OpenAIProviderError(StudyAgentProviderError):
@@ -106,6 +108,40 @@ def _expert_response_format() -> dict[str, Any]:
             "additionalProperties": False,
         },
     }
+
+def _expert_instructions(context_variant: str) -> str:
+    baseline = (
+        "你是獨立的 Study Load Review Expert。只檢查收到的去識別讀書計畫，"
+        "不得要求額外資料、不得呼叫工具、不得修改排程或資料庫。"
+        "assessment=insufficient 只用於 remainingMinutes>0；"
+        "若已排滿，再依時段是否過度集中選 balanced 或 concentrated。"
+        "recommendations 最多三項，必須是非寫入的建議。"
+        "citations 只能使用 planner-rule 或 study-load-review。"
+    )
+    if context_variant == EXPERT_CONTEXT_BASELINE:
+        return baseline
+    if context_variant != EXPERT_CONTEXT_CANDIDATE:
+        raise ValueError("Unknown expert context variant.")
+
+    few_shot = (
+        "\n\nWeek 09 few-shot 規則："
+        "先依 deterministic facts 判斷 assessment。"
+        "remainingMinutes>0 必須是 insufficient。"
+        "若 remainingMinutes=0，先按日期加總 sessions 分鐘；"
+        "任一日期占 scheduledMinutes 的三分之二以上時為 concentrated，"
+        "否則為 balanced。"
+        "\nFew-shot 1｜輸入：scheduledMinutes=240、remainingMinutes=120，"
+        "sessions 分散在兩天。輸出：assessment=insufficient；"
+        "summary 說明仍有 120 分鐘未排；recommendations 建議增加可用時段。"
+        "\nFew-shot 2｜輸入：scheduledMinutes=360、remainingMinutes=0，"
+        "三個 120 分鐘 sessions 全在同一天。輸出：assessment=concentrated；"
+        "summary 說明時數雖排滿但集中同一天；recommendations 建議若條件允許可分散。"
+        "\nFew-shot 3｜輸入：scheduledMinutes=360、remainingMinutes=0，"
+        "三個 120 分鐘 sessions 分布在三天。輸出：assessment=balanced；"
+        "summary 說明時數已排滿且分散。"
+    )
+    return baseline + few_shot
+
 
 def _openai_tool() -> dict[str, Any]:
     return {"type": "function", **tool_declaration(), "strict": True}
@@ -247,21 +283,16 @@ class OpenAIResponsesClient:
     def review_plan(
         self,
         packet: dict[str, Any],
+        *,
+        context_variant: str = EXPERT_CONTEXT_CANDIDATE,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
-        """Run a bounded second-agent review with no tool or write access."""
+        """Run the bounded expert with an explicit Week 09 context version."""
 
         payload = self._post(
-            "expert_review",
+            f"expert_review:{context_variant}",
             {
                 "model": self.config.model,
-                "instructions": (
-                    "你是獨立的 Study Load Review Expert。只檢查收到的去識別讀書計畫，"
-                    "不得要求額外資料、不得呼叫工具、不得修改排程或資料庫。"
-                    "assessment=insufficient 只用於 remainingMinutes>0；"
-                    "若已排滿，再依時段是否過度集中選 balanced 或 concentrated。"
-                    "recommendations 最多三項，必須是非寫入的建議。"
-                    "citations 只能使用 planner-rule 或 study-load-review。"
-                ),
+                "instructions": _expert_instructions(context_variant),
                 "input": [
                     {
                         "role": "user",
@@ -294,7 +325,8 @@ class OpenAIResponsesClient:
                 "OPENAI_INVALID_EXPERT_OUTPUT",
                 attempted=True,
             )
-        return result, self.calls[-1]
+        meta = {**self.calls[-1], "contextVersion": context_variant}
+        return result, meta
 
     def summarize(
         self,

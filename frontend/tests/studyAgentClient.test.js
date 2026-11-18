@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   requestStudyAgentPlan,
+  requestStudyContextComparison,
   studyPlansMatch,
 } from "../src/lib/studyAgentClient.js";
 
@@ -94,6 +95,58 @@ test("week08 frontend contract keeps backend multi-agent trace", async () => {
   assert.equal(result.multiAgent.roles[1].tools.length, 0);
   assert.equal(result.multiAgent.expertReview.assessment, "insufficient");
   assert.equal(result.comparison.agentCount, 2);
+});
+
+test("week09 frontend calls same-case context comparison endpoint", async () => {
+  const payload = {
+    startDate: "2026-09-17",
+    examDate: "2026-09-24",
+    hours: 6,
+    sessionHours: 2,
+    allowedPeriods: ["afternoon", "evening"],
+    courseName: "資料結構",
+    personalEvents: [],
+  };
+  let request;
+  const fetchImpl = async (url, options) => {
+    request = { url, options };
+    return jsonResponse({
+      runId: "week09-compare-test",
+      method: "few-shot prompting",
+      sameCase: true,
+      expectedAssessment: "balanced",
+      versions: {
+        baseline: {
+          contextVersion: "week08-instruction-v1",
+          output: { assessment: "concentrated" },
+          evaluation: {
+            pass: false,
+            expectedAssessment: "balanced",
+            actualAssessment: "concentrated",
+          },
+        },
+        candidate: {
+          contextVersion: "week09-few-shot-v1",
+          output: { assessment: "balanced" },
+          evaluation: {
+            pass: true,
+            expectedAssessment: "balanced",
+            actualAssessment: "balanced",
+          },
+        },
+      },
+      observation: "Candidate 在固定評估規則下由未通過變為通過。",
+    });
+  };
+
+  const result = await requestStudyContextComparison({ payload, fetchImpl });
+
+  assert.equal(request.url, "/api/v1/study-agent/context-comparison");
+  assert.equal(request.options.method, "POST");
+  assert.deepEqual(JSON.parse(request.options.body), payload);
+  assert.equal(result.sameCase, true);
+  assert.equal(result.versions.baseline.evaluation.pass, false);
+  assert.equal(result.versions.candidate.evaluation.pass, true);
 });
 
 test("week08 frontend still compares deterministic plan independent of key order", () => {

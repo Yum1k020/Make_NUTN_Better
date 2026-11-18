@@ -14,6 +14,7 @@ import {
 } from "../lib/planner.js";
 import {
   requestStudyAgentPlan,
+  requestStudyContextComparison,
   studyPlansMatch,
 } from "../lib/studyAgentClient.js";
 
@@ -156,6 +157,93 @@ function MultiAgentTrace({ multiAgent }) {
   );
 }
 
+function ContextOptimizationPanel({
+  result,
+  error,
+  isLoading,
+  onCompare,
+  canCompare,
+}) {
+  const baseline = result?.versions?.baseline;
+  const candidate = result?.versions?.candidate;
+  return (
+    <section className="panel agent-explanation-panel">
+      <div className="panel-heading">
+        <div>
+          <h2>Week 09 上下文優化</h2>
+          <p className="subtle">
+            同一案例比較 Week 08 指令版與 Week 09 few-shot 版。
+          </p>
+        </div>
+        <span className="agent-framework-badge">Few-shot</span>
+      </div>
+
+      <button
+        type="button"
+        className="primary-button full-width"
+        onClick={onCompare}
+        disabled={!canCompare || isLoading}
+      >
+        {isLoading ? "比較中" : "用同一案例比較 Baseline / Candidate"}
+      </button>
+
+      {!canCompare && (
+        <p className="helper-text">請先成功執行一次智慧學習主流程。</p>
+      )}
+      {error && (
+        <p className="notice notice-warning" role="alert">
+          <Icon name="alert" size={18} />
+          {error}
+        </p>
+      )}
+      {result && (
+        <div className="agent-result">
+          <div className="agent-result-tags">
+            <span>固定案例</span>
+            <span>固定模型</span>
+            <span>固定評估規則</span>
+          </div>
+          <p>
+            預期 assessment：<strong>{result.expectedAssessment}</strong>
+          </p>
+          <div className="workflow-trace">
+            <ol>
+              {[
+                ["Baseline", baseline],
+                ["Candidate", candidate],
+              ].map(([label, version]) => (
+                <li
+                  className={
+                    version?.evaluation?.pass ? "is-completed" : "is-rejected"
+                  }
+                  key={label}
+                >
+                  <span className="workflow-step-marker" aria-hidden="true" />
+                  <div>
+                    <strong>{label}</strong>
+                    <small>
+                      {version?.contextVersion}・輸出：
+                      {version?.evaluation?.actualAssessment || "無"}・
+                      {version?.evaluation?.pass ? "PASS" : "FAIL"}
+                    </small>
+                  </div>
+                  <span className="workflow-step-status">
+                    {version?.evaluation?.pass ? "通過" : "未通過"}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <p>{result.observation}</p>
+          <small>
+            method：{result.method}・run ID：{result.runId}
+          </small>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function AgentExplanationPanel({ result, error, isLoading, workflow }) {
   return (
     <section className="panel agent-explanation-panel">
@@ -236,6 +324,11 @@ export default function StudyPlanner({
   const [agentError, setAgentError] = useState("");
   const [agentWorkflow, setAgentWorkflow] = useState(null);
   const [agentLoading, setAgentLoading] = useState(false);
+  const [lastAgentRequest, setLastAgentRequest] = useState(null);
+  const [contextComparison, setContextComparison] = useState(null);
+  const [contextComparisonError, setContextComparisonError] = useState("");
+  const [contextComparisonLoading, setContextComparisonLoading] =
+    useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
   const [editError, setEditError] = useState("");
@@ -320,6 +413,9 @@ export default function StudyPlanner({
       ...request,
       weeklyClasses,
     });
+    setLastAgentRequest(request);
+    setContextComparison(null);
+    setContextComparisonError("");
 
     setPlanMessage(
       baseline.remainingMinutes > 0
@@ -363,6 +459,7 @@ export default function StudyPlanner({
         ...response.agent,
         comparison: response.comparison,
         multiAgent: response.multiAgent,
+        optimization: response.optimization,
       });
       setAgentWorkflow(response.workflow);
       setPlanMessage(
@@ -375,6 +472,30 @@ export default function StudyPlanner({
       setAgentWorkflow(error?.workflow || null);
     } finally {
       setAgentLoading(false);
+    }
+  }
+
+  async function compareContexts() {
+    if (!lastAgentRequest) return;
+    setContextComparison(null);
+    setContextComparisonError("");
+    setContextComparisonLoading(true);
+    try {
+      const response = await requestStudyContextComparison({
+        payload: lastAgentRequest,
+        signal:
+          typeof AbortSignal !== "undefined" &&
+          typeof AbortSignal.timeout === "function"
+            ? AbortSignal.timeout(45_000)
+            : undefined,
+      });
+      setContextComparison(response);
+    } catch (error) {
+      setContextComparisonError(
+        error instanceof Error ? error.message : String(error),
+      );
+    } finally {
+      setContextComparisonLoading(false);
     }
   }
 
@@ -537,8 +658,9 @@ export default function StudyPlanner({
               <p className="agent-disclosure">
                 按下後會將合成課名、日期、可用時段與私人行程送至 Flask
                 後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
-                Study Load Review Expert 檢查，最後由 Coordinator
-                整合回答。專家沒有 Tool 或資料庫寫入權限；API key 僅存在 Flask
+                Study Load Review Expert 檢查，最後由 Coordinator 整合回答。Week
+                09 主流程使用 few-shot context；下方可用同一案例比較 Baseline 與
+                Candidate。專家沒有 Tool 或資料庫寫入權限；API key 僅存在 Flask
                 後端。
               </p>
             </form>
@@ -756,6 +878,13 @@ export default function StudyPlanner({
             error={agentError}
             isLoading={agentLoading}
             workflow={agentWorkflow}
+          />
+          <ContextOptimizationPanel
+            result={contextComparison}
+            error={contextComparisonError}
+            isLoading={contextComparisonLoading}
+            onCompare={compareContexts}
+            canCompare={Boolean(lastAgentRequest && agentResult)}
           />
           <section className="panel study-summary-panel">
             <div className="panel-heading">

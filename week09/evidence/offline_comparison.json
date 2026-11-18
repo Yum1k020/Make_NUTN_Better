@@ -1,0 +1,125 @@
+{
+  "schema_version": "week09-offline-comparison-v1",
+  "method": "few-shot prompting",
+  "baseline_sha": "cf7376f97c6a85129c796580957df589512e2ef2",
+  "input": {
+    "startDate": "2026-09-17",
+    "examDate": "2026-09-24",
+    "hours": 6,
+    "sessionHours": 2,
+    "allowedPeriods": [
+      "afternoon",
+      "evening"
+    ],
+    "courseName": "資料結構",
+    "personalEvents": [
+      {
+        "id": "event-club",
+        "title": "社團會議",
+        "date": "2026-09-17",
+        "start": "17:00",
+        "end": "18:00",
+        "location": "活動中心 3 樓"
+      }
+    ]
+  },
+  "comparison": {
+    "runId": "week09-compare-61aaf331-a344-46ed-8820-fc16777dfb15",
+    "method": "few-shot prompting",
+    "target": "Study Load Review Expert context",
+    "sameCase": true,
+    "model": "offline-week09-stub",
+    "plan": {
+      "sessions": [
+        {
+          "date": "2026-09-17",
+          "start": "18:00",
+          "end": "20:00",
+          "id": "study-2026-09-17-18:00",
+          "title": "資料結構複習",
+          "location": "自行安排",
+          "tone": "amber"
+        },
+        {
+          "date": "2026-09-18",
+          "start": "13:00",
+          "end": "15:00",
+          "id": "study-2026-09-18-13:00",
+          "title": "資料結構複習",
+          "location": "自行安排",
+          "tone": "amber"
+        },
+        {
+          "date": "2026-09-19",
+          "start": "13:00",
+          "end": "15:00",
+          "id": "study-2026-09-19-13:00",
+          "title": "資料結構複習",
+          "location": "自行安排",
+          "tone": "amber"
+        }
+      ],
+      "scheduledMinutes": 360,
+      "remainingMinutes": 0
+    },
+    "expectedAssessment": "balanced",
+    "versions": {
+      "baseline": {
+        "contextVersion": "week08-instruction-v1",
+        "output": {
+          "assessment": "concentrated",
+          "summary": "week08-instruction-v1 的離線注入輸出。",
+          "recommendations": [],
+          "citations": [
+            "planner-rule",
+            "study-load-review"
+          ]
+        },
+        "evaluation": {
+          "pass": false,
+          "expectedAssessment": "balanced",
+          "actualAssessment": "concentrated",
+          "error": "專家 assessment=concentrated，但固定評估規則預期 balanced。"
+        },
+        "usage": {}
+      },
+      "candidate": {
+        "contextVersion": "week09-few-shot-v1",
+        "output": {
+          "assessment": "balanced",
+          "summary": "week09-few-shot-v1 的離線注入輸出。",
+          "recommendations": [],
+          "citations": [
+            "planner-rule",
+            "study-load-review"
+          ]
+        },
+        "evaluation": {
+          "pass": true,
+          "expectedAssessment": "balanced",
+          "actualAssessment": "balanced",
+          "error": null
+        },
+        "usage": {}
+      }
+    },
+    "observation": "Candidate 在固定評估規則下由未通過變為通過。",
+    "sharedContext": {
+      "personalEventDetailsSharedWithExpert": false,
+      "sameExpertPacket": true,
+      "sameDeterministicPlan": true
+    }
+  },
+  "checks": {
+    "same_expert_packet": true,
+    "same_deterministic_plan": true,
+    "baseline_version": true,
+    "candidate_version": true,
+    "baseline_failed_fixed_metric": true,
+    "candidate_passed_fixed_metric": true
+  },
+  "offline_all_pass": true,
+  "evidence_kind": "OFFLINE_INJECTED",
+  "live_status": "LIVE_NOT_RUN",
+  "note": "This proves the comparison plumbing and fixed evaluator only. It is not evidence that a real model improved."
+}
