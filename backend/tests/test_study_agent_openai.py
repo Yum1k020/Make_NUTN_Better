@@ -5,6 +5,8 @@ import pytest
 from app import create_app
 from app.study_agent_contract import TOOL_NAME
 from app.study_agent_openai import (
+    EXPERT_CONTEXT_BASELINE,
+    EXPERT_CONTEXT_CANDIDATE,
     OpenAIConfig,
     OpenAIProviderError,
     OpenAIResponsesClient,
@@ -147,6 +149,7 @@ def test_openai_two_turn_tool_loop_uses_server_key_and_strict_schemas():
     assert explanation["summary"] == "已完成安全排程。"
     assert selection_meta["usage"]["input_tokens"] == 20
     assert expert_meta["usage"]["output_tokens"] == 8
+    assert expert_meta["contextVersion"] == EXPERT_CONTEXT_CANDIDATE
     assert expert_review["assessment"] == "insufficient"
     assert summary_meta["usage"]["output_tokens"] == 10
     assert len(session.requests) == 3
@@ -165,11 +168,81 @@ def test_openai_two_turn_tool_loop_uses_server_key_and_strict_schemas():
         session.requests[1]["json"]["text"]["format"]["name"]
         == "study_load_expert_review"
     )
+    assert "Week 09 few-shot" in session.requests[1]["json"]["instructions"]
     assert session.requests[2]["json"]["input"][-2]["type"] == (
         "function_call_output"
     )
     assert session.requests[2]["json"]["text"]["format"]["strict"] is True
     assert "test-server-only-key" not in repr(client.config)
+
+
+def test_week09_baseline_and_candidate_use_different_context_with_same_packet():
+    expert_output = {
+        "output": [
+            {
+                "type": "message",
+                "content": [
+                    {
+                        "type": "output_text",
+                        "text": json.dumps(
+                            {
+                                "assessment": "balanced",
+                                "summary": "固定輸出。",
+                                "recommendations": [],
+                                "citations": ["planner-rule"],
+                            },
+                            ensure_ascii=False,
+                        ),
+                    }
+                ],
+            }
+        ],
+        "usage": {"input_tokens": 10, "output_tokens": 5},
+    }
+    session = FakeSession([expert_output, expert_output])
+    client = OpenAIResponsesClient(
+        config=OpenAIConfig(model="gpt-test"),
+        api_key="test-server-only-key",
+        session=session,
+    )
+    packet = {
+        "task": {
+            "courseName": "資料結構",
+            "startDate": "2026-09-17",
+            "examDate": "2026-09-24",
+            "hours": 6,
+            "sessionHours": 2,
+            "allowedPeriods": ["afternoon", "evening"],
+        },
+        "plan": {
+            "sessions": [
+                {"date": "2026-09-17", "start": "18:00", "end": "20:00"},
+                {"date": "2026-09-18", "start": "13:00", "end": "15:00"},
+                {"date": "2026-09-19", "start": "13:00", "end": "15:00"},
+            ],
+            "scheduledMinutes": 360,
+            "remainingMinutes": 0,
+        },
+        "deterministicChecks": {"issueCount": 0, "source": "planner-rule"},
+    }
+
+    _, baseline_meta = client.review_plan(
+        packet,
+        context_variant=EXPERT_CONTEXT_BASELINE,
+    )
+    _, candidate_meta = client.review_plan(
+        packet,
+        context_variant=EXPERT_CONTEXT_CANDIDATE,
+    )
+
+    baseline_request, candidate_request = session.requests
+    assert baseline_request["json"]["input"] == candidate_request["json"]["input"]
+    assert "Week 09 few-shot" not in baseline_request["json"]["instructions"]
+    assert "Week 09 few-shot" in candidate_request["json"]["instructions"]
+    assert baseline_meta["contextVersion"] == EXPERT_CONTEXT_BASELINE
+    assert candidate_meta["contextVersion"] == EXPERT_CONTEXT_CANDIDATE
+    assert "tools" not in baseline_request["json"]
+    assert "tools" not in candidate_request["json"]
 
 
 def test_openai_requires_server_side_key(monkeypatch):
