@@ -46,11 +46,9 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Show frontend Prettier diff
+      - name: Check frontend formatting
         working-directory: frontend
-        run: |
-          npm run format
-          git diff -- src/components/StudyPlanner.jsx src/lib/studyAgentClient.js tests/studyAgentClient.test.js
+        run: npm run format:check
 
       - name: Upload Week 09 offline evidence
         uses: actions/upload-artifact@v4
