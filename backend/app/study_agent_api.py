@@ -12,7 +12,12 @@ from flask import current_app, jsonify, request
 from flask_smorest import Blueprint
 
 from .study_agent_contract import TOOL_NAME, StudyAgentProviderError
-from .study_agent_openai import DEFAULT_OPENAI_MODEL, OpenAIResponsesClient
+from .study_agent_openai import (
+    DEFAULT_OPENAI_MODEL,
+    EXPERT_CONTEXT_BASELINE,
+    EXPERT_CONTEXT_CANDIDATE,
+    OpenAIResponsesClient,
+)
 
 
 routes = Blueprint(
@@ -413,12 +418,58 @@ def _validate_expert_review(
         raise ValueError("仍有未排分鐘時，專家必須標示 insufficient。")
     if plan["remainingMinutes"] == 0 and assessment == "insufficient":
         raise ValueError("已排滿時，專家不可標示 insufficient。")
+    expected = _expected_expert_assessment(plan)
+    if assessment != expected:
+        raise ValueError(
+            f"專家 assessment={assessment}，但固定評估規則預期 {expected}。"
+        )
 
     return {
         "assessment": assessment,
         "summary": summary.strip(),
         "recommendations": recommendations,
         "citations": citations,
+    }
+
+
+def _expected_expert_assessment(plan: dict[str, Any]) -> str:
+    remaining = int(plan.get("remainingMinutes", 0))
+    if remaining > 0:
+        return "insufficient"
+
+    sessions = plan.get("sessions", [])
+    scheduled = int(plan.get("scheduledMinutes", 0))
+    if scheduled <= 0 or not sessions:
+        return "balanced"
+
+    daily_minutes: dict[str, int] = {}
+    for session in sessions:
+        duration = _minutes(session["end"]) - _minutes(session["start"])
+        daily_minutes[session["date"]] = daily_minutes.get(session["date"], 0) + duration
+    max_daily = max(daily_minutes.values(), default=0)
+    return "concentrated" if max_daily * 3 >= scheduled * 2 else "balanced"
+
+
+def _evaluate_expert_output(
+    value: Any,
+    plan: dict[str, Any],
+) -> dict[str, Any]:
+    expected = _expected_expert_assessment(plan)
+    try:
+        validated = _validate_expert_review(value, plan)
+    except (ValueError, TypeError, KeyError) as error:
+        actual = value.get("assessment") if isinstance(value, dict) else None
+        return {
+            "pass": False,
+            "expectedAssessment": expected,
+            "actualAssessment": actual,
+            "error": str(error),
+        }
+    return {
+        "pass": True,
+        "expectedAssessment": expected,
+        "actualAssessment": validated["assessment"],
+        "error": None,
     }
 
 def _stage(identifier: str, label: str, status: str, **evidence: Any) -> dict[str, Any]:
@@ -437,9 +488,9 @@ class StudyAgentService:
 
     def run(self, payload: Any) -> dict[str, Any]:
         workflow = {
-            "name": "study-plan-multi-agent",
-            "version": "week08-route-a-v1",
-            "runId": f"week08-{uuid4()}",
+            "name": "study-plan-context-optimized-multi-agent",
+            "version": EXPERT_CONTEXT_CANDIDATE,
+            "runId": f"week09-{uuid4()}",
             "status": "running",
             "stopReason": None,
             "stages": [],
@@ -544,7 +595,10 @@ class StudyAgentService:
 
         expert_packet = _build_expert_packet(normalized, plan)
         try:
-            raw_expert_review, expert_meta = provider.review_plan(expert_packet)
+            raw_expert_review, expert_meta = provider.review_plan(
+                expert_packet,
+                context_variant=EXPERT_CONTEXT_CANDIDATE,
+            )
             expert_review = _validate_expert_review(raw_expert_review, plan)
         except StudyAgentProviderError as error:
             workflow["stages"].append(
@@ -598,6 +652,7 @@ class StudyAgentService:
                 ],
                 toolCalls=0,
                 assessment=expert_review["assessment"],
+                contextVersion=EXPERT_CONTEXT_CANDIDATE,
             )
         )
 
@@ -689,7 +744,74 @@ class StudyAgentService:
                 "sessionCount": len(plan["sessions"]),
                 "agentCount": 2,
             },
+            "optimization": {
+                "week": 9,
+                "method": "few-shot prompting",
+                "target": "Study Load Review Expert context",
+                "baselineContextVersion": EXPERT_CONTEXT_BASELINE,
+                "candidateContextVersion": EXPERT_CONTEXT_CANDIDATE,
+                "metric": "assessment exact match against deterministic rubric",
+                "expectedAssessment": _expected_expert_assessment(plan),
+            },
             "workflow": workflow,
+        }
+
+    def compare_context(self, payload: Any) -> dict[str, Any]:
+        try:
+            normalized = normalize_request(payload)
+        except (ValueError, TypeError) as error:
+            raise StudyAgentError(
+                "INVALID_REQUEST",
+                str(error),
+                422,
+            ) from error
+
+        plan = self.tool(normalized)
+        expert_packet = _build_expert_packet(normalized, plan)
+        provider = self.provider_factory()
+        versions = (
+            ("baseline", EXPERT_CONTEXT_BASELINE),
+            ("candidate", EXPERT_CONTEXT_CANDIDATE),
+        )
+        outputs: dict[str, Any] = {}
+        for label, context_version in versions:
+            raw_review, meta = provider.review_plan(
+                expert_packet,
+                context_variant=context_version,
+            )
+            outputs[label] = {
+                "contextVersion": context_version,
+                "output": raw_review,
+                "evaluation": _evaluate_expert_output(raw_review, plan),
+                "usage": meta.get("usage", {}),
+            }
+
+        baseline_pass = outputs["baseline"]["evaluation"]["pass"]
+        candidate_pass = outputs["candidate"]["evaluation"]["pass"]
+        if not baseline_pass and candidate_pass:
+            observation = "Candidate 在固定評估規則下由未通過變為通過。"
+        elif baseline_pass and candidate_pass:
+            observation = "兩版在這一案例都通過；單一案例尚不足以證明改善。"
+        elif baseline_pass and not candidate_pass:
+            observation = "Candidate 在這一案例退步，不應採用。"
+        else:
+            observation = "兩版都未通過，尚未觀察到改善。"
+
+        return {
+            "runId": f"week09-compare-{uuid4()}",
+            "method": "few-shot prompting",
+            "target": "Study Load Review Expert context",
+            "sameCase": True,
+            "model": provider.config.model,
+            "plan": plan,
+            "expectedAssessment": _expected_expert_assessment(plan),
+            "versions": outputs,
+            "observation": observation,
+            "sharedContext": {
+                "personalEventDetailsSharedWithExpert": False,
+                "sameExpertPacket": True,
+                "sameDeterministicPlan": True,
+            },
         }
 
 
@@ -729,6 +851,26 @@ def health():
         "modelConfigured": True,
         "liveChecked": False,
     }
+
+
+@routes.post("/context-comparison")
+def compare_study_agent_context():
+    try:
+        result = _service().compare_context(request.get_json(silent=True))
+        return jsonify(result), 200
+    except StudyAgentError as error:
+        return jsonify({"error": str(error), "code": error.code}), error.status
+    except StudyAgentProviderError as error:
+        status = 503 if not error.attempted else 502
+        return (
+            jsonify(
+                {
+                    "error": "模型供應者尚未可用，無法完成 Week 09 兩版比較。",
+                    "code": error.code,
+                }
+            ),
+            status,
+        )
 
 
 @routes.post("/run")
