@@ -208,27 +208,30 @@ function ContextOptimizationPanel({
           </p>
           <div className="workflow-trace">
             <ol>
-              {[["Baseline", baseline], ["Candidate", candidate]].map(
-                ([label, version]) => (
-                  <li
-                    className={version?.evaluation?.pass ? "is-completed" : "is-rejected"}
-                    key={label}
-                  >
-                    <span className="workflow-step-marker" aria-hidden="true" />
-                    <div>
-                      <strong>{label}</strong>
-                      <small>
-                        {version?.contextVersion}・輸出：
-                        {version?.evaluation?.actualAssessment || "無"}・
-                        {version?.evaluation?.pass ? "PASS" : "FAIL"}
-                      </small>
-                    </div>
-                    <span className="workflow-step-status">
-                      {version?.evaluation?.pass ? "通過" : "未通過"}
-                    </span>
-                  </li>
-                ),
-              )}
+              {[
+                ["Baseline", baseline],
+                ["Candidate", candidate],
+              ].map(([label, version]) => (
+                <li
+                  className={
+                    version?.evaluation?.pass ? "is-completed" : "is-rejected"
+                  }
+                  key={label}
+                >
+                  <span className="workflow-step-marker" aria-hidden="true" />
+                  <div>
+                    <strong>{label}</strong>
+                    <small>
+                      {version?.contextVersion}・輸出：
+                      {version?.evaluation?.actualAssessment || "無"}・
+                      {version?.evaluation?.pass ? "PASS" : "FAIL"}
+                    </small>
+                  </div>
+                  <span className="workflow-step-status">
+                    {version?.evaluation?.pass ? "通過" : "未通過"}
+                  </span>
+                </li>
+              ))}
             </ol>
           </div>
           <p>{result.observation}</p>
@@ -324,7 +327,8 @@ export default function StudyPlanner({
   const [lastAgentRequest, setLastAgentRequest] = useState(null);
   const [contextComparison, setContextComparison] = useState(null);
   const [contextComparisonError, setContextComparisonError] = useState("");
-  const [contextComparisonLoading, setContextComparisonLoading] = useState(false);
+  const [contextComparisonLoading, setContextComparisonLoading] =
+    useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
   const [editError, setEditError] = useState("");
@@ -654,10 +658,10 @@ export default function StudyPlanner({
               <p className="agent-disclosure">
                 按下後會將合成課名、日期、可用時段與私人行程送至 Flask
                 後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
-                Study Load Review Expert 檢查，最後由 Coordinator
-                整合回答。Week 09 主流程使用 few-shot context；下方可用同一案例比較
-                Baseline 與 Candidate。專家沒有 Tool 或資料庫寫入權限；API key 僅存在
-                Flask 後端。
+                Study Load Review Expert 檢查，最後由 Coordinator 整合回答。Week
+                09 主流程使用 few-shot context；下方可用同一案例比較 Baseline 與
+                Candidate。專家沒有 Tool 或資料庫寫入權限；API key 僅存在 Flask
+                後端。
               </p>
             </form>
           </section>
