@@ -48,7 +48,7 @@ EVENT_REQUIRED_FIELDS = {"id", "title", "date", "start", "end"}
 EVENT_ALLOWED_FIELDS = EVENT_REQUIRED_FIELDS | {"location"}
 SOURCE_IDS = {
     "planner-rule",
-    "weekly-classes-fixture",
+    "weekly-classes-backend-sqlite",
     "planner-backend-sqlite",
 }
 
@@ -511,6 +511,117 @@ def _stage(identifier: str, label: str, status: str, **evidence: Any) -> dict[st
     return {"id": identifier, "label": label, "status": status, "evidence": evidence}
 
 
+def _trajectory_actor(stage_id: str) -> str:
+    if stage_id in {"model-tool-call", "integrate-expert-review", "return-tool-result"}:
+        return "study-coordinator"
+    if stage_id == "delegate-study-load-expert":
+        return "study-load-reviewer"
+    if stage_id in {"validate-request", "validate-tool-args", "execute-tool"}:
+        return "trusted-program"
+    return "system"
+
+
+def _build_agent_data_package(
+    request_data: dict[str, Any],
+    plan: dict[str, Any],
+    workflow: dict[str, Any],
+    expert_review: dict[str, Any],
+) -> dict[str, Any]:
+    """Create a sanitized Week 10 task/environment/trajectory/verifier package."""
+
+    plan_issues = verify_plan(request_data, plan)
+    expected_assessment = _expected_expert_assessment(plan)
+    actual_assessment = expert_review.get("assessment")
+    verifier_pass = not plan_issues and actual_assessment == expected_assessment
+
+    weekly_classes = [
+        {
+            "id": item["id"],
+            "title": item["title"],
+            "weekday": item["weekday"],
+            "start": item["start"],
+            "end": item["end"],
+        }
+        for item in request_data["weeklyClasses"]
+    ]
+    personal_events = [
+        {
+            "id": item["id"],
+            "date": item["date"],
+            "start": item["start"],
+            "end": item["end"],
+        }
+        for item in request_data["personalEvents"]
+    ]
+    trajectory = [
+        {
+            "step": index + 1,
+            "actor": _trajectory_actor(stage["id"]),
+            "action": stage["id"],
+            "status": stage["status"],
+        }
+        for index, stage in enumerate(workflow["stages"])
+    ]
+
+    return {
+        "schemaVersion": "week10-agent-data-v1",
+        "packageId": f"week10-data-{workflow['runId']}",
+        "task": {
+            "courseName": request_data["courseName"],
+            "startDate": request_data["startDate"],
+            "examDate": request_data["examDate"],
+            "targetMinutes": round(float(request_data["hours"]) * 60),
+            "sessionMinutes": round(float(request_data["sessionHours"]) * 60),
+            "allowedPeriods": list(request_data["allowedPeriods"]),
+        },
+        "environment": {
+            "weeklyClasses": {
+                "source": "flask-sqlite:academic-timetable",
+                "count": len(weekly_classes),
+                "records": weekly_classes,
+            },
+            "personalEvents": {
+                "source": "flask-sqlite:personal-events",
+                "count": len(personal_events),
+                "records": personal_events,
+                "redactedFields": ["title", "location"],
+            },
+            "planner": {
+                "source": "deterministic:get_validated_study_plan",
+                "sessionCount": len(plan["sessions"]),
+            },
+        },
+        "trajectory": {
+            "source": "runtime-workflow-trace",
+            "stepCount": len(trajectory),
+            "steps": trajectory,
+            "modelWeightsChanged": False,
+        },
+        "verifier": {
+            "source": "deterministic:verify_plan+study-load-rubric",
+            "planIssueCount": len(plan_issues),
+            "planIssues": plan_issues,
+            "scheduledMinutes": plan["scheduledMinutes"],
+            "remainingMinutes": plan["remainingMinutes"],
+            "expectedAssessment": expected_assessment,
+            "actualAssessment": actual_assessment,
+            "passed": verifier_pass,
+        },
+        "provenance": {
+            "integratesClassmateData": True,
+            "sources": [
+                "Flask/SQLite academic timetable",
+                "Flask/SQLite personal events",
+                "deterministic study planner",
+                "Week 08 multi-agent trace",
+                "Week 09 expert context",
+            ],
+            "credentialsIncluded": False,
+            "personalEventTextIncluded": False,
+        },
+    }
+
+
 class StudyAgentService:
     def __init__(
         self,
@@ -789,6 +900,12 @@ class StudyAgentService:
                 "metric": "assessment exact match against deterministic rubric",
                 "expectedAssessment": _expected_expert_assessment(plan),
             },
+            "dataPackage": _build_agent_data_package(
+                normalized,
+                plan,
+                workflow,
+                expert_review,
+            ),
             "workflow": workflow,
         }
 

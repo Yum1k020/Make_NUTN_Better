@@ -22,6 +22,7 @@ def fixed_request() -> dict:
         "sessionHours": 2,
         "allowedPeriods": ["afternoon", "evening"],
         "courseName": "資料結構",
+        "weeklyClasses": [],
         "personalEvents": [
             {
                 "id": "event-club",

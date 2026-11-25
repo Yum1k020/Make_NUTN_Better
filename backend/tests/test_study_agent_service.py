@@ -108,7 +108,7 @@ class FakeProvider:
                 "warnings": [],
                 "citations": [
                     "planner-rule",
-                    "weekly-classes-fixture",
+                    "weekly-classes-backend-sqlite",
                     "planner-backend-sqlite",
                 ],
                 "refused": False,
@@ -156,6 +156,34 @@ def test_main_flow_records_function_call_validation_and_response():
     assert result["multiAgent"]["pattern"] == "bounded-specialist"
     assert result["multiAgent"]["roles"][1]["tools"] == []
     assert result["multiAgent"]["expertReview"]["assessment"] == "balanced"
+
+
+def test_week10_data_package_integrates_backend_inputs_and_redacts_private_text():
+    service = StudyAgentService(provider_factory=FakeProvider)
+    result = service.run(request_payload())
+
+    package = result["dataPackage"]
+    assert package["schemaVersion"] == "week10-agent-data-v1"
+    assert package["packageId"].startswith("week10-data-week09-")
+    assert package["environment"]["weeklyClasses"]["source"] == (
+        "flask-sqlite:academic-timetable"
+    )
+    assert package["environment"]["weeklyClasses"]["count"] == 1
+    assert package["environment"]["personalEvents"]["source"] == (
+        "flask-sqlite:personal-events"
+    )
+    assert package["environment"]["personalEvents"]["count"] == 2
+    serialized_events = repr(package["environment"]["personalEvents"]["records"])
+    assert "社團會議" not in serialized_events
+    assert "活動中心 3 樓" not in serialized_events
+    assert package["trajectory"]["stepCount"] == len(result["workflow"]["stages"])
+    assert package["verifier"]["planIssueCount"] == 0
+    assert package["verifier"]["expectedAssessment"] == "balanced"
+    assert package["verifier"]["actualAssessment"] == "balanced"
+    assert package["verifier"]["passed"] is True
+    assert package["provenance"]["integratesClassmateData"] is True
+    assert package["provenance"]["credentialsIncluded"] is False
+    assert package["provenance"]["personalEventTextIncluded"] is False
 
 
 def test_expert_receives_minimum_context_without_private_event_details():
@@ -326,6 +354,8 @@ def test_http_main_flow_and_invalid_boundary(tmp_path):
     assert body["multiAgent"]["pattern"] == "bounded-specialist"
     assert body["workflow"]["runId"].startswith("week09-")
     assert body["optimization"]["candidateContextVersion"] == EXPERT_CONTEXT_CANDIDATE
+    assert body["dataPackage"]["schemaVersion"] == "week10-agent-data-v1"
+    assert body["dataPackage"]["verifier"]["passed"] is True
 
     invalid = client.post(
         "/api/v1/study-agent/run",

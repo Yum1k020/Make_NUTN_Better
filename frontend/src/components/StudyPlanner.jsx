@@ -244,6 +244,78 @@ function ContextOptimizationPanel({
   );
 }
 
+function AgentDataPackagePanel({ dataPackage }) {
+  if (!dataPackage) return null;
+  const environment = dataPackage.environment || {};
+  const verifier = dataPackage.verifier || {};
+  const trajectory = dataPackage.trajectory || {};
+  return (
+    <div className="workflow-trace" aria-label="Week 10 Agent Data Package">
+      <div className="workflow-trace-heading">
+        <strong>Week 10 Agent Data Package</strong>
+        <span
+          className={`workflow-state is-${
+            verifier.passed ? "completed" : "rejected"
+          }`}
+        >
+          {verifier.passed ? "可核對" : "需檢查"}
+        </span>
+      </div>
+      <div className="agent-result">
+        <div className="agent-result-tags">
+          <span>Task</span>
+          <span>Environment</span>
+          <span>Trajectory</span>
+          <span>Verifier</span>
+        </div>
+        <p>
+          {dataPackage.task.courseName}・目標 {dataPackage.task.targetMinutes}{" "}
+          分鐘・ 每次 {dataPackage.task.sessionMinutes} 分鐘
+        </p>
+        <ul>
+          <li>
+            課表：{environment.weeklyClasses?.count ?? 0} 筆・
+            {environment.weeklyClasses?.source}
+          </li>
+          <li>
+            私人行程：{environment.personalEvents?.count ?? 0} 筆・只保留
+            ID／日期／時間
+          </li>
+          <li>
+            軌跡：{trajectory.stepCount ?? 0} 步・來源 {trajectory.source}
+          </li>
+          <li>
+            驗證：{verifier.planIssueCount ?? 0} 項排程問題・assessment{" "}
+            {verifier.actualAssessment} / {verifier.expectedAssessment}
+          </li>
+        </ul>
+        <div className="workflow-trace">
+          <ol>
+            {(trajectory.steps || []).map((step) => (
+              <li
+                className={`is-${
+                  step.status === "completed" ? "completed" : "rejected"
+                }`}
+                key={`${step.step}-${step.action}`}
+              >
+                <span className="workflow-step-marker" aria-hidden="true" />
+                <div>
+                  <strong>{step.action}</strong>
+                  <small>{step.actor}</small>
+                </div>
+                <span className="workflow-step-status">{step.status}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <small className="workflow-run-id">
+          package：{dataPackage.packageId}・不含 credentials／私人行程文字
+        </small>
+      </div>
+    </div>
+  );
+}
+
 function AgentExplanationPanel({ result, error, isLoading, workflow }) {
   return (
     <section className="panel agent-explanation-panel">
@@ -291,6 +363,7 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
             tool：{result.tool}・model：{result.model}・排程規則未交由 LLM
           </small>
           <MultiAgentTrace multiAgent={result.multiAgent} />
+          <AgentDataPackagePanel dataPackage={result.dataPackage} />
         </div>
       ) : (
         <p className="empty-state">
@@ -478,6 +551,7 @@ export default function StudyPlanner({
         comparison: response.comparison,
         multiAgent: response.multiAgent,
         optimization: response.optimization,
+        dataPackage: response.dataPackage,
       });
       setAgentWorkflow(response.workflow);
       setPlanMessage(
@@ -678,9 +752,10 @@ export default function StudyPlanner({
                 按下後會將課名、日期、可用時段、目前示範課表與私人行程送至 Flask
                 後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
                 Study Load Review Expert 檢查，最後由 Coordinator 整合回答。Week
-                09 主流程使用 few-shot context；下方可用同一案例比較 Baseline 與
-                Candidate。專家沒有 Tool 或資料庫寫入權限；API key 僅存在 Flask
-                後端。
+                09 主流程使用 few-shot context；Week 10
+                會把同學後端課表、私人行程、 Agent 軌跡與 verifier 整理成可核對
+                Data Package。專家沒有 Tool 或 資料庫寫入權限；API key 僅存在
+                Flask 後端。
               </p>
             </form>
           </section>

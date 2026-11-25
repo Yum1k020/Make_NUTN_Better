@@ -57,7 +57,7 @@ def _response_format() -> dict[str, Any]:
                         "type": "string",
                         "enum": [
                             "planner-rule",
-                            "weekly-classes-fixture",
+                            "weekly-classes-backend-sqlite",
                             "planner-backend-sqlite",
                         ],
                     },
