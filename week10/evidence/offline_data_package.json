@@ -1,0 +1,123 @@
+{
+  "schema_version": "week10-offline-v1",
+  "baseline_sha": "1b5124f9ab212f5efefc10dd4997cd65661aae6f",
+  "evidence_kind": "OFFLINE_INJECTED",
+  "task": {
+    "startDate": "2026-11-25",
+    "examDate": "2026-12-02",
+    "hours": 4,
+    "sessionHours": 2,
+    "allowedPeriods": ["afternoon", "evening"],
+    "courseName": "資料結構",
+    "weeklyClasses": [
+      {
+        "id": "backend-class-001",
+        "title": "計算機組織",
+        "weekday": 3,
+        "start": "14:00",
+        "end": "16:00",
+        "location": "J201"
+      }
+    ],
+    "personalEvents": [
+      {
+        "id": "backend-event-001",
+        "title": "不應進入資料包的私人文字",
+        "date": "2026-11-25",
+        "start": "18:00",
+        "end": "19:00",
+        "location": "不應進入資料包的私人地點"
+      }
+    ]
+  },
+  "dataPackage": {
+    "schemaVersion": "week10-agent-data-v1",
+    "packageId": "week10-data-week09-6560092c-2fba-4ca9-be4f-f852e6430cc6",
+    "task": {
+      "courseName": "資料結構",
+      "startDate": "2026-11-25",
+      "examDate": "2026-12-02",
+      "targetMinutes": 240,
+      "sessionMinutes": 120,
+      "allowedPeriods": ["afternoon", "evening"]
+    },
+    "environment": {
+      "weeklyClasses": {
+        "source": "flask-sqlite:academic-timetable",
+        "count": 1,
+        "records": [
+          {
+            "id": "backend-class-001",
+            "title": "計算機組織",
+            "weekday": 3,
+            "start": "14:00",
+            "end": "16:00"
+          }
+        ]
+      },
+      "personalEvents": {
+        "source": "flask-sqlite:personal-events",
+        "count": 1,
+        "records": [
+          {
+            "id": "backend-event-001",
+            "date": "2026-11-25",
+            "start": "18:00",
+            "end": "19:00"
+          }
+        ],
+        "redactedFields": ["title", "location"]
+      },
+      "planner": {
+        "source": "deterministic:get_validated_study_plan",
+        "sessionCount": 2
+      }
+    },
+    "trajectory": {
+      "source": "runtime-workflow-trace",
+      "stepCount": 7,
+      "steps": [
+        {"step": 1, "actor": "trusted-program", "action": "validate-request", "status": "completed"},
+        {"step": 2, "actor": "study-coordinator", "action": "model-tool-call", "status": "completed"},
+        {"step": 3, "actor": "trusted-program", "action": "validate-tool-args", "status": "completed"},
+        {"step": 4, "actor": "trusted-program", "action": "execute-tool", "status": "completed"},
+        {"step": 5, "actor": "study-load-reviewer", "action": "delegate-study-load-expert", "status": "completed"},
+        {"step": 6, "actor": "study-coordinator", "action": "integrate-expert-review", "status": "completed"},
+        {"step": 7, "actor": "study-coordinator", "action": "return-tool-result", "status": "completed"}
+      ],
+      "modelWeightsChanged": false
+    },
+    "verifier": {
+      "source": "deterministic:verify_plan+study-load-rubric",
+      "planIssueCount": 0,
+      "planIssues": [],
+      "scheduledMinutes": 240,
+      "remainingMinutes": 0,
+      "expectedAssessment": "balanced",
+      "actualAssessment": "balanced",
+      "passed": true
+    },
+    "provenance": {
+      "integratesClassmateData": true,
+      "sources": [
+        "Flask/SQLite academic timetable",
+        "Flask/SQLite personal events",
+        "deterministic study planner",
+        "Week 08 multi-agent trace",
+        "Week 09 expert context"
+      ],
+      "credentialsIncluded": false,
+      "personalEventTextIncluded": false
+    }
+  },
+  "checks": {
+    "backend_timetable_integrated": true,
+    "backend_personal_events_integrated": true,
+    "private_event_text_redacted": true,
+    "trajectory_recorded": true,
+    "verifier_passed": true,
+    "credentials_excluded": true,
+    "classmate_data_marked": true
+  },
+  "offline_all_pass": true
+}

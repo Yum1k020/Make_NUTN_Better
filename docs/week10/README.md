@@ -98,3 +98,24 @@ npm run format:check
 ```
 
 `week10.run_acceptance` 使用 `OFFLINE_INJECTED` provider，只驗證資料整合、redaction、trajectory 與 deterministic verifier；不冒充真實模型成功。
+
+
+## GitHub Actions 實測（Agent Data Package）
+
+Verified implementation SHA：`ebc1e604e56d5402c14e7d2a4023159539cf3e1d`
+
+- Week 10 run：`45530040876`
+- Week 10 job：`138922775744`
+- Focused backend：17 passed
+- Offline acceptance：`offline_all_pass=true`
+- Frontend：41 / 41 passed
+- Vite production build：PASS
+- Prettier：PASS
+- Artifact：`14984596003`
+
+同一 candidate 也重新跑既有回歸：
+
+- Week 09 run：`45530040897` → PASS
+- Week 08 run：`45530040946` → PASS
+
+實際 CI 產生的離線資料包已提交到 `week10/evidence/offline_data_package.json`。它標示為 `OFFLINE_INJECTED`，用來證明資料來源、redaction、trajectory 與 verifier 管線，不代表真實模型訓練資料品質已被驗證。
