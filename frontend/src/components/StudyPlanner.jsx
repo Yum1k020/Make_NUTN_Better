@@ -254,7 +254,9 @@ function AgentDataPackagePanel({ dataPackage }) {
       <div className="workflow-trace-heading">
         <strong>Week 10 Agent Data Package</strong>
         <span
-          className={`workflow-state is-${verifier.passed ? "completed" : "rejected"}`}
+          className={`workflow-state is-${
+            verifier.passed ? "completed" : "rejected"
+          }`}
         >
           {verifier.passed ? "可核對" : "需檢查"}
         </span>
@@ -291,7 +293,9 @@ function AgentDataPackagePanel({ dataPackage }) {
           <ol>
             {(trajectory.steps || []).map((step) => (
               <li
-                className={`is-${step.status === "completed" ? "completed" : "rejected"}`}
+                className={`is-${
+                  step.status === "completed" ? "completed" : "rejected"
+                }`}
                 key={`${step.step}-${step.action}`}
               >
                 <span className="workflow-step-marker" aria-hidden="true" />
