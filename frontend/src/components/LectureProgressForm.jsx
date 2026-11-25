@@ -6,9 +6,15 @@ const fields = [
   ["general_count", "general", "一般講座"],
 ];
 
-export default function LectureProgressForm({ lectureProgress, requirements, onSaved }) {
+export default function LectureProgressForm({
+  lectureProgress,
+  requirements,
+  onSaved,
+}) {
   const [counts, setCounts] = useState(() =>
-    Object.fromEntries(fields.map(([key]) => [key, lectureProgress[key] ?? ""])),
+    Object.fromEntries(
+      fields.map(([key]) => [key, lectureProgress[key] ?? ""]),
+    ),
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -17,9 +23,17 @@ export default function LectureProgressForm({ lectureProgress, requirements, onS
     event.preventDefault();
     if (saving) return;
     const values = Object.fromEntries(
-      fields.map(([key]) => [key, counts[key] === "" ? null : Number(counts[key])]),
+      fields.map(([key]) => [
+        key,
+        counts[key] === "" ? null : Number(counts[key]),
+      ]),
     );
-    if (Object.values(values).some((value) => value !== null && (!Number.isSafeInteger(value) || value < 0))) {
+    if (
+      Object.values(values).some(
+        (value) =>
+          value !== null && (!Number.isSafeInteger(value) || value < 0),
+      )
+    ) {
       setError("場次請輸入非負整數，尚待確認可留白。");
       return;
     }
@@ -60,14 +74,21 @@ export default function LectureProgressForm({ lectureProgress, requirements, onS
                 value={counts[key]}
                 disabled={saving}
                 onChange={(event) => {
-                  setCounts((current) => ({ ...current, [key]: event.target.value }));
+                  setCounts((current) => ({
+                    ...current,
+                    [key]: event.target.value,
+                  }));
                   setError("");
                 }}
               />
             </label>
           ))}
         </div>
-        {error && <p className="form-error" role="alert">{error}</p>}
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
         <div>
           <button type="submit" className="primary-button" disabled={saving}>
             {saving ? "儲存中" : "儲存場次"}

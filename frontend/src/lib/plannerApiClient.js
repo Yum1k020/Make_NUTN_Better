@@ -331,9 +331,7 @@ export async function saveTask(item, options = {}) {
       delete body.description;
     }
   }
-  return taskFromApi(
-    await requestData(path, { ...options, method, body }),
-  );
+  return taskFromApi(await requestData(path, { ...options, method, body }));
 }
 
 export async function deleteTask(item, options = {}) {

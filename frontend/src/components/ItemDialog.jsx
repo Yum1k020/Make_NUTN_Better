@@ -184,7 +184,9 @@ export default function ItemDialog({
           <label className="field">
             <span>
               {kind === "event" ? (
-                <>日期 <em>*</em></>
+                <>
+                  日期 <em>*</em>
+                </>
               ) : (
                 "截止日期（選填）"
               )}
@@ -322,11 +324,7 @@ export default function ItemDialog({
               type="submit"
               disabled={isSaving}
             >
-              {isSaving
-                ? "處理中"
-                : preview
-                  ? "確認行程與重排"
-                  : "儲存事項"}
+              {isSaving ? "處理中" : preview ? "確認行程與重排" : "儲存事項"}
             </button>
           </div>
         </form>

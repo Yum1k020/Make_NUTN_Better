@@ -167,7 +167,9 @@ export default function GraduationProgress({
         {rule?.lecture_requirements?.general?.minimum_count != null && (
           <div>
             <span>一般講座</span>
-            <strong>{rule.lecture_requirements.general.minimum_count} 場</strong>
+            <strong>
+              {rule.lecture_requirements.general.minimum_count} 場
+            </strong>
           </div>
         )}
         <div>
@@ -241,7 +243,9 @@ export default function GraduationProgress({
                 </small>
                 {rule?.planning_courses?.length > 0 &&
                   check.status !== "met" &&
-                  ["required_courses", "department_elective"].includes(check.check_id) && (
+                  ["required_courses", "department_elective"].includes(
+                    check.check_id,
+                  ) && (
                     <button
                       type="button"
                       className="text-link"
@@ -253,7 +257,9 @@ export default function GraduationProgress({
                         )
                       }
                     >
-                      {check.check_id === "required_courses" ? "瀏覽專業必修" : "瀏覽專業選修"}
+                      {check.check_id === "required_courses"
+                        ? "瀏覽專業必修"
+                        : "瀏覽專業選修"}
                     </button>
                   )}
               </article>

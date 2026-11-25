@@ -509,7 +509,9 @@ export default function StudyPlanner({
     };
     const baseline = planStudySessions(request);
     if (!baseline.sessions.length) {
-      setPlanMessage("目前沒有足夠空檔安排複習，請增加可用時段或縮短單次時長。");
+      setPlanMessage(
+        "目前沒有足夠空檔安排複習，請增加可用時段或縮短單次時長。",
+      );
       return;
     }
     setLastAgentRequest(useAgent ? request : null);
@@ -766,7 +768,9 @@ export default function StudyPlanner({
                 value="agent"
                 disabled={Boolean(planningMode)}
               >
-                {planningMode === "agent" ? "Agent 規劃中" : "用 Agent 產生學習計畫"}
+                {planningMode === "agent"
+                  ? "Agent 規劃中"
+                  : "用 Agent 產生學習計畫"}
               </button>
               <button
                 className="secondary-button full-width"

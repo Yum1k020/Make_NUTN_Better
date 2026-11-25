@@ -14,7 +14,13 @@ import { downloadCalendar } from "../lib/calendarExport.js";
 
 const ROW_HEIGHT = 38;
 
-function CalendarEvent({ event, startHour, onEditEvent, onOpenMap, onNavigate }) {
+function CalendarEvent({
+  event,
+  startHour,
+  onEditEvent,
+  onOpenMap,
+  onNavigate,
+}) {
   const top = ((minutes(event.start) - startHour * 60) / 60) * ROW_HEIGHT;
   const height =
     ((minutes(event.end) - minutes(event.start)) / 60) * ROW_HEIGHT;
@@ -82,10 +88,16 @@ function WeekCalendar({
   );
   const startHour = days
     .flat()
-    .reduce((hour, event) => Math.min(hour, Math.floor(minutes(event.start) / 60)), 8);
+    .reduce(
+      (hour, event) => Math.min(hour, Math.floor(minutes(event.start) / 60)),
+      8,
+    );
   const endHour = days
     .flat()
-    .reduce((hour, event) => Math.max(hour, Math.ceil(minutes(event.end) / 60)), 22);
+    .reduce(
+      (hour, event) => Math.max(hour, Math.ceil(minutes(event.end) / 60)),
+      22,
+    );
   const hours = Array.from(
     { length: endHour - startHour },
     (_, index) => startHour + index,
@@ -117,14 +129,14 @@ function WeekCalendar({
           key={date}
         >
           {days[index].map((event) => (
-              <CalendarEvent
-                key={event.id}
-                event={event}
-                startHour={startHour}
-                onEditEvent={onEditEvent}
-                onOpenMap={onOpenMap}
-                onNavigate={onNavigate}
-              />
+            <CalendarEvent
+              key={event.id}
+              event={event}
+              startHour={startHour}
+              onEditEvent={onEditEvent}
+              onOpenMap={onOpenMap}
+              onNavigate={onNavigate}
+            />
           ))}
         </div>
       ))}
@@ -228,7 +240,9 @@ function TaskList({ tasks, showDeadline = false, onToggleTask, onEditTask }) {
             <span className="custom-check">
               <Icon name="check" size={13} />
             </span>
-            <span className={task.completed ? "completed" : ""}>{task.title}</span>
+            <span className={task.completed ? "completed" : ""}>
+              {task.title}
+            </span>
           </label>
           <span className="task-time">
             {showDeadline && task.date ? `${formatDate(task.date)} ` : ""}
@@ -343,7 +357,12 @@ export default function Dashboard({
               className="secondary-button"
               type="button"
               onClick={() =>
-                downloadCalendar({ dates, weeklyClasses, personalEvents, studySessions })
+                downloadCalendar({
+                  dates,
+                  weeklyClasses,
+                  personalEvents,
+                  studySessions,
+                })
               }
             >
               匯出本週行事曆
@@ -355,7 +374,11 @@ export default function Dashboard({
                 <button
                   type="button"
                   className="icon-button"
-                  onClick={() => onSelectDate(addDays(selectedDate, calendarMode === "week" ? -7 : -1))}
+                  onClick={() =>
+                    onSelectDate(
+                      addDays(selectedDate, calendarMode === "week" ? -7 : -1),
+                    )
+                  }
                   aria-label={calendarMode === "week" ? "上一週" : "前一天"}
                 >
                   <Icon name="left" size={18} />
@@ -363,7 +386,11 @@ export default function Dashboard({
                 <button
                   type="button"
                   className="icon-button"
-                  onClick={() => onSelectDate(addDays(selectedDate, calendarMode === "week" ? 7 : 1))}
+                  onClick={() =>
+                    onSelectDate(
+                      addDays(selectedDate, calendarMode === "week" ? 7 : 1),
+                    )
+                  }
                   aria-label={calendarMode === "week" ? "下一週" : "後一天"}
                 >
                   <Icon name="right" size={18} />
@@ -457,7 +484,11 @@ export default function Dashboard({
               </span>
             </div>
             {todayTasks.length ? (
-              <TaskList tasks={todayTasks} onToggleTask={onToggleTask} onEditTask={onEditTask} />
+              <TaskList
+                tasks={todayTasks}
+                onToggleTask={onToggleTask}
+                onEditTask={onEditTask}
+              />
             ) : (
               <p className="empty-state">
                 這天沒有待辦事項。
@@ -486,7 +517,11 @@ export default function Dashboard({
               {undated.length > 0 && (
                 <details open>
                   <summary>未設定截止日（{undated.length}）</summary>
-                  <TaskList tasks={undated} onToggleTask={onToggleTask} onEditTask={onEditTask} />
+                  <TaskList
+                    tasks={undated}
+                    onToggleTask={onToggleTask}
+                    onEditTask={onEditTask}
+                  />
                 </details>
               )}
             </section>

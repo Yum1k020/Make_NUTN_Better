@@ -45,6 +45,8 @@ test("exports only the requested dates with Taipei times and escaped calendar te
   assert.ok(calendar.includes("LOCATION:教室\\,二樓\r\n"));
   assert.ok(calendar.includes("SUMMARY:個人\\;行程\\n下一行\r\n"));
   assert.ok(!calendar.includes("不在匯出範圍"));
-  assert.ok(calendar.split("\r\n").every((line) => Buffer.byteLength(line) <= 75));
+  assert.ok(
+    calendar.split("\r\n").every((line) => Buffer.byteLength(line) <= 75),
+  );
   assert.ok(calendar.replaceAll("\r\n ", "").includes("複習".repeat(30)));
 });

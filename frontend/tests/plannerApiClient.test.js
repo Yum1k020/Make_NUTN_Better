@@ -149,12 +149,18 @@ test("task loading follows server pagination so older tasks remain accessible", 
   const fetchImpl = async (url) => {
     if (url.endsWith("offset=0")) {
       return response({
-        data: Array.from({ length: 200 }, (_, index) => ({ ...task, task_id: `task-${index}` })),
+        data: Array.from({ length: 200 }, (_, index) => ({
+          ...task,
+          task_id: `task-${index}`,
+        })),
         meta: { total: 201 },
       });
     }
     if (url.endsWith("offset=200")) {
-      return response({ data: [{ ...task, task_id: "task-200" }], meta: { total: 201 } });
+      return response({
+        data: [{ ...task, task_id: "task-200" }],
+        meta: { total: 201 },
+      });
     }
     if (url.endsWith("/study-schedule")) return response({ data: null });
     return response({ data: [] });
@@ -176,43 +182,68 @@ test("editing an undated task preserves notes, priority, completion and linked r
     });
     return response({ data: { task_id: "task-1", title: "更新後的待辦" } });
   };
-  await saveTask({
-    backendId: "task-1",
-    title: "更新後的待辦",
-    course: "資料結構",
-    date: "",
-    time: "15:00",
-    previous: { course: "資料結構", description: "已存在的筆記" },
-  }, { fetchImpl });
+  await saveTask(
+    {
+      backendId: "task-1",
+      title: "更新後的待辦",
+      course: "資料結構",
+      date: "",
+      time: "15:00",
+      previous: { course: "資料結構", description: "已存在的筆記" },
+    },
+    { fetchImpl },
+  );
 });
 
 test("event adjustment preview and confirmation share the event and update the saved schedule", async () => {
-  const item = { backendId: "event-1", title: "聚會", date: "2026-11-29", start: "18:00", end: "19:00" };
+  const item = {
+    backendId: "event-1",
+    title: "聚會",
+    date: "2026-11-29",
+    start: "18:00",
+    end: "19:00",
+  };
   const requests = [];
   const fetchImpl = async (url, init) => {
     const body = JSON.parse(init.body);
     requests.push({ url, body });
-    if (url.endsWith("/preview")) return response({ data: { preview_token: "snapshot", moves: [] } });
-    return response({ data: {
-      event: { event_id: "event-1", ...body.event },
-      study_schedule: {
-        plan: { plan_id: "plan-1" },
-        plan_version: 4,
-        sessions: [{
-          session_id: "session-1",
-          plan_id: "plan-1",
-          title: "移動後的複習",
-          starts_at: "2026-11-29T19:00:00+08:00",
-          ends_at: "2026-11-29T20:00:00+08:00",
-        }],
+    if (url.endsWith("/preview"))
+      return response({ data: { preview_token: "snapshot", moves: [] } });
+    return response({
+      data: {
+        event: { event_id: "event-1", ...body.event },
+        study_schedule: {
+          plan: { plan_id: "plan-1" },
+          plan_version: 4,
+          sessions: [
+            {
+              session_id: "session-1",
+              plan_id: "plan-1",
+              title: "移動後的複習",
+              starts_at: "2026-11-29T19:00:00+08:00",
+              ends_at: "2026-11-29T20:00:00+08:00",
+            },
+          ],
+        },
       },
-    } });
+    });
   };
   const preview = await previewEventAdjustment(item, { fetchImpl });
-  const saved = await confirmEventAdjustment(item, preview.preview_token, { fetchImpl });
-  assert.equal(requests[0].url, "/api/v1/personal-events/study-adjustment/preview");
-  assert.equal(requests[1].url, "/api/v1/personal-events/study-adjustment/commit");
-  assert.deepEqual(requests[1].body, { ...requests[0].body, preview_token: "snapshot" });
+  const saved = await confirmEventAdjustment(item, preview.preview_token, {
+    fetchImpl,
+  });
+  assert.equal(
+    requests[0].url,
+    "/api/v1/personal-events/study-adjustment/preview",
+  );
+  assert.equal(
+    requests[1].url,
+    "/api/v1/personal-events/study-adjustment/commit",
+  );
+  assert.deepEqual(requests[1].body, {
+    ...requests[0].body,
+    preview_token: "snapshot",
+  });
   assert.equal(saved.event.backendId, "event-1");
   assert.equal(saved.sessions[0].start, "19:00");
   assert.equal(saved.sessions[0].planVersion, 4);

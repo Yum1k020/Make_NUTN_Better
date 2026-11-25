@@ -139,7 +139,9 @@ export default function App() {
             if (
               error.code === "SCHEDULE_CONFLICT" &&
               error.conflicts?.length &&
-              error.conflicts.every((item) => item.source_type === "study_session")
+              error.conflicts.every(
+                (item) => item.source_type === "study_session",
+              )
             ) {
               return await previewEventAdjustment(draft);
             }

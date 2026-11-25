@@ -26,7 +26,10 @@ function foldLine(line) {
 }
 
 function utcTimestamp(date) {
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+  return date
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}Z$/, "Z");
 }
 
 export function buildCalendar(
@@ -41,7 +44,12 @@ export function buildCalendar(
   ];
   const timestamp = utcTimestamp(now);
   for (const date of dates) {
-    const events = eventsOnDate(date, weeklyClasses, personalEvents, studySessions);
+    const events = eventsOnDate(
+      date,
+      weeklyClasses,
+      personalEvents,
+      studySessions,
+    );
     for (const event of events) {
       const start = new Date(`${date}T${event.start}:00+08:00`);
       const end = new Date(`${date}T${event.end}:00+08:00`);
@@ -62,7 +70,9 @@ export function buildCalendar(
 }
 
 export function downloadCalendar(data) {
-  const file = new Blob([buildCalendar(data)], { type: "text/calendar;charset=utf-8" });
+  const file = new Blob([buildCalendar(data)], {
+    type: "text/calendar;charset=utf-8",
+  });
   const url = URL.createObjectURL(file);
   const link = document.createElement("a");
   link.href = url;
