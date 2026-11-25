@@ -332,6 +332,26 @@ p {
   padding: 0 13px;
   border-bottom: 1px solid var(--line);
 }
+.calendar-jump {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.calendar-jump input {
+  min-height: 36px;
+  padding: 6px 8px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+.calendar-jump .secondary-button {
+  min-height: 36px;
+  padding: 6px 10px;
+}
 .calendar-range {
   display: flex;
   align-items: center;
@@ -497,6 +517,21 @@ button.calendar-event:hover {
 .task-panel,
 .deadlines-panel {
   overflow: hidden;
+}
+.backlog-panel details {
+  padding: 0 16px 12px;
+}
+.backlog-panel summary {
+  cursor: pointer;
+  padding-bottom: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.backlog-panel .task-list {
+  padding: 0;
+}
+.backlog-panel .task-time {
+  white-space: nowrap;
 }
 .task-list,
 .deadline-list {
@@ -2161,6 +2196,26 @@ button.calendar-event:hover {
   align-items: flex-start;
   margin-bottom: 15px;
 }
+.study-adjustment-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--blue-soft);
+  font-size: 13px;
+}
+.study-adjustment-preview p {
+  margin: 5px 0 9px;
+}
+.study-adjustment-preview ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+}
+.study-adjustment-preview li span {
+  display: block;
+  color: var(--muted);
+}
 .dialog-heading h2 {
   font-size: 20px;
   margin: 0;
@@ -2528,6 +2583,10 @@ button.calendar-event:hover {
   }
   .calendar-toolbar {
     display: none;
+  }
+  .calendar-jump {
+    padding: 0 0 10px;
+    border-bottom: 0;
   }
   .calendar-panel {
     border: 0;

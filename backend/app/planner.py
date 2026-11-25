@@ -11,6 +11,7 @@ from flask_smorest import Blueprint
 from marshmallow import ValidationError
 
 from .db import DEMO_USER_ID, get_db
+from .planner_adjustment import apply_adjustment, preview_adjustment
 from .planner_core import (
     RESOURCE, DATETIME, ID, NULL_ID, TITLE, Problem, at, body, boolean, checked, choice,
     day, dump, integer, interval, invalid, moment, owned, query, records, reference,
@@ -47,7 +48,7 @@ def endpoint(func):
                 response = current_app.response_class(status=204)
             db = g.get("planner_transaction")
             if db is not None:
-                if request.method not in ("GET",) and request.path not in ("/api/v1/schedule/conflicts", "/api/v1/schedule/availability", "/api/v1/planned-courses/check") and not request.path.endswith("/generate"):
+                if request.method not in ("GET",) and request.path not in ("/api/v1/schedule/conflicts", "/api/v1/schedule/availability", "/api/v1/planned-courses/check", "/api/v1/personal-events/study-adjustment/preview") and not request.path.endswith("/generate"):
                     stage("L5")
                 db.commit()
                 stage("L6")
@@ -247,18 +248,56 @@ def study_plan_input(value):
     )
 
 
+def current_study_schedule(db):
+    plans = records(db, "study-plans")
+    if not plans:
+        return None
+    plan = max(plans, key=lambda item: (item["updated_at"], item["plan_id"]))
+    return {"plan": output(db, "study-plans", plan), **session_result(db, plan)}
+
+
+def event_adjustment_input(confirm=False):
+    _, fields, required, defaults = RESOURCE["personal-events"]
+
+    def event_input(value):
+        return shape(value, fields, required, defaults)
+
+    keys = {"event": (event_input, False), "event_id": NULL_ID}
+    expected = ["event"]
+    if confirm:
+        keys["preview_token"] = (lambda value: string(value, 64), False)
+        expected.append("preview_token")
+    query({})
+    return shape(body(), keys, expected)
+
+
+@routes.post("/personal-events/study-adjustment/preview")
+@endpoint
+def event_adjustment_preview():
+    payload = event_adjustment_input()
+    db = transaction()
+    old = owned(db, "personal-events", payload["event_id"]) if payload.get("event_id") else None
+    preview, _, _ = preview_adjustment(db, payload["event"], old)
+    return {"data": preview}
+
+
+@routes.post("/personal-events/study-adjustment/commit")
+@endpoint
+def event_adjustment_commit():
+    payload = event_adjustment_input(confirm=True)
+    db = transaction(True)
+    old = owned(db, "personal-events", payload["event_id"]) if payload.get("event_id") else None
+    saved = apply_adjustment(db, payload["event"], old, payload["preview_token"])
+    return {"data": {"event": saved, "study_schedule": current_study_schedule(db)}}
+
+
 @routes.route("/study-schedule", methods=["GET", "PUT"])
 @endpoint
 def study_schedule_route():
     """Load or transactionally replace the single schedule used by the React UI."""
     query({})
     if request.method == "GET":
-        db = transaction()
-        plans = records(db, "study-plans")
-        if not plans:
-            return {"data": None}
-        plan = max(plans, key=lambda item: (item["updated_at"], item["plan_id"]))
-        return {"data": {"plan": output(db, "study-plans", plan), **session_result(db, plan)}}
+        return {"data": current_study_schedule(transaction())}
 
     payload = shape(
         body(),

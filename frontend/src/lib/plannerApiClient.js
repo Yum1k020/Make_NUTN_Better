@@ -51,7 +51,7 @@ export class PlannerApiError extends Error {
   }
 }
 
-async function requestData(
+async function requestPayload(
   path,
   { method = "GET", body, fetchImpl = globalThis.fetch } = {},
 ) {
@@ -78,7 +78,26 @@ async function requestData(
       },
     );
   }
-  return payload.data;
+  return payload;
+}
+
+async function requestData(path, options) {
+  return (await requestPayload(path, options))?.data ?? null;
+}
+
+async function loadTasks(fetchImpl) {
+  const limit = 200;
+  const tasks = [];
+  for (let offset = 0; ; offset += limit) {
+    const page = await requestPayload(
+      `/tasks?limit=${limit}&offset=${offset}`,
+      { fetchImpl },
+    );
+    tasks.push(...page.data);
+    if (page.data.length < limit || tasks.length >= page.meta?.total) {
+      return tasks;
+    }
+  }
 }
 
 function uiCourseDescription(course) {
@@ -97,6 +116,7 @@ function taskFromApi(task) {
     backendId: task.task_id,
     title: task.title,
     course: courseFromTask(task),
+    description: task.description || "",
     date: task.due_date || "",
     time: task.due_time || "",
     type: taskTypesFromApi[task.type] || "待辦",
@@ -179,7 +199,7 @@ export async function loadPlannerState({
 } = {}) {
   const [tasks, personalEvents, studySchedule, plannedCourses] =
     await Promise.all([
-      requestData("/tasks?limit=200", { fetchImpl }),
+      loadTasks(fetchImpl),
       requestData("/personal-events", { fetchImpl }),
       requestData("/study-schedule", { fetchImpl }),
       requestData(`/planned-courses?target_semester_id=${targetSemesterId}`, {
@@ -227,7 +247,7 @@ function weeklyClassesFromApi(entries, courses, enrollments) {
       id: `${entry.entry_id}:${index}`,
       courseId: entry.course_id,
       title: names.get(entry.course_id) || "未命名課程",
-      weekday: meeting.weekday,
+      weekday: meeting.weekday % 7,
       start: meeting.start_time,
       end: meeting.end_time,
       location: meeting.location || "地點待確認",
@@ -297,8 +317,22 @@ export async function loadApplicationState({
 export async function saveTask(item, options = {}) {
   const path = item.backendId ? `/tasks/${item.backendId}` : "/tasks";
   const method = item.backendId ? "PATCH" : "POST";
+  const body = taskToApi(item);
+  if (item.backendId) {
+    delete body.completed;
+    delete body.priority;
+    delete body.event_id;
+    if (item.previous?.course === item.course) delete body.course_id;
+    if (
+      item.previous?.course === item.course ||
+      (item.previous?.description &&
+        !item.previous.description.startsWith("ui-course:"))
+    ) {
+      delete body.description;
+    }
+  }
   return taskFromApi(
-    await requestData(path, { ...options, method, body: taskToApi(item) }),
+    await requestData(path, { ...options, method, body }),
   );
 }
 
@@ -327,6 +361,30 @@ export async function savePersonalEvent(item, options = {}) {
   return eventFromApi(
     await requestData(path, { ...options, method, body: eventToApi(item) }),
   );
+}
+
+export function previewEventAdjustment(item, options = {}) {
+  return requestData("/personal-events/study-adjustment/preview", {
+    ...options,
+    method: "POST",
+    body: { event: eventToApi(item), event_id: item.backendId ?? null },
+  });
+}
+
+export async function confirmEventAdjustment(item, previewToken, options = {}) {
+  const result = await requestData("/personal-events/study-adjustment/commit", {
+    ...options,
+    method: "POST",
+    body: {
+      event: eventToApi(item),
+      event_id: item.backendId ?? null,
+      preview_token: previewToken,
+    },
+  });
+  return {
+    event: eventFromApi(result.event),
+    ...scheduleFromApi(result.study_schedule),
+  };
 }
 
 export async function deletePersonalEvent(item, options = {}) {

@@ -10,12 +10,12 @@ import {
   weekStart,
 } from "../lib/planner.js";
 import { DEMO_DATE } from "../data/demo.js";
+import { downloadCalendar } from "../lib/calendarExport.js";
 
-const HOURS = Array.from({ length: 14 }, (_, index) => index + 8);
 const ROW_HEIGHT = 38;
 
-function CalendarEvent({ event, onEditEvent, onOpenMap, onNavigate }) {
-  const top = ((minutes(event.start) - 8 * 60) / 60) * ROW_HEIGHT;
+function CalendarEvent({ event, startHour, onEditEvent, onOpenMap, onNavigate }) {
+  const top = ((minutes(event.start) - startHour * 60) / 60) * ROW_HEIGHT;
   const height =
     ((minutes(event.end) - minutes(event.start)) / 60) * ROW_HEIGHT;
   const content = (
@@ -77,6 +77,19 @@ function WeekCalendar({
   onOpenMap,
   onNavigate,
 }) {
+  const days = dates.map((date) =>
+    eventsOnDate(date, weeklyClasses, personalEvents, studySessions),
+  );
+  const startHour = days
+    .flat()
+    .reduce((hour, event) => Math.min(hour, Math.floor(minutes(event.start) / 60)), 8);
+  const endHour = days
+    .flat()
+    .reduce((hour, event) => Math.max(hour, Math.ceil(minutes(event.end) / 60)), 22);
+  const hours = Array.from(
+    { length: endHour - startHour },
+    (_, index) => startHour + index,
+  );
   return (
     <div className="week-calendar" aria-label="本週課表與行程">
       <div className="calendar-corner" />
@@ -94,26 +107,25 @@ function WeekCalendar({
         </button>
       ))}
       <div className="calendar-hours">
-        {HOURS.map((hour) => (
+        {hours.map((hour) => (
           <span key={hour}>{String(hour).padStart(2, "0")}:00</span>
         ))}
       </div>
-      {dates.map((date) => (
+      {dates.map((date, index) => (
         <div
           className={`calendar-day ${date === selectedDate ? "selected" : ""}`}
           key={date}
         >
-          {eventsOnDate(date, weeklyClasses, personalEvents, studySessions).map(
-            (event) => (
+          {days[index].map((event) => (
               <CalendarEvent
                 key={event.id}
                 event={event}
+                startHour={startHour}
                 onEditEvent={onEditEvent}
                 onOpenMap={onOpenMap}
                 onNavigate={onNavigate}
               />
-            ),
-          )}
+          ))}
         </div>
       ))}
     </div>
@@ -202,6 +214,40 @@ function DayTimeline({
   );
 }
 
+function TaskList({ tasks, showDeadline = false, onToggleTask, onEditTask }) {
+  return (
+    <ul className="task-list">
+      {tasks.map((task) => (
+        <li key={task.id}>
+          <label className="task-check">
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => onToggleTask(task.id)}
+            />
+            <span className="custom-check">
+              <Icon name="check" size={13} />
+            </span>
+            <span className={task.completed ? "completed" : ""}>{task.title}</span>
+          </label>
+          <span className="task-time">
+            {showDeadline && task.date ? `${formatDate(task.date)} ` : ""}
+            {task.time}
+          </span>
+          <button
+            type="button"
+            className="row-edit"
+            onClick={() => onEditTask(task)}
+            aria-label={`編輯${task.title}`}
+          >
+            <Icon name="edit" size={16} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function Dashboard({
   selectedDate,
   onSelectDate,
@@ -225,11 +271,15 @@ export default function Dashboard({
     .filter((item) => item.date === selectedDate)
     .sort((a, b) => a.time.localeCompare(b.time));
   const completedCount = todayTasks.filter((item) => item.completed).length;
+  const overdue = tasks.filter(
+    (item) => !item.completed && item.date && item.date < DEMO_DATE,
+  );
+  const undated = tasks.filter((item) => !item.completed && !item.date);
   const upcoming = tasks
     .filter(
       (item) =>
         !item.completed &&
-        item.date >= selectedDate &&
+        item.date >= DEMO_DATE &&
         ["作業", "報告", "考試"].includes(item.type),
     )
     .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))
@@ -249,7 +299,6 @@ export default function Dashboard({
             </span>
             <span className="demo-badge">示範資料</span>
           </div>
-          <p>把每一個今天，累積成更好的未來。</p>
         </div>
         <div className="header-actions">
           <button
@@ -272,28 +321,58 @@ export default function Dashboard({
       </header>
       <div className="dashboard-grid">
         <section className="panel calendar-panel">
+          <div className="calendar-jump">
+            <label>
+              <span className="sr-only">跳到指定日期</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(event) => {
+                  if (event.target.value) onSelectDate(event.target.value);
+                }}
+              />
+            </label>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => onSelectDate(DEMO_DATE)}
+            >
+              回到今天
+            </button>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() =>
+                downloadCalendar({ dates, weeklyClasses, personalEvents, studySessions })
+              }
+            >
+              匯出本週行事曆
+            </button>
+          </div>
           <div className="calendar-toolbar">
             <div className="calendar-range">
               <div className="calendar-arrows">
                 <button
                   type="button"
                   className="icon-button"
-                  onClick={() => onSelectDate(addDays(selectedDate, -7))}
-                  aria-label="上一週"
+                  onClick={() => onSelectDate(addDays(selectedDate, calendarMode === "week" ? -7 : -1))}
+                  aria-label={calendarMode === "week" ? "上一週" : "前一天"}
                 >
                   <Icon name="left" size={18} />
                 </button>
                 <button
                   type="button"
                   className="icon-button"
-                  onClick={() => onSelectDate(addDays(selectedDate, 7))}
-                  aria-label="下一週"
+                  onClick={() => onSelectDate(addDays(selectedDate, calendarMode === "week" ? 7 : 1))}
+                  aria-label={calendarMode === "week" ? "下一週" : "後一天"}
                 >
                   <Icon name="right" size={18} />
                 </button>
               </div>
               <strong>
-                {formatDate(start, true)} – {formatDate(dates[6])}
+                {calendarMode === "week"
+                  ? `${formatDate(start, true)} – ${formatDate(dates[6])}`
+                  : formatDate(selectedDate, true)}
               </strong>
             </div>
             <div className="segment" role="group" aria-label="課表檢視模式">
@@ -378,34 +457,7 @@ export default function Dashboard({
               </span>
             </div>
             {todayTasks.length ? (
-              <ul className="task-list">
-                {todayTasks.map((task) => (
-                  <li key={task.id}>
-                    <label className="task-check">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => onToggleTask(task.id)}
-                      />
-                      <span className="custom-check">
-                        <Icon name="check" size={13} />
-                      </span>
-                      <span className={task.completed ? "completed" : ""}>
-                        {task.title}
-                      </span>
-                    </label>
-                    <span className="task-time">{task.time}</span>
-                    <button
-                      type="button"
-                      className="row-edit"
-                      onClick={() => onEditTask(task)}
-                      aria-label={`編輯${task.title}`}
-                    >
-                      <Icon name="edit" size={16} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <TaskList tasks={todayTasks} onToggleTask={onToggleTask} onEditTask={onEditTask} />
             ) : (
               <p className="empty-state">
                 這天沒有待辦事項。
@@ -415,6 +467,30 @@ export default function Dashboard({
               </p>
             )}
           </section>
+          {(overdue.length > 0 || undated.length > 0) && (
+            <section className="panel task-panel backlog-panel">
+              <div className="panel-heading">
+                <h2>尚待處理</h2>
+              </div>
+              {overdue.length > 0 && (
+                <details open>
+                  <summary>已逾期（{overdue.length}）</summary>
+                  <TaskList
+                    tasks={overdue}
+                    showDeadline
+                    onToggleTask={onToggleTask}
+                    onEditTask={onEditTask}
+                  />
+                </details>
+              )}
+              {undated.length > 0 && (
+                <details open>
+                  <summary>未設定截止日（{undated.length}）</summary>
+                  <TaskList tasks={undated} onToggleTask={onToggleTask} onEditTask={onEditTask} />
+                </details>
+              )}
+            </section>
+          )}
           <section className="panel deadlines-panel">
             <div className="panel-heading">
               <h2>近期截止事項</h2>

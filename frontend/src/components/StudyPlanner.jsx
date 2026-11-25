@@ -397,7 +397,7 @@ export default function StudyPlanner({
   const [agentResult, setAgentResult] = useState(null);
   const [agentError, setAgentError] = useState("");
   const [agentWorkflow, setAgentWorkflow] = useState(null);
-  const [agentLoading, setAgentLoading] = useState(false);
+  const [planningMode, setPlanningMode] = useState(null);
   const [lastAgentRequest, setLastAgentRequest] = useState(null);
   const [contextComparison, setContextComparison] = useState(null);
   const [contextComparisonError, setContextComparisonError] = useState("");
@@ -462,6 +462,8 @@ export default function StudyPlanner({
 
   async function generatePlan(event) {
     event.preventDefault();
+    if (planningMode) return;
+    const useAgent = event.nativeEvent.submitter?.value !== "rules";
     if (
       !Number.isFinite(Number(hours)) ||
       Number(hours) <= 0 ||
@@ -474,6 +476,8 @@ export default function StudyPlanner({
       return setPlanMessage("後端目前沒有可用課程，請先設定 115 示範身分。");
     if (examDate <= DEMO_DATE)
       return setPlanMessage(`考試日期需晚於今天 ${formatDate(DEMO_DATE)}。`);
+    if (examDate > addDays(DEMO_DATE, 60))
+      return setPlanMessage("考試日期最遠可選在 60 天後。");
     const planningWeeklyClasses = weeklyClasses.map(
       ({ id, title, weekday, start, end, location }) => ({
         id,
@@ -504,19 +508,19 @@ export default function StudyPlanner({
       ),
     };
     const baseline = planStudySessions(request);
-    setLastAgentRequest(request);
+    if (!baseline.sessions.length) {
+      setPlanMessage("目前沒有足夠空檔安排複習，請增加可用時段或縮短單次時長。");
+      return;
+    }
+    setLastAgentRequest(useAgent ? request : null);
     setContextComparison(null);
     setContextComparisonError("");
 
-    setPlanMessage(
-      baseline.remainingMinutes > 0
-        ? `可安排時間不足，尚缺 ${baseline.remainingMinutes / 60} 小時。請增加可安排時段或調整複習需求。`
-        : `已在考試前安排 ${baseline.scheduledMinutes / 60} 小時，正在請 Agent 說明結果。`,
-    );
+    setPlanMessage("正在儲存規則排程。");
     setAgentResult(null);
     setAgentError("");
     setAgentWorkflow(null);
-    setAgentLoading(true);
+    setPlanningMode(useAgent ? "agent" : "rules");
     setEditingId(null);
 
     try {
@@ -529,9 +533,19 @@ export default function StudyPlanner({
         `後端儲存失敗：${error instanceof Error ? error.message : String(error)}`,
       );
       setPlanMessage("學習計畫未寫入後端，請修正錯誤後再試一次。");
-      setAgentLoading(false);
+      setPlanningMode(null);
       return;
     }
+
+    const savedMessage = baseline.remainingMinutes
+      ? `規則排程已儲存，空檔不足，尚缺 ${baseline.remainingMinutes / 60} 小時。`
+      : `規則排程已儲存，共 ${baseline.scheduledMinutes / 60} 小時。`;
+    if (!useAgent) {
+      setPlanMessage(savedMessage);
+      setPlanningMode(null);
+      return;
+    }
+    setPlanMessage(`${savedMessage}正在取得 Agent 說明。`);
 
     try {
       const response = await requestStudyAgentPlan({
@@ -563,8 +577,9 @@ export default function StudyPlanner({
       const message = error instanceof Error ? error.message : String(error);
       setAgentError(error?.code ? `${message}（${error.code}）` : message);
       setAgentWorkflow(error?.workflow || null);
+      setPlanMessage(`${savedMessage}Agent 說明暫時無法取得。`);
     } finally {
-      setAgentLoading(false);
+      setPlanningMode(null);
     }
   }
 
@@ -601,7 +616,10 @@ export default function StudyPlanner({
   async function saveEdit(session) {
     if (!draft?.date || minutes(draft.end) <= minutes(draft.start))
       return setEditError("請輸入有效的日期與時間。");
-    if (draft.date < DEMO_DATE || draft.date >= examDate)
+    if (
+      draft.date < (studyPlan?.start_date || DEMO_DATE) ||
+      draft.date >= (studyPlan?.exam_date || examDate)
+    )
       return setEditError("複習時段需在示範起始日與考試日期之間。");
     const occupied = eventsOnDate(
       draft.date,
@@ -690,6 +708,7 @@ export default function StudyPlanner({
                 <input
                   type="date"
                   min={addDays(DEMO_DATE, 1)}
+                  max={addDays(DEMO_DATE, 60)}
                   value={examDate}
                   onChange={(event) => setExamDate(event.target.value)}
                 />
@@ -744,9 +763,18 @@ export default function StudyPlanner({
               <button
                 className="primary-button full-width"
                 type="submit"
-                disabled={agentLoading}
+                value="agent"
+                disabled={Boolean(planningMode)}
               >
-                {agentLoading ? "Agent 規劃中" : "用 Agent 產生學習計畫"}
+                {planningMode === "agent" ? "Agent 規劃中" : "用 Agent 產生學習計畫"}
+              </button>
+              <button
+                className="secondary-button full-width"
+                type="submit"
+                value="rules"
+                disabled={Boolean(planningMode)}
+              >
+                {planningMode === "rules" ? "正在儲存" : "只用規則排程並儲存"}
               </button>
               <p className="agent-disclosure">
                 按下後會將課名、日期、可用時段、目前示範課表與私人行程送至 Flask
@@ -970,7 +998,7 @@ export default function StudyPlanner({
           <AgentExplanationPanel
             result={agentResult}
             error={agentError}
-            isLoading={agentLoading}
+            isLoading={planningMode === "agent"}
             workflow={agentWorkflow}
           />
           <ContextOptimizationPanel

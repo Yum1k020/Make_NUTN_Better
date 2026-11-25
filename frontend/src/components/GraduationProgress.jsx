@@ -13,9 +13,12 @@ import {
   VALIDITY_MESSAGES,
 } from "../lib/graduationMemory.js";
 import { loadAcademicState } from "../lib/plannerApiClient.js";
+import LectureProgressForm from "./LectureProgressForm.jsx";
 
 export default function GraduationProgress({
   onNavigate,
+  onOpenCourseCategory,
+  onProgressChange,
   plannedCourseIds,
   initialAcademic,
 }) {
@@ -33,6 +36,7 @@ export default function GraduationProgress({
   const [reload, setReload] = useState(0);
   const [memoryReason, setMemoryReason] = useState("");
   const [fixtureMode, setFixtureMode] = useState(false);
+  const [savedMessage, setSavedMessage] = useState("");
   const memory = useRef(null);
   useEffect(() => {
     const store = new GraduationMemory({
@@ -93,6 +97,7 @@ export default function GraduationProgress({
       .then((state) => {
         if (controller.signal.aborted) return;
         setProgress(state.graduationProgress);
+        onProgressChange(state.graduationProgress);
         setRule(state.rule);
         setEnrollments(state.enrollments);
       })
@@ -103,10 +108,16 @@ export default function GraduationProgress({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [reload]);
+  }, [onProgressChange, reload]);
 
   function generateExplanation() {
     void memory.current?.generate();
+  }
+
+  function lecturesSaved() {
+    memory.current?.clear();
+    setSavedMessage("已儲存講座場次。");
+    setReload((count) => count + 1);
   }
 
   return (
@@ -148,11 +159,17 @@ export default function GraduationProgress({
           </strong>
         </div>
         <div>
-          <span>學術講座</span>
+          <span>專業講座</span>
           <strong>
             {rule?.lecture_requirements?.professional?.minimum_count ?? "—"} 場
           </strong>
         </div>
+        {rule?.lecture_requirements?.general?.minimum_count != null && (
+          <div>
+            <span>一般講座</span>
+            <strong>{rule.lecture_requirements.general.minimum_count} 場</strong>
+          </div>
+        )}
         <div>
           <span>領域學程證書</span>
           <strong>
@@ -169,6 +186,7 @@ export default function GraduationProgress({
         開始新的說明工作階段
       </button>
       {loading && <p role="status">正在讀取畢業進度…</p>}
+      {savedMessage && <p role="status">{savedMessage}</p>}
       {error && (
         <p role="alert" className="graduation-notice">
           {error}
@@ -221,9 +239,33 @@ export default function GraduationProgress({
                 <small>
                   依據：{progress.rule_set_id}:{check.check_id}
                 </small>
+                {rule?.planning_courses?.length > 0 &&
+                  check.status !== "met" &&
+                  ["required_courses", "department_elective"].includes(check.check_id) && (
+                    <button
+                      type="button"
+                      className="text-link"
+                      onClick={() =>
+                        onOpenCourseCategory(
+                          check.check_id === "required_courses"
+                            ? "department_required"
+                            : "department_elective",
+                        )
+                      }
+                    >
+                      {check.check_id === "required_courses" ? "瀏覽專業必修" : "瀏覽專業選修"}
+                    </button>
+                  )}
               </article>
             ))}
           </section>
+          {rule?.lecture_requirements && progress.lecture_progress && (
+            <LectureProgressForm
+              lectureProgress={progress.lecture_progress}
+              requirements={rule.lecture_requirements}
+              onSaved={lecturesSaved}
+            />
+          )}
           {!!progress.data_errors.length && (
             <section className="panel graduation-section">
               <h2>資料待確認</h2>

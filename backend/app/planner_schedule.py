@@ -157,10 +157,11 @@ def calendar(db, first, last):
             "warnings": warnings}
 
 
-def available(db, start, end, windows, minimum=1, ignore_plan=None):
+def available(db, start, end, windows, minimum=1, ignore_plan=None, *, exclude=(), extra_busy=()):
     stage("L4")
-    events, warnings = occupied(db, start, end, ignore_plan=ignore_plan)
-    slots = subtract(windows, [(moment(e["starts_at"]), moment(e["ends_at"])) for e in events])
+    events, warnings = occupied(db, start, end, ignore_plan=ignore_plan, exclude=exclude)
+    busy = [(moment(e["starts_at"]), moment(e["ends_at"])) for e in events]
+    slots = subtract(windows, busy + list(extra_busy))
     free = []
     for a, b in slots:
         # Minute-based slots round inward; no partly occupied minute is declared free.

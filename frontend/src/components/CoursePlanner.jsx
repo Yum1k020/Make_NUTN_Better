@@ -74,8 +74,9 @@ export default function CoursePlanner({
   plannedCourseIds,
   onToggleCourse,
   academic,
+  initialCatalog = "department_required",
 }) {
-  const [catalog, setCatalog] = useState("department_required");
+  const [catalog, setCatalog] = useState(initialCatalog);
   const [query, setQuery] = useState("");
   const courses = academic.courses || [];
   const rule = academic.rule;

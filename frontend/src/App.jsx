@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Dashboard from "./components/Dashboard.jsx";
 import StudyPlanner from "./components/StudyPlanner.jsx";
 import CoursePlanner from "./components/CoursePlanner.jsx";
@@ -11,12 +11,14 @@ import { MobileNav, Sidebar } from "./components/Navigation.jsx";
 import { DEMO_DATE } from "./data/demo.js";
 import {
   addPlannedCourse,
+  confirmEventAdjustment,
   deletePersonalEvent,
   deletePlannedCourse,
   deleteStudySession,
   deleteTask,
   loadApplicationState,
   migrateLegacyPlannerState,
+  previewEventAdjustment,
   replaceStudySchedule,
   savePersonalEvent,
   saveTask,
@@ -46,6 +48,7 @@ function initializePlannerState() {
 
 export default function App() {
   const [activePage, setActivePage] = useState("dashboard");
+  const [catalogFocus, setCatalogFocus] = useState("department_required");
   const [selectedDate, setSelectedDate] = useState(DEMO_DATE);
   const [tasks, setTasks] = useState([]);
   const [personalEvents, setPersonalEvents] = useState([]);
@@ -69,6 +72,9 @@ export default function App() {
   const [dialog, setDialog] = useState(null);
   const [mapDialog, setMapDialog] = useState(null);
   const plannedCourseIds = plannedCourses.map((item) => item.course_id);
+  const updateGraduationProgress = useCallback((graduationProgress) => {
+    setAcademic((state) => ({ ...state, graduationProgress }));
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -115,14 +121,31 @@ export default function App() {
     setBackendState({ status: "ready", message });
   }
 
-  async function saveItem(item) {
+  async function saveItem(item, previewToken) {
     try {
       if (item.kind === "event") {
         const original = personalEvents.find((event) => event.id === item.id);
-        const saved = await savePersonalEvent({
-          ...item,
-          backendId: original?.backendId,
-        });
+        const draft = { ...item, backendId: original?.backendId };
+        let saved;
+        if (previewToken) {
+          const adjusted = await confirmEventAdjustment(draft, previewToken);
+          setStudyPlan(adjusted.plan);
+          setStudySessions(adjusted.sessions);
+          saved = adjusted.event;
+        } else {
+          try {
+            saved = await savePersonalEvent(draft);
+          } catch (error) {
+            if (
+              error.code === "SCHEDULE_CONFLICT" &&
+              error.conflicts?.length &&
+              error.conflicts.every((item) => item.source_type === "study_session")
+            ) {
+              return await previewEventAdjustment(draft);
+            }
+            throw error;
+          }
+        }
         setPersonalEvents((current) =>
           current.some((event) => event.id === saved.id)
             ? current.map((event) => (event.id === saved.id ? saved : event))
@@ -133,7 +156,7 @@ export default function App() {
         const saved = await saveTask({
           ...item,
           backendId: original?.backendId,
-          completed: original?.completed || false,
+          previous: original,
         });
         setTasks((current) =>
           current.some((task) => task.id === saved.id)
@@ -141,7 +164,9 @@ export default function App() {
             : [...current, saved],
         );
       }
-      reportBackendReady("已儲存到後端 SQLite。");
+      reportBackendReady(
+        previewToken ? "行程與新的複習時段已儲存。" : "已儲存到後端 SQLite。",
+      );
       setDialog(null);
     } catch (error) {
       throw reportBackendError(error);
@@ -324,13 +349,18 @@ export default function App() {
             plannedCourseIds={plannedCourseIds}
             onToggleCourse={toggleCourse}
             academic={academic}
+            initialCatalog={catalogFocus}
           />
         )}
         {activePage === "graduation" && (
           <GraduationProgress
             plannedCourseIds={plannedCourseIds}
-            onToggleCourse={toggleCourse}
             onNavigate={setActivePage}
+            onOpenCourseCategory={(category) => {
+              setCatalogFocus(category);
+              setActivePage("courses");
+            }}
+            onProgressChange={updateGraduationProgress}
             initialAcademic={academic}
           />
         )}
