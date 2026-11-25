@@ -269,8 +269,8 @@ function AgentDataPackagePanel({ dataPackage }) {
           <span>Verifier</span>
         </div>
         <p>
-          {dataPackage.task.courseName}・目標 {dataPackage.task.targetMinutes} 分鐘・
-          每次 {dataPackage.task.sessionMinutes} 分鐘
+          {dataPackage.task.courseName}・目標 {dataPackage.task.targetMinutes}{" "}
+          分鐘・ 每次 {dataPackage.task.sessionMinutes} 分鐘
         </p>
         <ul>
           <li>
@@ -752,9 +752,10 @@ export default function StudyPlanner({
                 按下後會將課名、日期、可用時段、目前示範課表與私人行程送至 Flask
                 後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
                 Study Load Review Expert 檢查，最後由 Coordinator 整合回答。Week
-                09 主流程使用 few-shot context；Week 10 會把同學後端課表、私人行程、
-                Agent 軌跡與 verifier 整理成可核對 Data Package。專家沒有 Tool 或
-                資料庫寫入權限；API key 僅存在 Flask 後端。
+                09 主流程使用 few-shot context；Week 10
+                會把同學後端課表、私人行程、 Agent 軌跡與 verifier 整理成可核對
+                Data Package。專家沒有 Tool 或 資料庫寫入權限；API key 僅存在
+                Flask 後端。
               </p>
             </form>
           </section>
