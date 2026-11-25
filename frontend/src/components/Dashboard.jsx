@@ -9,6 +9,7 @@ import {
   weekdayLabel,
   weekStart,
 } from "../lib/planner.js";
+import { DEMO_DATE } from "../data/demo.js";
 
 const HOURS = Array.from({ length: 14 }, (_, index) => index + 8);
 const ROW_HEIGHT = 38;
@@ -138,7 +139,7 @@ function DayTimeline({
     <div className="day-timeline">
       <div className="panel-heading">
         <h2>
-          {date === "2026-09-17"
+          {date === DEMO_DATE
             ? "今日課程與行程"
             : `${formatDate(date)}課程與行程`}
         </h2>
@@ -368,7 +369,7 @@ export default function Dashboard({
           <section className="panel task-panel">
             <div className="panel-heading">
               <h2>
-                {selectedDate === "2026-09-17"
+                {selectedDate === DEMO_DATE
                   ? "今日待辦"
                   : `${formatDate(selectedDate)}待辦`}
               </h2>

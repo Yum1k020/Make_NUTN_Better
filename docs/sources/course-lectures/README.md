@@ -1,6 +1,6 @@
-# 第 3–7 週課堂投影片來源
+# 第 3–10 週課堂投影片來源
 
-整理日期：2026-11-03
+整理日期：2026-11-25
 
 本機使用 Microsoft MarkItDown 從課堂 PDF 抽取 Markdown，供專案概念對照與報告撰寫使用。PDF 是課堂來源，不是本專案自行產生的內容；引用時應註明週次與投影片標示頁碼。為避免重新發布完整課堂教材，轉換後的全文由 `.gitignore` 排除，GitHub 只保存本來源清單、雜湊與專案自行整理的概念對照。
 
@@ -11,6 +11,7 @@
 | Week 05 | `Lecture05_Agentic_AI_Engineering_Frameworks_Orchestration.pdf` | `lecture05-frameworks-orchestration.md` | `e6eaa339d23db4c062d20a3158293b5791d26d3119e54052a9b7d3af1c580a2d` |
 | Week 06 | `Lecture06_Agentic_AI_Engineering_Agent_Design_Patterns_Scaffolds.pdf` | `lecture06-agent-design-patterns.md` | `ac31b2e7d2669c15dce44ec18afb59bc143235782b978c530c5b513c66b910f2` |
 | Week 07 | `Lecture07_Agentic_AI_Engineering_Agent_Memory_Architectures.pdf` | `lecture07-agent-memory.md` | `83f4370071aa373a260f248fd5f9d5caec45547ce95c868ec4ef85aea50e7e9b` |
+| Week 10 | `Lecture10_Agentic_AI_Engineering_What_Data_Do_Agents_Need.pdf` | —（未保存） | `73996ac8973b8bb9194ad5759464a1daabc38690f810f5afbb0af024bdeb9d75` |
 
 ## 使用界線
 

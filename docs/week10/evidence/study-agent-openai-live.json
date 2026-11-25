@@ -1,0 +1,24 @@
+{
+  "schema_version": "midterm-live-v1",
+  "executed_at": "2026-11-25T09:48:25+08:00",
+  "source_version": "493364d764262df516cc1557f3db4cba63de1d74+working-tree",
+  "flow": "user request -> OpenAI function call -> parameter validation -> deterministic tool -> function_call_output -> OpenAI summary",
+  "provider": "OpenAI Responses API",
+  "authentication": "Server-side API key",
+  "input_kind": "synthetic",
+  "configured": {
+    "api_key": true,
+    "model": true
+  },
+  "live_status": "LIVE_FAIL",
+  "reason_code": "OPENAI_HTTP_401",
+  "actual_call": {
+    "attempted": true
+  },
+  "result": null,
+  "security": {
+    "credentials_recorded": false,
+    "tokens_recorded": false,
+    "personal_data_recorded": false
+  }
+}

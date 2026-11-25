@@ -40,8 +40,10 @@ REQUEST_FIELDS = {
     "sessionHours",
     "allowedPeriods",
     "courseName",
+    "weeklyClasses",
     "personalEvents",
 }
+CLASS_REQUIRED_FIELDS = {"id", "title", "weekday", "start", "end", "location"}
 EVENT_REQUIRED_FIELDS = {"id", "title", "date", "start", "end"}
 EVENT_ALLOWED_FIELDS = EVENT_REQUIRED_FIELDS | {"location"}
 SOURCE_IDS = {
@@ -49,18 +51,6 @@ SOURCE_IDS = {
     "weekly-classes-fixture",
     "planner-backend-sqlite",
 }
-
-WEEKLY_CLASSES = [
-    {"weekday": 1, "start": "09:00", "end": "10:50", "title": "微積分（一）"},
-    {"weekday": 1, "start": "14:00", "end": "15:50", "title": "專題討論"},
-    {"weekday": 2, "start": "09:00", "end": "10:50", "title": "英文閱讀與寫作"},
-    {"weekday": 2, "start": "11:00", "end": "12:50", "title": "程式設計（一）"},
-    {"weekday": 4, "start": "09:00", "end": "10:50", "title": "資料結構"},
-    {"weekday": 4, "start": "11:00", "end": "12:50", "title": "普通心理學"},
-    {"weekday": 4, "start": "14:00", "end": "15:50", "title": "程式設計（一）"},
-    {"weekday": 5, "start": "09:00", "end": "10:50", "title": "微積分（一）"},
-    {"weekday": 5, "start": "11:00", "end": "12:50", "title": "普通心理學"},
-]
 
 
 class StudyAgentError(RuntimeError):
@@ -120,6 +110,39 @@ def normalize_request(payload: Any) -> dict[str, Any]:
     course_name = payload["courseName"]
     if not isinstance(course_name, str) or not course_name.strip() or len(course_name) > 120:
         raise ValueError("courseName 必須是 1 至 120 字元。")
+    weekly_classes = payload["weeklyClasses"]
+    if not isinstance(weekly_classes, list) or len(weekly_classes) > 200:
+        raise ValueError("weeklyClasses 必須是最多 200 筆的陣列。")
+    normalized_classes = []
+    for index, item in enumerate(weekly_classes):
+        if not isinstance(item, dict):
+            raise ValueError(f"weeklyClasses[{index}] 必須是 object。")
+        if set(item) != CLASS_REQUIRED_FIELDS:
+            raise ValueError(f"weeklyClasses[{index}] 欄位不合法。")
+        for field in ("id", "title"):
+            if not isinstance(item[field], str) or not item[field].strip():
+                raise ValueError(f"weeklyClasses[{index}].{field} 不可為空。")
+        weekday = item["weekday"]
+        if isinstance(weekday, bool) or not isinstance(weekday, int) or not 0 <= weekday <= 6:
+            raise ValueError(f"weeklyClasses[{index}].weekday 必須介於 0 至 6。")
+        start, end = item["start"], item["end"]
+        if not isinstance(start, str) or not TIME_RE.fullmatch(start):
+            raise ValueError(f"weeklyClasses[{index}].start 格式錯誤。")
+        if not isinstance(end, str) or not TIME_RE.fullmatch(end) or end <= start:
+            raise ValueError(f"weeklyClasses[{index}].end 必須晚於 start。")
+        location = item["location"]
+        if not isinstance(location, str) or len(location) > 200:
+            raise ValueError(f"weeklyClasses[{index}].location 不合法。")
+        normalized_classes.append(
+            {
+                "id": item["id"],
+                "title": item["title"],
+                "weekday": weekday,
+                "start": start,
+                "end": end,
+                "location": location,
+            }
+        )
     events = payload["personalEvents"]
     if not isinstance(events, list) or len(events) > 200:
         raise ValueError("personalEvents 必須是最多 200 筆的陣列。")
@@ -158,6 +181,7 @@ def normalize_request(payload: Any) -> dict[str, Any]:
         "sessionHours": int(session_hours) if session_hours.is_integer() else session_hours,
         "allowedPeriods": list(periods),
         "courseName": course_name.strip(),
+        "weeklyClasses": normalized_classes,
         "personalEvents": normalized_events,
     }
 
@@ -190,6 +214,7 @@ def _dates(start: str, end: str) -> list[str]:
 
 def _occupied_on(
     day: str,
+    weekly_classes: list[dict[str, Any]],
     personal_events: list[dict[str, Any]],
     sessions: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
@@ -197,7 +222,7 @@ def _occupied_on(
     javascript_weekday = (parsed.weekday() + 1) % 7
     classes = [
         {**item, "date": day}
-        for item in WEEKLY_CLASSES
+        for item in weekly_classes
         if item["weekday"] == javascript_weekday
     ]
     return [
@@ -223,7 +248,12 @@ def get_validated_study_plan(payload: dict[str, Any]) -> dict[str, Any]:
             if remaining <= 0:
                 break
             duration = min(usual, remaining)
-            occupied = _occupied_on(day, data["personalEvents"], sessions)
+            occupied = _occupied_on(
+                day,
+                data["weeklyClasses"],
+                data["personalEvents"],
+                sessions,
+            )
             selected = None
             for period in data["allowedPeriods"]:
                 lower, upper = PERIODS[period]
@@ -294,7 +324,12 @@ def verify_plan(request_data: dict[str, Any], plan: dict[str, Any]) -> list[str]
         )
         if not allowed:
             issues.append("複習時段不在允許範圍。")
-        occupied = _occupied_on(item["date"], request_data["personalEvents"], accepted)
+        occupied = _occupied_on(
+            item["date"],
+            request_data["weeklyClasses"],
+            request_data["personalEvents"],
+            accepted,
+        )
         if any(_overlaps(item, event) for event in occupied):
             issues.append("複習時段與既有行程重疊。")
         total += duration
@@ -514,6 +549,7 @@ class StudyAgentService:
                 "需求驗證",
                 "completed",
                 fieldCount=len(normalized),
+                weeklyClassCount=len(normalized["weeklyClasses"]),
                 personalEventCount=len(normalized["personalEvents"]),
             )
         )

@@ -43,6 +43,7 @@
 目前沒有正式登入、課表自動匯入或校務系統連線；課表與畢業條件使用本機示範／測試資料。沒有後端 `OPENAI_API_KEY` 或未完成真實呼叫時，主流程必須標示 `LIVE_NOT_RUN`，不得以 fixture 冒充。
 
 Week 06 的兩條 workflow 與 Week 07 的兩種記憶控制分別整理於 [`docs/week06/README.md`](docs/week06/README.md) 與 [`docs/week07/README.md`](docs/week07/README.md)。
+Week 10 自主專題將智慧學習主流程的課表來源統一與可重現驗證整理於 [`docs/week10/README.md`](docs/week10/README.md)。
 
 ### 期中報告版本
 

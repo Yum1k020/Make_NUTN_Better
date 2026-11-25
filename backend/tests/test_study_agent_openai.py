@@ -21,6 +21,7 @@ def request_payload():
         "sessionHours": 1,
         "allowedPeriods": ["evening"],
         "courseName": "資料結構",
+        "weeklyClasses": [],
         "personalEvents": [],
     }
 

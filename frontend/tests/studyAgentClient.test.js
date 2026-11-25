@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { weeklyClasses } from "../src/data/demo.js";
 
 import {
   requestStudyAgentPlan,
@@ -25,6 +26,7 @@ test("week08 frontend contract keeps backend multi-agent trace", async () => {
     sessionHours: 2,
     allowedPeriods: ["afternoon", "evening"],
     courseName: "資料結構",
+    weeklyClasses: [],
     personalEvents: [],
   };
   const plan = {
@@ -105,6 +107,7 @@ test("week09 frontend calls same-case context comparison endpoint", async () => 
     sessionHours: 2,
     allowedPeriods: ["afternoon", "evening"],
     courseName: "資料結構",
+    weeklyClasses: [],
     personalEvents: [],
   };
   let request;
@@ -162,4 +165,70 @@ test("week08 frontend still compares deterministic plan independent of key order
   };
 
   assert.equal(studyPlansMatch(left, right), true);
+});
+
+test("frontend client sends the current timetable without credentials", async () => {
+  const payload = {
+    startDate: "2026-11-25",
+    examDate: "2026-12-02",
+    hours: 2,
+    sessionHours: 2,
+    allowedPeriods: ["afternoon"],
+    courseName: "資料結構",
+    weeklyClasses: weeklyClasses.map(
+      ({ id, title, weekday, start, end, location }) => ({
+        id,
+        title,
+        weekday,
+        start,
+        end,
+        location,
+      }),
+    ),
+    personalEvents: [],
+  };
+  const responseBody = {
+    plan: {
+      sessions: [],
+      scheduledMinutes: 0,
+      remainingMinutes: 120,
+    },
+    agent: {
+      summary: "尚缺 120 分鐘。",
+      warnings: ["請增加可安排時段。"],
+      citations: ["planner-rule"],
+      refused: false,
+      framework: "OpenAI Responses API",
+      tool: "get_validated_study_plan",
+      model: "gpt-test",
+    },
+  };
+  let captured;
+
+  const response = await requestStudyAgentPlan({
+    payload,
+    endpoint: "/api/v1/study-agent/run",
+    fetchImpl: async (url, options) => {
+      captured = { url, options };
+      return {
+        ok: true,
+        json: async () => responseBody,
+      };
+    },
+  });
+
+  assert.deepEqual(response, responseBody);
+  assert.equal(captured.url, "/api/v1/study-agent/run");
+  assert.equal(captured.options.headers.Authorization, undefined);
+  assert.doesNotMatch(captured.options.body, /test-api-key|OPENAI_API_KEY/);
+  const sent = JSON.parse(captured.options.body);
+  assert.equal(sent.weeklyClasses.length, weeklyClasses.length);
+  assert.deepEqual(sent.weeklyClasses[0], {
+    id: "class-calculus-mon",
+    title: "微積分（一）",
+    weekday: 1,
+    start: "09:00",
+    end: "10:50",
+    location: "文薈樓 J101",
+  });
 });

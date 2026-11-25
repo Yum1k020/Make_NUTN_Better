@@ -25,6 +25,16 @@ def synthetic_request():
         "sessionHours": 2,
         "allowedPeriods": ["afternoon", "evening"],
         "courseName": "資料結構",
+        "weeklyClasses": [
+            {
+                "id": "synthetic-class",
+                "title": "合成課程",
+                "weekday": 4,
+                "start": "14:00",
+                "end": "15:50",
+                "location": "合成教室",
+            }
+        ],
         "personalEvents": [
             {
                 "id": "event-club",

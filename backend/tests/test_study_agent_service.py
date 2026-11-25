@@ -23,6 +23,16 @@ def request_payload(**overrides):
         "sessionHours": 2,
         "allowedPeriods": ["afternoon", "evening"],
         "courseName": "資料結構",
+        "weeklyClasses": [
+            {
+                "id": "class-programming-thursday",
+                "title": "程式設計（一）",
+                "weekday": 4,
+                "start": "14:00",
+                "end": "15:50",
+                "location": "文薈樓 J201",
+            }
+        ],
         "personalEvents": [
             {
                 "id": "event-club",
@@ -113,10 +123,14 @@ def service_factory(provider):
 
 def test_deterministic_tool_matches_frontend_fixture():
     result = get_validated_study_plan(request_payload())
+    result_without_classes = get_validated_study_plan(
+        request_payload(weeklyClasses=[])
+    )
     assert result["scheduledMinutes"] == 360
     assert result["remainingMinutes"] == 0
     assert len(result["sessions"]) == 3
     assert result["sessions"][0]["id"] == "study-2026-09-17-18:00"
+    assert result_without_classes["sessions"][0]["id"] == "study-2026-09-17-13:00"
 
 
 def test_main_flow_records_function_call_validation_and_response():
@@ -278,6 +292,21 @@ def test_changed_model_arguments_stop_before_tool_execution():
 def test_request_schema_rejects_unknown_fields():
     with pytest.raises(ValueError, match="未允許欄位"):
         normalize_request(request_payload(secret="no"))
+
+
+def test_request_schema_rejects_invalid_weekly_class():
+    invalid = [
+        {
+            "id": "bad-class",
+            "title": "錯誤課程",
+            "weekday": 7,
+            "start": "09:00",
+            "end": "10:00",
+            "location": "測試教室",
+        }
+    ]
+    with pytest.raises(ValueError, match="weekday"):
+        normalize_request(request_payload(weeklyClasses=invalid))
 
 
 def test_http_main_flow_and_invalid_boundary(tmp_path):

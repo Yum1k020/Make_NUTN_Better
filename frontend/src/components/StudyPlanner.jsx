@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import Icon from "./Icon.jsx";
 import StudyMemoryPanel from "./StudyMemoryPanel.jsx";
-import { DEMO_DATE } from "../data/demo.js";
+import { DEFAULT_EXAM_DATE, DEMO_DATE } from "../data/demo.js";
 import {
   addDays,
   eventsOnDate,
@@ -303,6 +303,7 @@ function AgentExplanationPanel({ result, error, isLoading, workflow }) {
 }
 
 export default function StudyPlanner({
+  studyPlan,
   personalEvents,
   studySessions,
   courses,
@@ -312,7 +313,7 @@ export default function StudyPlanner({
   onDeleteSession,
 }) {
   const [courseId, setCourseId] = useState("");
-  const [examDate, setExamDate] = useState("2026-09-24");
+  const [examDate, setExamDate] = useState(DEFAULT_EXAM_DATE);
   const [hours, setHours] = useState(6);
   const [sessionHours, setSessionHours] = useState(2);
   const [allowedPeriods, setAllowedPeriods] = useState([
@@ -335,14 +336,23 @@ export default function StudyPlanner({
   const enrolledCourses = courses.filter((course) =>
     ["inProgress", "completed"].includes(course.status),
   );
+  const planCourse = courses.find(
+    (course) => course.id === studyPlan?.course_id,
+  );
   const selectableCourses = enrolledCourses.length
-    ? enrolledCourses
-    : courses.slice(0, 10);
+    ? [
+        ...enrolledCourses,
+        ...(planCourse &&
+        !enrolledCourses.some((course) => course.id === planCourse.id)
+          ? [planCourse]
+          : []),
+      ]
+    : courses;
   const activeCourseId = selectableCourses.some(
     (course) => course.id === courseId,
   )
     ? courseId
-    : selectableCourses[0]?.id || "";
+    : planCourse?.id || selectableCourses[0]?.id || "";
   const courseName =
     courses.find((course) => course.id === activeCourseId)?.name || "課程";
   const scheduledHours =
@@ -390,7 +400,17 @@ export default function StudyPlanner({
     if (!activeCourseId)
       return setPlanMessage("後端目前沒有可用課程，請先設定 115 示範身分。");
     if (examDate <= DEMO_DATE)
-      return setPlanMessage("考試日期需晚於示範起始日 9 月 17 日。");
+      return setPlanMessage(`考試日期需晚於今天 ${formatDate(DEMO_DATE)}。`);
+    const planningWeeklyClasses = weeklyClasses.map(
+      ({ id, title, weekday, start, end, location }) => ({
+        id,
+        title,
+        weekday,
+        start,
+        end,
+        location: location || "",
+      }),
+    );
     const request = {
       startDate: DEMO_DATE,
       examDate,
@@ -398,6 +418,7 @@ export default function StudyPlanner({
       sessionHours,
       allowedPeriods,
       courseName,
+      weeklyClasses: planningWeeklyClasses,
       personalEvents: personalEvents.map(
         ({ id, title, date, start, end, location }) => ({
           id,
@@ -409,10 +430,7 @@ export default function StudyPlanner({
         }),
       ),
     };
-    const baseline = planStudySessions({
-      ...request,
-      weeklyClasses,
-    });
+    const baseline = planStudySessions(request);
     setLastAgentRequest(request);
     setContextComparison(null);
     setContextComparisonError("");
@@ -468,7 +486,8 @@ export default function StudyPlanner({
           : `規則與 Agent 結果一致，已安排 ${response.plan.scheduledMinutes / 60} 小時。`,
       );
     } catch (error) {
-      setAgentError(error instanceof Error ? error.message : String(error));
+      const message = error instanceof Error ? error.message : String(error);
+      setAgentError(error?.code ? `${message}（${error.code}）` : message);
       setAgentWorkflow(error?.workflow || null);
     } finally {
       setAgentLoading(false);
@@ -596,7 +615,7 @@ export default function StudyPlanner({
                 <span>考試日期</span>
                 <input
                   type="date"
-                  min="2026-09-18"
+                  min={addDays(DEMO_DATE, 1)}
                   value={examDate}
                   onChange={(event) => setExamDate(event.target.value)}
                 />
@@ -656,7 +675,7 @@ export default function StudyPlanner({
                 {agentLoading ? "Agent 規劃中" : "用 Agent 產生學習計畫"}
               </button>
               <p className="agent-disclosure">
-                按下後會將合成課名、日期、可用時段與私人行程送至 Flask
+                按下後會將課名、日期、可用時段、目前示範課表與私人行程送至 Flask
                 後端。Coordinator 先呼叫確定性排程工具，再把去識別的時段結果交給
                 Study Load Review Expert 檢查，最後由 Coordinator 整合回答。Week
                 09 主流程使用 few-shot context；下方可用同一案例比較 Baseline 與

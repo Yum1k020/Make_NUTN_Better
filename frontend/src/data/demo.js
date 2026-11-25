@@ -1,4 +1,19 @@
-export const DEMO_DATE = "2026-09-17";
+function localIsoDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function relativeDate(days) {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() + days);
+  return localIsoDate(date);
+}
+
+export const DEMO_DATE = relativeDate(0);
+export const DEFAULT_EXAM_DATE = relativeDate(7);
 
 export const courses = [
   {

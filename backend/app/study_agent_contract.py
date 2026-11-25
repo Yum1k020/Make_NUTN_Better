@@ -33,6 +33,19 @@ def tool_declaration() -> dict[str, Any]:
         "required": ["id", "title", "date", "start", "end", "location"],
         "additionalProperties": False,
     }
+    weekly_class = {
+        "type": "object",
+        "properties": {
+            "id": {"type": "string"},
+            "title": {"type": "string"},
+            "weekday": {"type": "integer", "minimum": 0, "maximum": 6},
+            "start": {"type": "string"},
+            "end": {"type": "string"},
+            "location": {"type": "string"},
+        },
+        "required": ["id", "title", "weekday", "start", "end", "location"],
+        "additionalProperties": False,
+    }
     return {
         "name": TOOL_NAME,
         "description": (
@@ -54,6 +67,7 @@ def tool_declaration() -> dict[str, Any]:
                     },
                 },
                 "courseName": {"type": "string"},
+                "weeklyClasses": {"type": "array", "items": weekly_class},
                 "personalEvents": {"type": "array", "items": event},
             },
             "required": [
@@ -63,6 +77,7 @@ def tool_declaration() -> dict[str, Any]:
                 "sessionHours",
                 "allowedPeriods",
                 "courseName",
+                "weeklyClasses",
                 "personalEvents",
             ],
             "additionalProperties": False,

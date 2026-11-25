@@ -13,10 +13,7 @@ import {
   getCitationAudit,
   getEvidenceGateMetrics,
 } from "../src/lib/evidence.js";
-import {
-  requestStudyAgentPlan,
-  studyPlansMatch,
-} from "../src/lib/studyAgentClient.js";
+import { studyPlansMatch } from "../src/lib/studyAgentClient.js";
 import {
   buildValidatedStudyPlan,
   createStudyAgentService,
@@ -185,41 +182,6 @@ test("framework input validation rejects an invalid planning range", () => {
       ),
     /考試日期必須晚於規劃起始日/,
   );
-});
-
-test("frontend client sends only planning data and accepts structured output", async () => {
-  const payload = createStudyPlanRequest();
-  const plan = buildValidatedStudyPlan(payload);
-  let captured;
-  const responseBody = {
-    plan,
-    agent: {
-      summary: "已完成說明。",
-      warnings: [],
-      citations: ["planner-rule"],
-      refused: false,
-      framework: "OpenAI Agents SDK",
-      tool: STUDY_PLAN_TOOL_NAME,
-      model: "gpt-test",
-    },
-  };
-
-  const response = await requestStudyAgentPlan({
-    payload,
-    endpoint: "/api/v1/study-agent/run",
-    fetchImpl: async (url, options) => {
-      captured = { url, options };
-      return {
-        ok: true,
-        json: async () => responseBody,
-      };
-    },
-  });
-
-  assert.deepEqual(response, responseBody);
-  assert.equal(captured.url, "/api/v1/study-agent/run");
-  assert.equal(captured.options.headers.Authorization, undefined);
-  assert.doesNotMatch(captured.options.body, /test-api-key|OPENAI_API_KEY/);
 });
 
 test("frontend comparison detects framework changes to the rule result", () => {

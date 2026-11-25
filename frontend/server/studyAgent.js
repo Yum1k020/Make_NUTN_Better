@@ -1,10 +1,15 @@
 import {
   Agent,
   run,
-  setDefaultOpenAIKey,
+  setDefaultModelProvider,
   setTracingDisabled,
   tool,
-} from "@openai/agents";
+} from "@openai/agents-core";
+import {
+  OpenAIProvider,
+  setDefaultOpenAIKey,
+  setDefaultOpenAITracingExporter,
+} from "@openai/agents-openai";
 import { z } from "zod";
 import { weeklyClasses } from "../src/data/demo.js";
 import {
@@ -16,6 +21,11 @@ import {
 
 const DEFAULT_MODEL = "gpt-5-mini";
 const STUDY_PLAN_TOOL_NAME = "get_validated_study_plan";
+
+setDefaultModelProvider(
+  new OpenAIProvider({ cacheResponsesWebSocketModels: false }),
+);
+setDefaultOpenAITracingExporter();
 
 const agentOutputSchema = z
   .object({

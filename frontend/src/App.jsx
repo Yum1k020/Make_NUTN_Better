@@ -309,6 +309,7 @@ export default function App() {
         )}
         {activePage === "study" && (
           <StudyPlanner
+            studyPlan={studyPlan}
             personalEvents={personalEvents}
             studySessions={studySessions}
             courses={academic.courses}
