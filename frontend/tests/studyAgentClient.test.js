@@ -79,6 +79,41 @@ test("week08 frontend contract keeps backend multi-agent trace", async () => {
         },
       },
       comparison: { rulePreserved: true, agentCount: 2 },
+      dataPackage: {
+        schemaVersion: "week10-agent-data-v1",
+        packageId: "week10-data-week09-test",
+        task: {
+          courseName: "資料結構",
+          targetMinutes: 360,
+          sessionMinutes: 120,
+        },
+        environment: {
+          weeklyClasses: {
+            source: "flask-sqlite:academic-timetable",
+            count: 1,
+          },
+          personalEvents: {
+            source: "flask-sqlite:personal-events",
+            count: 1,
+          },
+        },
+        trajectory: {
+          source: "runtime-workflow-trace",
+          stepCount: 7,
+          steps: [],
+        },
+        verifier: {
+          planIssueCount: 0,
+          expectedAssessment: "insufficient",
+          actualAssessment: "insufficient",
+          passed: true,
+        },
+        provenance: {
+          integratesClassmateData: true,
+          credentialsIncluded: false,
+          personalEventTextIncluded: false,
+        },
+      },
       workflow: {
         name: "study-plan-multi-agent",
         version: "week08-route-a-v1",
@@ -97,6 +132,9 @@ test("week08 frontend contract keeps backend multi-agent trace", async () => {
   assert.equal(result.multiAgent.roles[1].tools.length, 0);
   assert.equal(result.multiAgent.expertReview.assessment, "insufficient");
   assert.equal(result.comparison.agentCount, 2);
+  assert.equal(result.dataPackage.schemaVersion, "week10-agent-data-v1");
+  assert.equal(result.dataPackage.provenance.integratesClassmateData, true);
+  assert.equal(result.dataPackage.verifier.passed, true);
 });
 
 test("week09 frontend calls same-case context comparison endpoint", async () => {
