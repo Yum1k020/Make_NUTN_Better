@@ -37,3 +37,64 @@ Week 10 課堂不指定新功能、資料包或提交增量，自主實作的完
 - 整合 Week 8、9 遠端更新後，前端測試：41 passed；Vite production build 與 Prettier 檢查通過。
 - OpenAI 合成資料 smoke test 已實際送出，但回傳 `OPENAI_HTTP_401`，因此當次結論是 `LIVE_FAIL`，不是 `LIVE_PASS`。清理後紀錄位於 [`evidence/study-agent-openai-live.json`](evidence/study-agent-openai-live.json)；檔案不含憑證、token、原始回應或個人資料。
 - 若要完成真實模型驗收，需先在本機 `.env.local` 改用可授權的 `OPENAI_API_KEY`，再重跑 `backend/midterm_live.py --output docs/week10/evidence/study-agent-openai-live.json`。
+
+
+## Agent Data Package 增量
+
+在同學已完成的「前後端課表來源一致化」上，本週再把課堂的 Task / Environment / Trajectory / Verifier 概念接回同一條智慧學習主流程；沒有另建第二份 demo 資料。
+
+### 資料流
+
+```text
+App.jsx
+  ├─ Flask/SQLite academic.weeklyClasses
+  ├─ Flask/SQLite personalEvents
+  └─ 已整合 study planner state
+          ↓
+StudyPlanner.jsx
+          ↓
+POST /api/v1/study-agent/run
+          ↓
+Coordinator → deterministic planner → Expert → Coordinator
+          ↓
+verify_plan + expert assessment rubric
+          ↓
+dataPackage
+          ↓
+React「Week 10 Agent Data Package」
+```
+
+### Data Package 結構
+
+- **Task**：課程、日期範圍、目標分鐘、單次分鐘、允許時段。
+- **Environment**：
+  - 課表來源標示 `flask-sqlite:academic-timetable`。
+  - 私人行程來源標示 `flask-sqlite:personal-events`。
+  - 私人行程只保留 id / date / start / end，title / location 不進可重用資料包。
+- **Trajectory**：把既有 Week 08 / 09 workflow stages 轉成 step / actor / action / status。
+- **Verifier**：沿用 `verify_plan` 與固定 study-load rubric，不讓模型自我宣告成功。
+- **Provenance**：標示整合同學資料、排除 credentials 與私人行程文字。
+
+### 來源標籤修正
+
+先前 structured output 仍允許 `weekly-classes-fixture`，但目前課表已由 Flask／SQLite academic state 提供，因此更新為：
+
+`weekly-classes-backend-sqlite`
+
+### 前端
+
+Agent 成功後會直接顯示「Week 10 Agent Data Package」，包含環境資料筆數、完整 trajectory、verifier 結果與 package ID。
+
+### 驗收
+
+```bash
+python -m pytest backend/tests/test_study_agent_service.py backend/tests/test_study_agent_openai.py -q
+python -m week10.run_acceptance
+
+cd frontend
+npm test
+npm run build
+npm run format:check
+```
+
+`week10.run_acceptance` 使用 `OFFLINE_INJECTED` provider，只驗證資料整合、redaction、trajectory 與 deterministic verifier；不冒充真實模型成功。
